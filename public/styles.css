@@ -16,15 +16,22 @@ nav {
 
 main {
     border: green dashed 2px;
-    height: 550px;
+    height: 100%;
     background-color: #C9EDFE;
 }
 
-section {
+.section1 {
     border: red solid 3px;
-    height: 450px;
+    height: 100%;
     margin: 20px 36px;
     background-color: #00A9FE;
+}
+
+.section2 {
+    border: purple solid 3px;
+    height: 100%;
+    margin: 20px 36px;
+    background-color: #B6D7A3;
 }
 
 /* Styles relevant to the CLUB page */
@@ -36,13 +43,14 @@ section {
 }
 
 /* 
-A bit of a struggle to get the button centered on the page.
+A bit of a struggle to get the button centered on the page. <<<<<<<<<<<<<<
 https://www.w3schools.com/css/css_align.asp
 */
 .btn {
-    position: absolute;
+    margin: 10px;
+    /* position: absolute;
     top: 50%;
-    left: 50%;
+    left: 50%; */
 }
 
 .thumbnail {
@@ -54,11 +62,6 @@ https://www.w3schools.com/css/css_align.asp
     display: block;
     margin-left: auto;
     margin-right: auto;
-}
-
-.club-middle {
-    background-color: lightgrey;
-    height: 300px;
 }
 
 .details {
@@ -73,17 +76,72 @@ https://www.w3schools.com/css/css_align.asp
 }
 
 /* Styles relevant to the BOOK page */
+.avatar-thumbnail {
+    background-color: red;
+    width: 100px;
+    height: 100px;
+    border: solid 1px black;
+}
 
+.review-details {
+    background-color: white;
+    height: 100px;
+    border: solid 1px black;
+}
 
 
 /* Styles relevant to the DISCUSSION page */
 .questions {
     background-color: white;
-    width: 800px;
+    color: navy;
+    font-weight: bold;
+    font-size: 1.5em;
+    width: 75%;
     height: 400px;
     border: solid 2px black;
 }
 
+/* Styles relevant to the TEACHER page */
+.avatar-large {
+    background-color: yellow;
+    width: 200px;
+    height: 200px;
+    border: solid 1px black;
+}
+
+.short-bio {
+    background-color: lightcyan;
+    height: 100px;
+    border: solid 2px orange;
+}
+
+.shelf {
+    background-color: #DDDDDD;
+    border: 1px solid #777777;
+    margin: 20px 36px;
+}
+
+.thumbnail-small {
+    background-color: #FFF2B4;
+    width: 100px;
+    height: 150px;
+    border: solid 1px black;
+    /* Centering the thumbnail in the column */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.details-small {
+    background-color: #EDFFA9;
+    width: 15 0px;
+    height: 100px;
+    border: solid 1px black;
+    /* Centering the details in the column */
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
 
 footer {
     margin-top: 10px;
