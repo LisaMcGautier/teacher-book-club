@@ -9,12 +9,11 @@ app.get("/", (req, res) => {
 });
 
 app.get("/api", (req, res) => {
-  //res.send('Hello World!');
   fetch(
-    // `https://www.googleapis.com/books/v1/volumes?q=harry-potter&key=AIzaSyDzTrOwGaarH-w1d93pwHM28JOHqMB8kSU`
     "https://www.googleapis.com/books/v1/volumes?q=" +
       req.query.searchterm +
-      "&key=AIzaSyDzTrOwGaarH-w1d93pwHM28JOHqMB8kSU"
+      "&key=" +
+      process.env.GOOGLE_BOOKS_API_KEY
   )
     .then((response) => response.json())
     .then((result) => {
