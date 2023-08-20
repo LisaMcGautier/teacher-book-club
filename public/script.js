@@ -37,3 +37,14 @@ async function searchBooks() {
     // How to add pages of results...
   }
 }
+
+// Hamburger menu function
+function hamburger() {
+  let menu = document.getElementById("menu-links");
+
+  if (menu.style.display === "block") {
+      menu.style.display = "none";
+  } else {
+      menu.style.display = "block";
+  }
+}
