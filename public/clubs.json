@@ -1,0 +1,10 @@
+{
+    "clubName": "English Teachers",
+    "membersList": ["Charlee Chavis", "Mr. Green", "Mrs. White"],
+    "booksList": ["Harry Potter", "Hamlet", "Percy Jackson"],
+    "nextMeeting": Date(),
+    "currentBook": "Brain Rules",
+    "teacherReviews": [],
+    "pastBooks": ["Romeo and Juliet", "Tartuffe"],
+    "schoolSite": 7391
+}

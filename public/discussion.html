@@ -16,11 +16,35 @@
 </head>
 
 <body class="text-center">
-    <!-- Mobile nav -->
-    <!-- <nav></nav> -->
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav">
+        <div id="menu-links">
+            <a href="index.html">Home</a>
+            <a href="search.html">Search</a>
+            <a href="club.html">Club</a>
+            <a href="book.html">Book</a>
+            <a href="discussion.html">Discussion</a>
+            <a href="teacher.html">Profile</a>
+        </div>
+
+        <a class="menu-icon" onclick="hamburger()">
+            <div>&#9776;</div>
+        </a>
+    </nav>
 
     <header>Teacher Book Club</header>
-    <nav>Home | Club | Book | <s>Discussion</s> | Profile</nav>
+
+    <!-- Tablet & Desktop Nav -->
+    <nav class="tablet-desktop">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="search.html">Search</a></li>
+            <li><a href="club.html">Club</a></li>
+            <li><a href="book.html">Book</a></li>
+            <li><a href="discussion.html">Discussion</a></li>
+            <li><a href="teacher.html">Profile</a></li>
+        </ul>
+    </nav>
 
     <main class="container text-center">
         On this page, users will be able to add discussion posts
@@ -77,6 +101,8 @@
     </main>
 
     <footer>Copyright 2023</footer>
+
+    <script src="script.js"></script>
 
 </body>
 
