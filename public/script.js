@@ -48,3 +48,36 @@ function hamburger() {
       menu.style.display = "block";
   }
 }
+
+// connecting to the database to get the data
+async function loadClub() {
+  // call nodeJS and get the right club document from collection
+  // let searchterm = document.getElementById("searchterm");
+  let id = "64ded933d12c22a31d474bd4";
+  const response = await fetch("/api/clubs?id=" + id);
+  const club = await response.json();
+  console.log(club);
+
+  // update the DOM with data from the clubs collection
+  let clubHeading = document.getElementById("club-heading");
+  let clubCalendar = document.getElementById("club-calendar");
+  let clubThumbnail = document.getElementById("club-thumbnail");
+  let clubDetails = document.getElementById("club-details");
+
+  let thumbnailImage = document.createElement("img");
+
+clubHeading.innerText = club.clubName;
+clubCalendar.innerText = club.nextMeeting;
+thumbnailImage.src = "http://books.google.com/books/content?id=86HoBAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api";
+
+clubThumbnail.innerText = "";
+clubThumbnail.appendChild(thumbnailImage);
+
+clubDetails.innerText = "";
+
+for (i = 0; i < club.membersList.length; i++) {
+  const member = document.createElement("div");
+  member.innerText = club.membersList[i];
+  clubDetails.appendChild(member);
+}
+}
