@@ -1,8 +1,9 @@
-require('dotenv').config();
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const { MongoClient, ServerApiVersion } = require("mongodb");
-var ObjectId = require('mongodb').ObjectId;
+var ObjectId = require("mongodb").ObjectId;
+const { Client } = require("@notionhq/client");
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static("public"));
@@ -20,6 +21,9 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
+const notion = new Client({ auth: process.env.NOTION_API_KEY });
+const databaseId = process.env.NOTION_DATABASE_ID;
 
 // async function run() {
 //   try {
@@ -81,7 +85,7 @@ app.get("/api/clubs", (req, res) => {
       client
         .db("edbookclubs")
         .collection("clubs")
-        .findOne({ "_id": new ObjectId('64ded933d12c22a31d474bd4') })
+        .findOne({ _id: new ObjectId("64ded933d12c22a31d474bd4") })
     )
     .then((data) => {
       console.log(data);
@@ -90,6 +94,29 @@ app.get("/api/clubs", (req, res) => {
       res.send(data);
     })
     .catch((err) => console.log(err));
+});
+
+async function queryDatabase(databaseId, uniqueID) {
+  try {
+    const response = await notion.databases.query({
+      database_id: databaseId,
+      filter: {
+        property: "uniqueID",
+        formula: {
+          string: { equals: uniqueID },
+        },
+      },
+    });
+    return response.results[0];
+  } catch (error) {
+    console.log(error.body);
+  }
+}
+
+app.get("/api/clubs-notion", (req, res) => {
+  queryDatabase(databaseId, "66cd1ad4c8b947bf88a652becd464e24").then((data) => {
+    res.send(data);
+  });
 });
 
 app.get("/api", (req, res) => {
