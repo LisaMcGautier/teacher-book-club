@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require("express");
 const app = express();
 const { MongoClient, ServerApiVersion } = require("mongodb");
+var ObjectId = require('mongodb').ObjectId;
 const PORT = process.env.PORT || 3000;
 
 app.use(express.static("public"));
@@ -79,12 +81,13 @@ app.get("/api/clubs", (req, res) => {
       client
         .db("edbookclubs")
         .collection("clubs")
-        .findOne({ clubName: "English Teachers" })
+        .findOne({ "_id": new ObjectId('64ded933d12c22a31d474bd4') })
     )
     .then((data) => {
       console.log(data);
-      const jsonContent = JSON.stringify(data);
-      res.end(jsonContent);
+      // const jsonContent = JSON.stringify(data);
+      // res.end(jsonContent);
+      res.send(data);
     })
     .catch((err) => console.log(err));
 });
