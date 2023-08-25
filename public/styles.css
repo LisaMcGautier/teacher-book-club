@@ -2,6 +2,32 @@ body {
     background-color: slategrey;
 }
 
+/* Style rules for hamburger menu */
+.mobile-nav a {
+    color: navy;
+    font-family: 'Cabin Sketch', cursive, Verdana, Arial, sans-serif;
+    text-align: center;
+    font-size: 1.5em;
+    text-decoration: none;
+    padding: 0.5em 1em;
+    display: block;
+    border-bottom: 1px dashed navy;
+}
+
+.mobile-nav a.menu-icon {
+    /* background-color: #FFF; */
+    display: block;   
+    position: absolute;
+    left: -15px;
+    top: -10px;
+    border-bottom: none;
+}
+
+.tablet-desktop,
+#menu-links {
+    display: none;
+}
+
 header {
     height: 150px;
     background-color: #FF788F;
@@ -147,4 +173,48 @@ footer {
     margin-top: 10px;
     height: 75px;
     background-color: #B980FF;
+}
+
+/* Media Query for Tablet Viewport */
+/* ==================================================================== */
+@media screen and (min-width: 700px) {
+
+    .tablet-desktop {
+        display: block;
+    }
+
+    /* Hide mobile specific content */
+    .mobile,
+    .mobile-nav {
+        display: none;
+    }
+
+    nav {
+        background-color: #4455bb;
+    }
+    
+    nav ul {
+        list-style-type: none;
+        text-align: center;
+    }
+
+    nav li {
+        display: inline-block;
+        font-size: 1.25em;
+        font-family: 'Cabin Sketch', cursive, Verdana, Arial, sans-serif;
+        font-weight: bold;
+        border: 1px solid #66bb66;
+    }
+
+    nav li a {
+        display: block;
+        color: #ffffe6;
+        text-align: center;
+        padding: 0.5em 1em;
+        text-decoration: none;
+    }
+    
+    nav li a:hover {
+        color: #ffee66;
+    }
 }

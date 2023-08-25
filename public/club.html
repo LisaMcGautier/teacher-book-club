@@ -16,31 +16,55 @@
 </head>
 
 <body class="text-center">
-    <!-- Mobile nav -->
-    <!-- <nav></nav> -->
+    <!-- Mobile Nav -->
+    <nav class="mobile-nav">
+        <div id="menu-links">
+            <a href="index.html">Home</a>
+            <a href="search.html">Search</a>
+            <a href="club.html">Club</a>
+            <a href="book.html">Book</a>
+            <a href="discussion.html">Discussion</a>
+            <a href="teacher.html">Profile</a>
+        </div>
+
+        <a class="menu-icon" onclick="hamburger()">
+            <div>&#9776;</div>
+        </a>
+    </nav>
 
     <header>Teacher Book Club</header>
-    <nav>Home | <s>Club</s> | Book | Discussion | Profile</nav>
+
+    <!-- Tablet & Desktop Nav -->
+    <nav class="tablet-desktop">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="search.html">Search</a></li>
+            <li><a href="club.html">Club</a></li>
+            <li><a href="book.html">Book</a></li>
+            <li><a href="discussion.html">Discussion</a></li>
+            <li><a href="teacher.html">Profile</a></li>
+        </ul>
+    </nav>
 
     <main class="container text-center">
         On this page, users will be able to view upcoming meeting info and the current book.
 
         <!-- https://getbootstrap.com/docs/5.3/layout/columns/ -->
         <section class="section1">
-            <h1>Section 1</h1>
+            <h1 id="club-heading">Section 1</h1>
 
             <div class="row">
 
                 <div class="col club-left">
                     One of two columns
-                    <div class="calendar">Calendar view</div>
+                    <div id="club-calendar" class="calendar">Calendar view</div>
                 </div>
 
                 <div class="col club-right">
                     Two of two columns
-                    <div class="thumbnail">Image of book cover</div>
-                    <button type="button" class="btn btn-success">Click to join discussion</button>
-                    <div class="details">Title, author, ISBN, etc.</div>
+                    <div id="club-thumbnail" class="thumbnail">Image of book cover</div>
+                    <button onclick="loadClub()" type="button" class="btn btn-success">Click to join discussion</button>
+                    <div id="club-details" class="details">Title, author, ISBN, etc.</div>
                 </div>
 
             </div>
@@ -64,6 +88,8 @@
     </main>
 
     <footer>Copyright 2023</footer>
+    
+    <script src="script.js"></script>
 
 </body>
 
