@@ -25,61 +25,7 @@ const client = new MongoClient(uri, {
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 const databaseId = process.env.NOTION_DATABASE_ID;
 
-// async function run() {
-//   try {
-//     // Connect the client to the server	(optional starting in v4.7)
-//     await client.connect();
-
-//     const result = await client.db("edbookclubs").collection("clubs").findOne({ clubName: "English Teachers" });
-
-//   } finally {
-//     // Ensures that the client will close when you finish/error
-//     await client.close();
-//   }
-// }
-// run().catch(console.dir);
-
 app.get("/api/clubs", (req, res) => {
-  // client.connect(url, function(err, db) {
-  //   if (err) throw err;
-  //   var dbo = db.db("edbookclubs");
-  //   dbo.collection("clubs").find({}).toArray(function(err, result) {
-  //     if (err) throw err;
-  //     console.log(result);
-  //     db.close();
-  //   });
-  // });
-
-  // MongoClient.connect(uri, function (err, db) {
-  //   var dbo = db.db("edbookclubs");
-  //   dbo
-  //     .collection("clubs")
-  //     .find({})
-  //     .toArray(function (err, result) {
-  //       if (err) {
-  //         // throw err;
-  //         console.log(err);
-  //       }
-  //       res.send("Hello World!");
-  //       console.log(result);
-  //       db.close();
-  //     });
-  // });
-
-  //   MongoClient.connect(uri)
-  //     .then(client => {
-  //     console.log(`Connected to Database`);
-  //     const db = client.db('edbookclubs');
-  //     const tasksCollection = db.collection('clubs').find({}).then(function(results) {
-  //       console.log(results);
-  //     });
-
-  //     })
-
-  // //CRUD requests
-
-  //     .catch(error => console.error(error))
-
   MongoClient.connect(uri)
     .then((client) =>
       client
@@ -89,8 +35,6 @@ app.get("/api/clubs", (req, res) => {
     )
     .then((data) => {
       console.log(data);
-      // const jsonContent = JSON.stringify(data);
-      // res.end(jsonContent);
       res.send(data);
     })
     .catch((err) => console.log(err));

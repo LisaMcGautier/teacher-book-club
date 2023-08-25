@@ -43,13 +43,13 @@ function hamburger() {
   let menu = document.getElementById("menu-links");
 
   if (menu.style.display === "block") {
-      menu.style.display = "none";
+    menu.style.display = "none";
   } else {
-      menu.style.display = "block";
+    menu.style.display = "block";
   }
 }
 
-// connecting to the database to get the data
+// connecting to the MongoDb database to get the data
 async function loadClub() {
   // call nodeJS and get the right club document from collection
   // let searchterm = document.getElementById("searchterm");
@@ -66,20 +66,21 @@ async function loadClub() {
 
   let thumbnailImage = document.createElement("img");
 
-clubHeading.innerText = club.clubName;
-clubCalendar.innerText = club.nextMeeting;
-thumbnailImage.src = "http://books.google.com/books/content?id=86HoBAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api";
+  clubHeading.innerText = club.clubName;
+  clubCalendar.innerText = club.nextMeeting;
+  thumbnailImage.src =
+    "http://books.google.com/books/content?id=86HoBAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api";
 
-clubThumbnail.innerText = "";
-clubThumbnail.appendChild(thumbnailImage);
+  clubThumbnail.innerText = "";
+  clubThumbnail.appendChild(thumbnailImage);
 
-clubDetails.innerText = "";
+  clubDetails.innerText = "";
 
-for (i = 0; i < club.membersList.length; i++) {
-  const member = document.createElement("div");
-  member.innerText = club.membersList[i];
-  clubDetails.appendChild(member);
-}
+  for (i = 0; i < club.membersList.length; i++) {
+    const member = document.createElement("div");
+    member.innerText = club.membersList[i];
+    clubDetails.appendChild(member);
+  }
 }
 
 // connecting to the Notion API to get the data
@@ -99,21 +100,15 @@ async function loadClubNotion() {
 
   let thumbnailImage = document.createElement("img");
 
-clubHeading.innerText = club.properties.Name.title[0].plain_text;
-clubCalendar.innerText = club.properties["Next Meeting"].date.start;
+  clubHeading.innerText = club.properties.Name.title[0].plain_text;
+  clubCalendar.innerText = club.properties["Next Meeting"].date.start;
 
-// thumbnailImage.src = "http://books.google.com/books/content?id=86HoBAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api";
-// clubThumbnail.innerText = "";
-// clubThumbnail.appendChild(thumbnailImage);
+  clubThumbnail.innerText = "";
+  clubThumbnail.innerText = club.properties.Books.rich_text[0].plain_text;
 
-clubThumbnail.innerText = "";
-clubThumbnail.innerText = club.properties.Books.rich_text[0].plain_text;
+  clubDetails.innerText = "";
 
-clubDetails.innerText = "";
-
-// for (i = 0; i < club.membersList.length; i++) {
   const member = document.createElement("div");
   member.innerText = club.properties.Members.rich_text[0].plain_text;
   clubDetails.appendChild(member);
-// }
 }
