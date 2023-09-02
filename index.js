@@ -1,12 +1,31 @@
-require("dotenv").config();
-const express = require("express");
+import "dotenv/config";
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
 const app = express();
-const { MongoClient, ServerApiVersion } = require("mongodb");
-var ObjectId = require("mongodb").ObjectId;
-const { Client } = require("@notionhq/client");
+import * as mongodb from "mongodb";
+var ObjectId = mongodb.ObjectId;
+import { Client } from "@notionhq/client";
 const PORT = process.env.PORT || 3000;
 
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
+
+// const completion = await openai.chat.completions.create({
+//   model:"gpt-3.5-turbo",
+//   messages: [
+//     {role: "user", content: "Hello World"},
+//   ]
+// });
+
+// console.log(completion.choices[0].message);
+
 app.use(express.static("public"));
+app.use(bodyParser.json());
+app.use(cors());
 
 const uri =
   "mongodb+srv://nixxxxer:" +
@@ -14,16 +33,13 @@ const uri =
   "@cluster0.o44p6og.mongodb.net/?retryWrites=true&w=majority";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new MongoClient(uri, {
+const client = new mongodb.MongoClient(uri, {
   serverApi: {
-    version: ServerApiVersion.v1,
+    version: mongodb.ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
   },
 });
-
-const notion = new Client({ auth: process.env.NOTION_API_KEY });
-const databaseId = process.env.NOTION_DATABASE_ID;
 
 app.get("/api/clubs", (req, res) => {
   MongoClient.connect(uri)
@@ -39,6 +55,9 @@ app.get("/api/clubs", (req, res) => {
     })
     .catch((err) => console.log(err));
 });
+
+const notion = new Client({ auth: process.env.NOTION_API_KEY });
+const databaseId = process.env.NOTION_DATABASE_ID;
 
 async function queryDatabase(databaseId, uniqueID) {
   try {
@@ -74,6 +93,39 @@ app.get("/api", (req, res) => {
     .then((result) => {
       res.send(result.items);
     });
+});
+
+// app.get("/create", async (req, res) => {
+
+//   const completion = await openai.chat.completions.create({
+//     model:"gpt-3.5-turbo",
+//     messages: [
+//       {role: "user", content: "Hello World"},
+//     ]
+//   })
+
+//   res.json({
+//     completion: completion.choices[0].message
+//   })
+// });
+
+app.post("/", async (req, res) => {
+
+  const { messages } = req.body;
+
+  console.log(messages);
+  const completion = await openai.chat.completions.create({
+    model:"gpt-3.5-turbo",
+    messages: [
+      {"role": "system", "content": "You are DesignGPT, a helpful assistant graphics design chatbot."},
+      ...messages
+      // {role: "user", content: `${message}`},
+    ]
+  })
+
+  res.json({
+    completion: completion.choices[0].message
+  })
 });
 
 app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
