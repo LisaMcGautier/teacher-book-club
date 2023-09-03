@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Teacher Book Club - Home</title>
+    <title>TBC - Register</title>
     <meta name="description"
         content="Teacher Book Club is a website to help teachers connect via shared reading experiences.">
 
@@ -48,32 +48,43 @@
     </nav>
 
     <main class="container text-center">
-        On this page, users will be able to...
+        On this page, users will be able to register a new account. <br>
+        Already have an account? You can log in <a href="login.html">here.</a>
 
         <section class="section1">
-            <h1>Section 1</h1>
+            <h1>Register</h1>
 
-            <div class="thumbnail">Image of book cover</div>
-            <button type="button" class="btn btn-success">This is the button message</button>
-            <div class="details">Title, author, ISBN, etc.</div>
+            <label for="firstname">first name:</label>
+            <input type="text" id="firstname" name="firstname" required/>
 
-        </section>
+            <br><br>
 
-        <section class="section2">
-            <h1>Section 2</h1>
+            <label for="lastname">last name:</label>
+            <input type="text" id="lastname" name="lastname" required/>
 
-            <div class="row">
+            <br><br>
 
-                <!-- <div class="col-sm-2">
-                    Column
-                    <div class="avatar-thumbnail">Avatar image</div>
-                </div> -->
+            <label for="username">username:</label>
+            <input type="text" id="username" name="username" required/>
 
-                <div class="col">
-                    <div class="review-details">Lorem ipsum...</div>
-                </div>
+            <br><br>
 
-            </div>
+            <label for="email">email:</label>
+            <input type="email" id="email" name="email" required/>
+
+            <br><br>
+
+            <label for="password">password:</label>
+            <input type="password" id="password" name="password" required/>
+
+            <br><br>
+
+            <label for="confirm">confirm password:</label>
+            <input type="password" id="confirm" name="confirm" required/>
+
+            <br>
+
+            <button type="button" class="btn btn-success">Click to Register</button>            
 
         </section>
 
