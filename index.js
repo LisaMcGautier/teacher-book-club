@@ -11,17 +11,8 @@ const PORT = process.env.PORT || 3000;
 import OpenAI from "openai";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 });
-
-// const completion = await openai.chat.completions.create({
-//   model:"gpt-3.5-turbo",
-//   messages: [
-//     {role: "user", content: "Hello World"},
-//   ]
-// });
-
-// console.log(completion.choices[0].message);
 
 app.use(express.static("public"));
 app.use(bodyParser.json());
@@ -41,7 +32,7 @@ const client = new mongodb.MongoClient(uri, {
   },
 });
 
-app.get("/api/clubs", (req, res) => {
+app.get("/api/clubs-mongo", (req, res) => {
   MongoClient.connect(uri)
     .then((client) =>
       client
@@ -57,14 +48,13 @@ app.get("/api/clubs", (req, res) => {
 });
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
-const databaseId = process.env.NOTION_DATABASE_ID;
 
-async function queryDatabase(databaseId, uniqueID) {
+async function queryDatabase(databaseId, columnName, uniqueID) {
   try {
     const response = await notion.databases.query({
       database_id: databaseId,
       filter: {
-        property: "uniqueID",
+        property: columnName,
         formula: {
           string: { equals: uniqueID },
         },
@@ -77,9 +67,37 @@ async function queryDatabase(databaseId, uniqueID) {
 }
 
 app.get("/api/clubs-notion", (req, res) => {
-  queryDatabase(databaseId, "66cd1ad4c8b947bf88a652becd464e24").then((data) => {
+  console.log("CLUB " + req.query.id);
+  queryDatabase(
+    process.env.NOTION_DATABASE_CLUBS_ID,
+    "club ID",
+    req.query.id
+  ).then((data) => {
     res.send(data);
   });
+});
+
+app.get("/api/book-notion", (req, res) => {
+  console.log("BOOK " + req.query.id);
+  queryDatabase(
+    process.env.NOTION_DATABASE_BOOKS_ID,
+    "book ID",
+    req.query.id
+  ).then((data) => {
+    res.send(data);
+  });
+});
+
+app.get("/api/book", (req, res) => {
+  // grab the bookID from the page URL
+  fetch(
+    "https://www.googleapis.com/books/v1/volumes/" +
+      req.query.id)
+    .then((response) => response.json())
+    .then((result) => {
+      // returns a single book
+      res.send(result);
+    });
 });
 
 app.get("/api", (req, res) => {
@@ -91,41 +109,31 @@ app.get("/api", (req, res) => {
   )
     .then((response) => response.json())
     .then((result) => {
+      // returns an array of books
       res.send(result.items);
     });
 });
 
-// app.get("/create", async (req, res) => {
-
-//   const completion = await openai.chat.completions.create({
-//     model:"gpt-3.5-turbo",
-//     messages: [
-//       {role: "user", content: "Hello World"},
-//     ]
-//   })
-
-//   res.json({
-//     completion: completion.choices[0].message
-//   })
-// });
-
 app.post("/", async (req, res) => {
-
   const { messages } = req.body;
 
   console.log(messages);
   const completion = await openai.chat.completions.create({
-    model:"gpt-3.5-turbo",
+    model: "gpt-3.5-turbo",
     messages: [
-      {"role": "system", "content": "You are DesignGPT, a helpful assistant graphics design chatbot."},
-      ...messages
+      {
+        role: "system",
+        content:
+          "You are DesignGPT, a helpful assistant graphics design chatbot.",
+      },
+      ...messages,
       // {role: "user", content: `${message}`},
-    ]
-  })
+    ],
+  });
 
   res.json({
-    completion: completion.choices[0].message
-  })
+    completion: completion.choices[0].message,
+  });
 });
 
 app.listen(PORT, () => console.log(`Server listening on port: ${PORT}`));
