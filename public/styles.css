@@ -30,8 +30,14 @@ body {
 
 header {
     height: 150px;
-    background-color: #FF788F;
+    background-color: #000000;
+    color: #ffffff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 3em;
     margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 nav {
@@ -61,6 +67,14 @@ main {
 }
 
 /* Styles relevant to the CLUB page */
+.col-left {
+    background-color: lightskyblue;
+}
+
+.col-right {
+    background-color: lightcyan;
+}
+
 .calendar {
     background-color: white;
     width: 400px;
@@ -80,10 +94,10 @@ https://www.w3schools.com/css/css_align.asp
 }
 
 .thumbnail {
-    background-color: #FFF2B4;
-    width: 200px;
-    height: 300px;
-    border: solid 1px black;
+    /* background-color: #FFF2B4; */
+    /* width: 200px;
+    height: 200px; */
+    /* border: solid 1px black; */
     /* Centering the thumbnail in the column */
     display: block;
     margin-left: auto;
@@ -92,9 +106,9 @@ https://www.w3schools.com/css/css_align.asp
 
 .details {
     background-color: #EDFFA9;
-    width: 200px;
-    height: 100px;
-    border: solid 1px black;
+    /* width: 200px;
+    height: 200px;
+    border: solid 1px black; */
     /* Centering the details in the column */
     display: block;
     margin-left: auto;
