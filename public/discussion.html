@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>TBD - Discussion</title>
+    <title>TBC - Discussion</title>
     <meta name="description" content="View and add discussion posts.">
 
     <!-- Bootstrap 5 CSS CDN link -->
@@ -50,23 +50,32 @@
         On this page, users will be able to add discussion posts
 
         <section class="section1">
-            <h1>Section 1</h1>
+            <!-- Added -->
+            <h1 id="discussion-heading">Section 1</h1>
 
             <div class="row">
 
-                <div class="col discussion-left">
-                    One of two columns
+                <div class="col col-left">
                     <div class="thumbnail">
                         <a href="book.html">
-                            <img
+                            <!-- Added -->
+                            <img id="discussion-thumbnail"
                                 src="http://books.google.com/books/content?id=EIqoiww1r9sC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api">
                         </a>
                     </div>
-                    <div class="details">Title, author, ISBN, etc.</div>
+                    <!-- Added -->
+                    <div id="discussion-details" class="details">
+                        <!-- Title, author, ISBN, etc. -->
+
+                        <h5 id="details-title">Title</h5>
+                        <p id="details-author">by author</p>
+                        <p id="details-isbnTen">ISBN 10: </p>
+                        <p id="details-isbnThirteen">ISBN 13: </p>
+
+                    </div>
                 </div>
 
-                <div class="col discussion-right">
-                    Two of two columns
+                <div class="col col-right">
                     <div class="questions">
                         <ol>
                             <li>Who</li>
@@ -86,7 +95,7 @@
         </section>
 
         <section class="section2">
-            <h1>Section 2</h1>
+            <h1>Comments</h1>
 
             <div class="row">
 

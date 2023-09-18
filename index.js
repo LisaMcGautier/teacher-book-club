@@ -18,6 +18,7 @@ app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(cors());
 
+// https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/connect/
 const uri =
   "mongodb+srv://nixxxxer:" +
   process.env.DB_PASSWORD +
@@ -49,6 +50,7 @@ app.get("/api/clubs-mongo", (req, res) => {
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
+// https://www.twilio.com/blog/manipulate-notion-database-using-node-js
 async function queryDatabase(databaseId, columnName, uniqueID) {
   try {
     const response = await notion.databases.query({
@@ -92,7 +94,11 @@ app.get("/api/book", (req, res) => {
   // grab the bookID from the page URL
   fetch(
     "https://www.googleapis.com/books/v1/volumes/" +
-      req.query.id)
+      req.query.id 
+      + 
+      "?key=" +
+      process.env.GOOGLE_BOOKS_API_KEY
+    )
     .then((response) => response.json())
     .then((result) => {
       // returns a single book
@@ -100,6 +106,7 @@ app.get("/api/book", (req, res) => {
     });
 });
 
+// https://developers.google.com/books/docs/v1/using#PerformingSearch
 app.get("/api", (req, res) => {
   fetch(
     "https://www.googleapis.com/books/v1/volumes?q=" +
@@ -114,6 +121,7 @@ app.get("/api", (req, res) => {
     });
 });
 
+// https://www.youtube.com/watch?v=LX_DXLlaymg
 app.post("/", async (req, res) => {
   const { messages } = req.body;
 
@@ -124,7 +132,8 @@ app.post("/", async (req, res) => {
       {
         role: "system",
         content:
-          "You are DesignGPT, a helpful assistant graphics design chatbot.",
+        "You are Charlie, a helpful assistant chatbot for teachers.",
+        // "You are DesignGPT, a helpful assistant graphics design chatbot.",
       },
       ...messages,
       // {role: "user", content: `${message}`},
