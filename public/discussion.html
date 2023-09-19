@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="text-center">
+<body class="text-center" onload="loadDiscussion()">
     <!-- Mobile Nav -->
     <nav class="mobile-nav">
         <div id="menu-links">
@@ -23,7 +23,7 @@
             <a href="search.html">Search</a>
             <a href="club.html?id=e2aba750fd744955b539b01cc21af326">Club</a>
             <a href="book.html?id=nDjRDwAAQBAJ">Book</a>
-            <a href="discussion.html">Discussion</a>
+            <a href="discussion.html?id=9fc5a018c95a47bea4b032cad3558858">Discussion</a>
             <a href="my-profile.html">My Profile</a>
         </div>
 
@@ -41,7 +41,7 @@
             <li><a href="search.html">Search</a></li>
             <li><a href="club.html?id=e2aba750fd744955b539b01cc21af326">Club</a></li>
             <li><a href="book.html?id=nDjRDwAAQBAJ">Book</a></li>
-            <li><a href="discussion.html">Discussion</a></li>
+            <li><a href="discussion.html?id=9fc5a018c95a47bea4b032cad3558858">Discussion</a></li>
             <li><a href="my-profile.html">My Profile</a></li>
         </ul>
     </nav>
@@ -52,6 +52,7 @@
         <section class="section1">
             <!-- Added -->
             <h1 id="discussion-heading">Section 1</h1>
+            <h3>Led by <span id="discussion-leader"></span></h3>
 
             <div class="row">
 
@@ -77,16 +78,16 @@
 
                 <div class="col col-right">
                     <div class="questions">
-                        <ol>
-                            <li>Who</li>
-                            <li>What</li>
-                            <li>When</li>
-                            <li>Where</li>
-                            <li>Why</li>
-                        </ol>
+                        <ul>
+                            <li id="question-one">Who</li>
+                            <li id="question-two">What</li>
+                            <li id="question-three">When</li>
+                            <li id="question-four">Where</li>
+                            <li id="question-five">Why</li>
+                        </ul>
                     </div>
 
-                    <a href="club.html" class="btn btn-warning">Click to go back to club</a>
+                    <a href="club.html?id=e2aba750fd744955b539b01cc21af326" class="btn btn-warning">Click to go back to club</a>
                     <button type="button" class="btn btn-success">Click to add comment</button>
                 </div>
 
