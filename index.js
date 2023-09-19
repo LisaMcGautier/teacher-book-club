@@ -90,6 +90,17 @@ app.get("/api/book-notion", (req, res) => {
   });
 });
 
+app.get("/api/discussion-notion", (req, res) => {
+  console.log("DISCUSSION " + req.query.id);
+  queryDatabase(
+    process.env.NOTION_DATABASE_DISCUSSIONS_ID,
+    "discussion ID",
+    req.query.id
+  ).then((data) => {
+    res.send(data);
+  });
+});
+
 app.get("/api/book", (req, res) => {
   // grab the bookID from the page URL
   fetch(

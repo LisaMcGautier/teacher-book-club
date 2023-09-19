@@ -175,3 +175,59 @@ loadBook = async () => {
 
   // .......
 };
+
+loadDiscussion = async () => {
+  // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const discussionId = urlParams.get("id");
+
+  const discussion = await fetch("/api/discussion-notion?id=" + discussionId).then((response) =>
+    response.json()
+  );
+
+  console.log(discussion);
+
+  // update the DOM with discussion information
+  let discussionHeading = document.getElementById("discussion-heading");
+  discussionHeading.innerText = discussion.properties.Name.title[0].plain_text;
+
+  // ??????????????????????????????????????????????????????
+  // Is it possible to call GBooks API for book details 
+  // and also call Notion API for discussion details?
+
+  // let bookThumbnail = document.getElementById("book-thumbnail");
+  // bookThumbnail.src = book.volumeInfo.imageLinks.smallThumbnail;
+
+  // let bookDetails = document.getElementById("book-details");
+  // bookDetails.innerText = "";
+  // let title = document.createElement("h5");
+  // title.innerText = book.volumeInfo.title;
+  // let author = document.createElement("p");
+  // author.innerText = "by " + book.volumeInfo.authors[0];
+  // let isbnTen = document.createElement("p");
+  // isbnTen.innerText = "ISBN 10: " + book.volumeInfo.industryIdentifiers[0].identifier;
+  // let isbnThirteen = document.createElement("p");
+  // isbnThirteen.innerText = "ISBN 13: " + book.volumeInfo.industryIdentifiers[1].identifier;
+
+  // bookDetails.appendChild(title);
+  // bookDetails.appendChild(author);
+  // bookDetails.appendChild(isbnTen);
+  // bookDetails.appendChild(isbnThirteen); 
+
+  let questionOne = document.getElementById("question-one");
+  questionOne.innerText = discussion.properties["Question 1"].rich_text[0].plain_text;
+
+  let questionTwo = document.getElementById("question-two");
+  questionTwo.innerText = discussion.properties["Question 2"].rich_text[0].plain_text;
+
+  let questionThree = document.getElementById("question-three");
+  questionThree.innerText = discussion.properties["Question 3"].rich_text[0].plain_text;
+
+  let questionFour = document.getElementById("question-four");
+  questionFour.innerText = discussion.properties["Question 4"].rich_text[0].plain_text;
+
+  let questionFive = document.getElementById("question-five");
+  questionFive.innerText = discussion.properties["Question 5"].rich_text[0].plain_text;
+
+  // .......
+};
