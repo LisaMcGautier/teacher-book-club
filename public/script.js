@@ -1,3 +1,43 @@
+// Register a new user
+async function registerUser() {
+  // alert("You clicked it!");
+  // grab the values from the register.html form
+  let firstname = document.getElementById("firstname");
+  let lastname = document.getElementById("lastname");
+  let username = document.getElementById("username");
+  let email = document.getElementById("email");
+  let password = document.getElementById("password");
+  let confirm = document.getElementById("confirm");
+
+  // construct a body JSON object using those values
+  let body = {
+    firstname: firstname.value,
+    lastname: lastname.value,
+    username: username.value,
+    email: email.value,
+    password: password.value,
+    confirm: confirm.value,
+  };
+
+  // call nodeJS create-user endpoint -- POST
+  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+  const response = await fetch("/api/create-user", {
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    mode: "cors", // no-cors, *cors, same-origin
+    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: "same-origin", // include, *same-origin, omit
+    headers: {
+      "Content-Type": "application/json",
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    redirect: "follow", // manual, *follow, error
+    referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+    body: JSON.stringify(body), // body data type must match "Content-Type" header
+  });
+
+  return response.json(); // parses JSON response into native JavaScript objects
+}
+
 async function searchBooks() {
   let searchterm = document.getElementById("searchterm");
   const response = await fetch("/api?searchterm=" + searchterm.value);
@@ -125,16 +165,19 @@ loadClub = async () => {
   let title = document.createElement("h5");
   title.innerText = book.properties.Title.title[0].plain_text;
   let author = document.createElement("p");
-  author.innerText = "by " + book.properties["Author(s)"].rich_text[0].plain_text;
+  author.innerText =
+    "by " + book.properties["Author(s)"].rich_text[0].plain_text;
   let isbnTen = document.createElement("p");
-  isbnTen.innerText = "ISBN 10: " + book.properties["ISBN 10"].rich_text[0].plain_text;
+  isbnTen.innerText =
+    "ISBN 10: " + book.properties["ISBN 10"].rich_text[0].plain_text;
   let isbnThirteen = document.createElement("p");
-  isbnThirteen.innerText = "ISBN 13: " + book.properties["ISBN 10"].rich_text[0].plain_text;
-  
+  isbnThirteen.innerText =
+    "ISBN 13: " + book.properties["ISBN 10"].rich_text[0].plain_text;
+
   clubDetails.appendChild(title);
   clubDetails.appendChild(author);
   clubDetails.appendChild(isbnTen);
-  clubDetails.appendChild(isbnThirteen);  
+  clubDetails.appendChild(isbnThirteen);
 
   // ......
 };
@@ -164,14 +207,16 @@ loadBook = async () => {
   let author = document.createElement("p");
   author.innerText = "by " + book.volumeInfo.authors[0];
   let isbnTen = document.createElement("p");
-  isbnTen.innerText = "ISBN 10: " + book.volumeInfo.industryIdentifiers[0].identifier;
+  isbnTen.innerText =
+    "ISBN 10: " + book.volumeInfo.industryIdentifiers[0].identifier;
   let isbnThirteen = document.createElement("p");
-  isbnThirteen.innerText = "ISBN 13: " + book.volumeInfo.industryIdentifiers[1].identifier;
+  isbnThirteen.innerText =
+    "ISBN 13: " + book.volumeInfo.industryIdentifiers[1].identifier;
 
   bookDetails.appendChild(title);
   bookDetails.appendChild(author);
   bookDetails.appendChild(isbnTen);
-  bookDetails.appendChild(isbnThirteen); 
+  bookDetails.appendChild(isbnThirteen);
 
   // .......
 };
@@ -181,9 +226,9 @@ loadDiscussion = async () => {
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const discussionId = urlParams.get("id");
 
-  const discussion = await fetch("/api/discussion-notion?id=" + discussionId).then((response) =>
-    response.json()
-  );
+  const discussion = await fetch(
+    "/api/discussion-notion?id=" + discussionId
+  ).then((response) => response.json());
 
   console.log(discussion);
 
@@ -192,7 +237,7 @@ loadDiscussion = async () => {
   discussionHeading.innerText = discussion.properties.Name.title[0].plain_text;
 
   // ??????????????????????????????????????????????????????
-  // Is it possible to call GBooks API for book details 
+  // Is it possible to call GBooks API for book details
   // and also call Notion API for discussion details?
 
   // let bookThumbnail = document.getElementById("book-thumbnail");
@@ -212,22 +257,27 @@ loadDiscussion = async () => {
   // bookDetails.appendChild(title);
   // bookDetails.appendChild(author);
   // bookDetails.appendChild(isbnTen);
-  // bookDetails.appendChild(isbnThirteen); 
+  // bookDetails.appendChild(isbnThirteen);
 
   let questionOne = document.getElementById("question-one");
-  questionOne.innerText = discussion.properties["Question 1"].rich_text[0].plain_text;
+  questionOne.innerText =
+    discussion.properties["Question 1"].rich_text[0].plain_text;
 
   let questionTwo = document.getElementById("question-two");
-  questionTwo.innerText = discussion.properties["Question 2"].rich_text[0].plain_text;
+  questionTwo.innerText =
+    discussion.properties["Question 2"].rich_text[0].plain_text;
 
   let questionThree = document.getElementById("question-three");
-  questionThree.innerText = discussion.properties["Question 3"].rich_text[0].plain_text;
+  questionThree.innerText =
+    discussion.properties["Question 3"].rich_text[0].plain_text;
 
   let questionFour = document.getElementById("question-four");
-  questionFour.innerText = discussion.properties["Question 4"].rich_text[0].plain_text;
+  questionFour.innerText =
+    discussion.properties["Question 4"].rich_text[0].plain_text;
 
   let questionFive = document.getElementById("question-five");
-  questionFive.innerText = discussion.properties["Question 5"].rich_text[0].plain_text;
+  questionFive.innerText =
+    discussion.properties["Question 5"].rich_text[0].plain_text;
 
   // .......
 };

@@ -68,6 +68,99 @@ async function queryDatabase(databaseId, columnName, uniqueID) {
   }
 }
 
+// Create User Database
+// ============================
+// https://www.dschapman.com/articles/using-notion-to-create-a-user-database-i
+// let username = "testuser";
+// let email = "me@myaddress";
+// let password = "SuperS3cr3t!";
+
+async function CreateUser(body) {
+  let foundUser = await CheckUsername(body.username);
+
+  // https://www.youtube.com/watch?v=Pzz36k2rt10&t=220s
+  const response = await notion.pages.create({
+    parent: { database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID },
+    properties: {
+      "Last Name": {
+        title: [
+          {
+            type: "text",
+            text: {
+              content: body.lastname,
+            },
+          },
+        ],
+      },
+      "First Name": {
+        rich_text: [
+          {
+            text: {
+              content: body.firstname,
+            },
+          },
+        ],
+      },
+      username: {
+        rich_text: [
+          {
+            text: {
+              content: body.username,
+            },
+          },
+        ],
+      },
+      Email: {
+        email: body.email,
+      },
+      password: {
+        rich_text: [
+          {
+            text: {
+              content: body.password,
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  console.log(`SUCCESS: User successfully added with pageId ${response.id}`);
+  return response;
+
+  // async () => {
+  //   CreateUser(username, email, password);
+  // };
+}
+
+async function CheckUsername(username) {
+  const response = await notion.databases.query({
+    database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID,
+    // https://developers.notion.com/reference/post-database-query-filter
+    filter: {
+      property: "username",
+      formula: {
+        string: {
+          equals: username,
+        },
+      },
+    },
+  });
+
+  if (response?.results[0]?.id) {
+    return response.results[0].id;
+  } else {
+    return false;
+  }
+}
+
+app.post("/api/create-user", (req, res) => {
+  console.log(req.body);
+  CreateUser(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
 app.get("/api/clubs-notion", (req, res) => {
   console.log("CLUB " + req.query.id);
   queryDatabase(
@@ -105,11 +198,10 @@ app.get("/api/book", (req, res) => {
   // grab the bookID from the page URL
   fetch(
     "https://www.googleapis.com/books/v1/volumes/" +
-      req.query.id 
-      + 
+      req.query.id +
       "?key=" +
       process.env.GOOGLE_BOOKS_API_KEY
-    )
+  )
     .then((response) => response.json())
     .then((result) => {
       // returns a single book
@@ -142,8 +234,7 @@ app.post("/", async (req, res) => {
     messages: [
       {
         role: "system",
-        content:
-        "You are Charlie, a helpful assistant chatbot for teachers.",
+        content: "You are Charlie, a helpful assistant chatbot for teachers.",
         // "You are DesignGPT, a helpful assistant graphics design chatbot.",
       },
       ...messages,
