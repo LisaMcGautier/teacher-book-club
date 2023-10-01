@@ -1,6 +1,6 @@
 // Register a new user
 async function registerUser() {
-  // alert("You clicked it!");
+
   // grab the values from the register.html form
   let firstname = document.getElementById("firstname");
   let lastname = document.getElementById("lastname");
@@ -35,7 +35,55 @@ async function registerUser() {
     body: JSON.stringify(body), // body data type must match "Content-Type" header
   });
 
-  return response.json(); // parses JSON response into native JavaScript objects
+  // TODO: update the UI based on the result (success) or (error)
+  //return response.json(); // parses JSON response into native JavaScript objects
+  console.log(response.json()); 
+}
+
+// Allow user to log in
+async function login() {
+
+  // grab the values from the login.html form
+  let username = document.getElementById("username");
+  let password = document.getElementById("password");
+
+  // construct a body JSON object using those values
+  let body = {
+    username: username.value,
+    password: password.value
+  };
+
+  // call nodeJS login-user endpoint -- POST
+  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+  const response = await fetch("/api/login-user", {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(body),
+  });
+
+  // TODO: update the UI based on the result (success) or (error)
+  const userInfo = await response.json();
+  console.log(userInfo);
+  
+  // Check if user login was successful
+  if (userInfo != null && userInfo != false) {
+    // store userInfo to Local Storage
+    localStorage.setItem("userId", userInfo.id);
+    localStorage.setItem("userFirst", userInfo.firstName);
+    localStorage.setItem("userLast", userInfo.lastName);
+
+    // redirect to the user's profile page
+    location.replace("/my-profile.html");
+  } else {
+    alert("Oops! Login failed!");
+  }
 }
 
 async function searchBooks() {
