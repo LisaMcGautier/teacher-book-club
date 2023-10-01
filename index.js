@@ -154,9 +154,56 @@ async function CheckUsername(username) {
   }
 }
 
+async function CheckLogin(username, password) {
+  const response = await notion.databases.query({
+    database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID,
+    // https://developers.notion.com/reference/post-database-query-filter
+
+    filter: {
+      and: [
+        {
+          property: "username",
+          formula: {
+            string: {
+              equals: username,
+            },
+          },
+        },
+        {
+          property: "password",
+          formula: {
+            string: {
+              equals: password,
+            },
+          },
+        },
+      ],
+    },
+  });
+
+  if (response?.results[0]?.id) {
+    let userInfo = {
+      id: response.results[0].id,
+      firstName: response.results[0].properties["First Name"].rich_text[0].plain_text,
+      lastName: response.results[0].properties["Last Name"].title[0].plain_text,
+    }
+    
+    return userInfo;
+  } else {
+    return false;
+  }
+}
+
 app.post("/api/create-user", (req, res) => {
   console.log(req.body);
   CreateUser(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
+app.post("/api/login-user", (req, res) => {
+  console.log(req.body);
+  CheckLogin(req.body.username, req.body.password).then((data) => {
     res.send(data);
   });
 });
