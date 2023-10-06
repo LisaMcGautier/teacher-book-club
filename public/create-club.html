@@ -47,24 +47,33 @@
     </nav>
 
     <main class="container text-center">
-        On this page, users will be able to use Chat GPT to generate discussion questions.
+        On this page, users will be able to create a new club or use Chat GPT to generate discussion questions.
 
         <!-- https://getbootstrap.com/docs/5.3/layout/columns/ -->
         <section class="section1">
-            <h1 id="club-heading">Section 1</h1>
+            <h1 id="club-heading">Create a new club</h1>
 
             <div class="row">
 
                 <div class="col club-left">
-                    <img
+                    <!-- <img
                         src="http://books.google.com/books/content?id=OYtkbGl2j0sC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api">
-                    <h2>Fahrenheit 451</h2>
+                    <h2>Fahrenheit 451</h2> -->
+
+                    <label for="clubname">club name:</label>
+                    <input type="text" id="clubname" name="clubname" required />
+
+                    <br><br>
+
+                    <button onclick="createClub()" type="button" class="btn btn-success">Create club</button>
                 </div>
 
                 <div class="col club-right">
                     <h3>Guiding Questions</h3>
                     <textarea id="club-thumbnail" class="thumbnail">Content</textarea>
-                    <button onclick="loadClub()" type="button" class="btn btn-primary">Ask AI to generate
+
+                    <!-- Why does this button call loadClub? ============================================== -->
+                    <button onclick="loadClub()" type="button" class="btn btn-danger">Ask AI to generate
                         questions</button>
                 </div>
 
@@ -142,6 +151,8 @@
                 })
         })
     </script>
+    
+    <script src="script.js"></script>
 
 </body>
 

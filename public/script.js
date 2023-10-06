@@ -38,7 +38,7 @@ async function registerUser() {
   // TODO: update the UI based on the result (success) or (error)
   //return response.json(); // parses JSON response into native JavaScript objects
   console.log(response.json()); 
-}
+};
 
 // Allow user to log in
 async function login() {
@@ -84,7 +84,7 @@ async function login() {
   } else {
     alert("Oops! Login failed!");
   }
-}
+};
 
 async function searchBooks() {
   let searchterm = document.getElementById("searchterm");
@@ -131,7 +131,7 @@ async function searchBooks() {
     // TODO: what if there are more than 10 results?
     // How to add pages of results...
   }
-}
+};
 
 // Hamburger menu function
 function hamburger() {
@@ -176,7 +176,7 @@ async function loadClubMongo() {
     member.innerText = club.membersList[i];
     clubDetails.appendChild(member);
   }
-}
+};
 
 // https://www.pluralsight.com/guides/handling-nested-promises-using-asyncawait-in-react
 loadClub = async () => {
@@ -197,7 +197,7 @@ loadClub = async () => {
 
   // update the DOM with club and book information
   let clubHeading = document.getElementById("club-heading");
-  clubHeading.innerText = club.properties.Name.title[0].plain_text;
+  clubHeading.innerText = club.properties["Club Name"].title[0].plain_text;
 
   let clubCalendar = document.getElementById("club-calendar");
   clubCalendar.innerText = club.properties["Next Meeting"].date.start;
@@ -228,6 +228,44 @@ loadClub = async () => {
   clubDetails.appendChild(isbnThirteen);
 
   // ......
+};
+
+async function createClub() {
+
+  let clubname = document.getElementById("clubname");
+
+  let body = {
+    clubname: clubname.value,
+  };
+
+  // call nodeJS create-club endpoint -- POST
+  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+  const response = await fetch("/api/create-club", {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(body),
+  });
+
+  // TODO: update the UI based on the result (success) or (error)
+  //return response.json(); // parses JSON response into native JavaScript objects
+  // console.log(response.json());
+
+  const clubInfo = await response.json();
+  console.log(clubInfo);
+
+  if (clubInfo != null && clubInfo.id != undefined) {
+    alert("HOORAY!");
+  } else {
+    alert("Oops! There is already a club named " + body.clubname);
+  }
+
 };
 
 loadBook = async () => {
