@@ -71,9 +71,6 @@ async function queryDatabase(databaseId, columnName, uniqueID) {
 // Create User Database
 // ============================
 // https://www.dschapman.com/articles/using-notion-to-create-a-user-database-i
-// let username = "testuser";
-// let email = "me@myaddress";
-// let password = "SuperS3cr3t!";
 
 async function CreateUser(body) {
   let foundUser = await CheckUsername(body.username);
@@ -184,11 +181,66 @@ async function CheckLogin(username, password) {
   if (response?.results[0]?.id) {
     let userInfo = {
       id: response.results[0].id,
-      firstName: response.results[0].properties["First Name"].rich_text[0].plain_text,
+      firstName:
+        response.results[0].properties["First Name"].rich_text[0].plain_text,
       lastName: response.results[0].properties["Last Name"].title[0].plain_text,
-    }
-    
+    };
+
     return userInfo;
+  } else {
+    return false;
+  }
+}
+
+async function CreateClub(body) {
+  let foundClub = await DoesClubnameExist(body.clubname);
+
+  if (foundClub == false) {
+    // https://www.youtube.com/watch?v=Pzz36k2rt10&t=220s
+    const response = await notion.pages.create({
+      parent: { database_id: process.env.NOTION_DATABASE_CLUBS_ID },
+      properties: {
+        "Club Name": {
+          title: [
+            {
+              type: "text",
+              text: {
+                content: body.clubname,
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    console.log(`SUCCESS: Club successfully added with pageId ${response.id}`);
+    return response;
+  } else {
+    const response = {
+      duplicate: true
+    }
+
+    console.log(`CONFLICT: Club name already exists`);
+    return response;
+  }
+}
+
+async function DoesClubnameExist(clubname) {
+  const response = await notion.databases.query({
+    database_id: process.env.NOTION_DATABASE_CLUBS_ID,
+    // https://developers.notion.com/reference/post-database-query-filter
+    filter: {
+      property: "Club Name",
+      formula: {
+        string: {
+          equals: clubname,
+        },
+      },
+    },
+  });
+
+  if (response?.results[0]?.id) {
+    return true;
   } else {
     return false;
   }
@@ -204,6 +256,13 @@ app.post("/api/create-user", (req, res) => {
 app.post("/api/login-user", (req, res) => {
   console.log(req.body);
   CheckLogin(req.body.username, req.body.password).then((data) => {
+    res.send(data);
+  });
+});
+
+app.post("/api/create-club", (req, res) => {
+  console.log(req.body);
+  CreateClub(req.body).then((data) => {
     res.send(data);
   });
 });
