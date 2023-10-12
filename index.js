@@ -62,7 +62,7 @@ async function queryDatabase(databaseId, columnName, uniqueID) {
         },
       },
     });
-    return response.results[0];
+    return response.results;
   } catch (error) {
     console.log(error.body);
   }
@@ -217,8 +217,8 @@ async function CreateClub(body) {
     return response;
   } else {
     const response = {
-      duplicate: true
-    }
+      duplicate: true,
+    };
 
     console.log(`CONFLICT: Club name already exists`);
     return response;
@@ -289,6 +289,17 @@ app.get("/api/book-notion", (req, res) => {
   });
 });
 
+app.get("/api/reviews-notion", (req, res) => {
+  console.log("REVIEW " + req.query.isbn);
+  queryDatabase(
+    process.env.NOTION_DATABASE_REVIEWS_ID,
+    "ISBN",
+    req.query.isbn
+  ).then((data) => {
+    res.send(data);
+  });
+});
+
 app.get("/api/discussion-notion", (req, res) => {
   console.log("DISCUSSION " + req.query.id);
   queryDatabase(
@@ -300,12 +311,27 @@ app.get("/api/discussion-notion", (req, res) => {
   });
 });
 
+// app.get("/api/book", (req, res) => {
+//   // grab the bookID from the page URL
+//   fetch(
+//     "https://www.googleapis.com/books/v1/volumes/" +
+//       req.query.id +
+//       "?key=" +
+//       process.env.GOOGLE_BOOKS_API_KEY
+//   )
+//     .then((response) => response.json())
+//     .then((result) => {
+//       // returns a single book
+//       res.send(result);
+//     });
+// });
+
 app.get("/api/book", (req, res) => {
   // grab the bookID from the page URL
   fetch(
-    "https://www.googleapis.com/books/v1/volumes/" +
+    "https://www.googleapis.com/books/v1/volumes?q=isbn:" +
       req.query.id +
-      "?key=" +
+      "&key=" +
       process.env.GOOGLE_BOOKS_API_KEY
   )
     .then((response) => response.json())
