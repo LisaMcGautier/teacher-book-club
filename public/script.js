@@ -1,6 +1,5 @@
 // Register a new user
 async function registerUser() {
-
   // grab the values from the register.html form
   let firstname = document.getElementById("firstname");
   let lastname = document.getElementById("lastname");
@@ -37,12 +36,11 @@ async function registerUser() {
 
   // TODO: update the UI based on the result (success) or (error)
   //return response.json(); // parses JSON response into native JavaScript objects
-  console.log(response.json()); 
-};
+  console.log(response.json());
+}
 
 // Allow user to log in
 async function login() {
-
   // grab the values from the login.html form
   let username = document.getElementById("username");
   let password = document.getElementById("password");
@@ -50,7 +48,7 @@ async function login() {
   // construct a body JSON object using those values
   let body = {
     username: username.value,
-    password: password.value
+    password: password.value,
   };
 
   // call nodeJS login-user endpoint -- POST
@@ -71,7 +69,7 @@ async function login() {
   // TODO: update the UI based on the result (success) or (error)
   const userInfo = await response.json();
   console.log(userInfo);
-  
+
   // Check if user login was successful
   if (userInfo != null && userInfo != false) {
     // store userInfo to Local Storage
@@ -84,7 +82,7 @@ async function login() {
   } else {
     alert("Oops! Login failed!");
   }
-};
+}
 
 async function searchBooks() {
   let searchterm = document.getElementById("searchterm");
@@ -131,7 +129,7 @@ async function searchBooks() {
     // TODO: what if there are more than 10 results?
     // How to add pages of results...
   }
-};
+}
 
 // Hamburger menu function
 function hamburger() {
@@ -176,7 +174,7 @@ async function loadClubMongo() {
     member.innerText = club.membersList[i];
     clubDetails.appendChild(member);
   }
-};
+}
 
 // https://www.pluralsight.com/guides/handling-nested-promises-using-asyncawait-in-react
 loadClub = async () => {
@@ -231,7 +229,6 @@ loadClub = async () => {
 };
 
 async function createClub() {
-
   let clubname = document.getElementById("clubname");
 
   let body = {
@@ -265,8 +262,7 @@ async function createClub() {
   } else {
     alert("Oops! There is already a club named " + body.clubname);
   }
-
-};
+}
 
 loadBook = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
@@ -281,23 +277,23 @@ loadBook = async () => {
 
   // update the DOM with book information
   let bookHeading = document.getElementById("book-heading");
-  bookHeading.innerText = book.volumeInfo.title;
+  bookHeading.innerText = book.items[0].volumeInfo.title;
 
   let bookThumbnail = document.getElementById("book-thumbnail");
-  bookThumbnail.src = book.volumeInfo.imageLinks.smallThumbnail;
+  bookThumbnail.src = book.items[0].volumeInfo.imageLinks.smallThumbnail;
 
   let bookDetails = document.getElementById("book-details");
   bookDetails.innerText = "";
   let title = document.createElement("h5");
-  title.innerText = book.volumeInfo.title;
+  title.innerText = book.items[0].volumeInfo.title;
   let author = document.createElement("p");
-  author.innerText = "by " + book.volumeInfo.authors[0];
+  author.innerText = "by " + book.items[0].volumeInfo.authors[0];
   let isbnTen = document.createElement("p");
   isbnTen.innerText =
-    "ISBN 10: " + book.volumeInfo.industryIdentifiers[0].identifier;
+    "ISBN 10: " + book.items[0].volumeInfo.industryIdentifiers[1].identifier;
   let isbnThirteen = document.createElement("p");
   isbnThirteen.innerText =
-    "ISBN 13: " + book.volumeInfo.industryIdentifiers[1].identifier;
+    "ISBN 13: " + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
 
   bookDetails.appendChild(title);
   bookDetails.appendChild(author);
@@ -305,6 +301,56 @@ loadBook = async () => {
   bookDetails.appendChild(isbnThirteen);
 
   // .......
+
+  const reviews = await fetch("/api/reviews-notion?isbn=" + bookId).then(
+    (response) => response.json()
+  );
+
+  console.log(reviews[0]);
+
+  let reviewSection = document.getElementById("review-section");
+  // reviewContent.innerText = reviews[1].properties.Review.rich_text[0].plain_text;
+
+  for (i = 0; i < reviews.length; i++) {
+    const row = document.createElement("div");
+    const col1 = document.createElement("div");
+    const col2 = document.createElement("div");
+    const avatar = document.createElement("img");
+    const anchorAvatar = document.createElement("a");
+    const reviewContent = document.createElement("div");
+
+    row.classList.add("row");
+    col1.classList.add("col-sm-2");
+    col2.classList.add("col-sm-10");
+
+    // what if there are no thumbnails to display??
+    // generic image (no image)
+
+    // thumbnail.src = books[i].volumeInfo.imageLinks.smallThumbnail;
+    // anchorTitle.innerText = books[i].volumeInfo.title;
+
+    anchorAvatar.href =
+      "teacher.html?id=" + reviews[i].properties["🧑‍🏫 Employees"].relation[0].id;
+    // anchorTitle.href = "book.html?id=" + books[i].id;
+
+    anchorAvatar.classList.add("avatar-thumbnail");
+    anchorAvatar.appendChild(avatar);
+
+    reviewContent.innerText =
+      reviews[i].properties.Review.rich_text[0].plain_text;
+    reviewContent.classList.add("review-details");
+
+    col1.appendChild(anchorAvatar);
+    col2.appendChild(reviewContent);
+
+    row.appendChild(col1);
+    row.appendChild(col2);
+
+    reviewSection.appendChild(row);
+
+    // TODO: what if there are more than 10 results?
+    // How to add pages of results...
+  }
 };
 
 loadDiscussion = async () => {
