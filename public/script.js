@@ -329,8 +329,10 @@ loadBook = async () => {
     // thumbnail.src = books[i].volumeInfo.imageLinks.smallThumbnail;
     // anchorTitle.innerText = books[i].volumeInfo.title;
 
-    anchorAvatar.href =
-      "teacher.html?id=" + reviews[i].properties["🧑‍🏫 Employees"].relation[0].id;
+    let teacherId = reviews[i].properties["🧑‍🏫 Employees"].relation[0].id;
+    teacherId = teacherId.replaceAll("-", "");
+
+    anchorAvatar.href = "teacher.html?id=" + teacherId;
     // anchorTitle.href = "book.html?id=" + books[i].id;
 
     anchorAvatar.classList.add("avatar-thumbnail");
@@ -366,7 +368,7 @@ loadDiscussion = async () => {
 
   // update the DOM with discussion information
   let discussionHeading = document.getElementById("discussion-heading");
-  discussionHeading.innerText = discussion.properties.Name.title[0].plain_text;
+  discussionHeading.innerText = discussion[0].properties.Name.title[0].plain_text;
 
   // ??????????????????????????????????????????????????????
   // Is it possible to call GBooks API for book details
@@ -393,23 +395,77 @@ loadDiscussion = async () => {
 
   let questionOne = document.getElementById("question-one");
   questionOne.innerText =
-    discussion.properties["Question 1"].rich_text[0].plain_text;
+    discussion[0].properties["Question 1"].rich_text[0].plain_text;
 
   let questionTwo = document.getElementById("question-two");
   questionTwo.innerText =
-    discussion.properties["Question 2"].rich_text[0].plain_text;
+    discussion[0].properties["Question 2"].rich_text[0].plain_text;
 
   let questionThree = document.getElementById("question-three");
   questionThree.innerText =
-    discussion.properties["Question 3"].rich_text[0].plain_text;
+    discussion[0].properties["Question 3"].rich_text[0].plain_text;
 
   let questionFour = document.getElementById("question-four");
   questionFour.innerText =
-    discussion.properties["Question 4"].rich_text[0].plain_text;
+    discussion[0].properties["Question 4"].rich_text[0].plain_text;
 
   let questionFive = document.getElementById("question-five");
   questionFive.innerText =
-    discussion.properties["Question 5"].rich_text[0].plain_text;
+    discussion[0].properties["Question 5"].rich_text[0].plain_text;
 
   // .......
+};
+
+loadTeacher = async () => {
+  // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const teacherId = urlParams.get("id");
+
+  const teacher = await fetch("/api/teacher?id=" + teacherId).then((response) =>
+    response.json()
+  );
+
+  console.log(teacher);
+
+  let firstName = document.querySelectorAll(".first-name");
+  for (let i = 0; i < firstName.length; i++) {
+    firstName[i].innerText =
+      teacher[0].properties["First Name"].rich_text[0].plain_text;
+  }
+
+  let lastName = document.querySelectorAll(".last-name");
+  for (let i = 0; i < lastName.length; i++) {
+    lastName[i].innerText =
+      teacher[0].properties["Last Name"].title[0].plain_text;
+  }
+
+  let avatar = document.getElementById("avatar");
+  avatar.innerText = "";
+  let thumbnail = document.createElement("img");
+  thumbnail.classList.add("avatar-large");
+  thumbnail.src = teacher[0].properties["Avatar image"].files[0].external.url;
+  avatar.appendChild(thumbnail);
+
+  let shortBio = document.getElementById("short-bio");
+  shortBio.innerText = "";
+  shortBio.innerText =
+    teacher[0].properties["Short bio"].rich_text[0].plain_text;
+
+  // IF there are books in the wishlist
+
+  // make another call to Notion to get the Wishlist
+  const wishlist = await fetch("/api/wishlist?id=" + teacherId).then(
+    (response) => response.json()
+  );
+
+  console.log("WISHLIST: ", wishlist);
+
+  // loop over the results to make one call to GB API per ISBN to render thumbnails on the page
+
+  // make another call to Notion to get the History
+  const history = await fetch("/api/history?id=" + teacherId).then((response) =>
+    response.json()
+  );
+
+  console.log("HISTORY: ", history);
 };
