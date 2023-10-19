@@ -84,6 +84,36 @@ async function login() {
   }
 }
 
+async function listClubs() {
+  const response = await fetch("/api/clubs");
+  const clubs = await response.json();
+  console.log(clubs);
+
+  let clubsList = document.getElementById("clubs-list");
+
+  for (i = 0; i < clubs.length; i++) {
+    const row = document.createElement("div");
+    const col1 = document.createElement("div");
+    const col2 = document.createElement("div");
+
+    const anchorTitle = document.createElement("a");
+
+    row.classList.add("row");
+    col1.classList.add("col");
+    // col2.classList.add("col");
+
+    anchorTitle.innerText = clubs[i].properties["Club Name"].title[0].plain_text;
+    anchorTitle.href = "club.html?id=" + clubs[i].id.replaceAll("-", "");
+
+    col1.appendChild(anchorTitle);
+
+    row.appendChild(col1);
+    // row.appendChild(col2);
+
+    clubsList.appendChild(row);
+  }
+}
+
 async function searchBooks() {
   let searchterm = document.getElementById("searchterm");
   const response = await fetch("/api?searchterm=" + searchterm.value);
