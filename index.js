@@ -146,8 +146,7 @@ async function CheckLogin(username, password) {
   if (response.length > 0) {
     let userInfo = {
       id: response[0].id,
-      firstName:
-        response[0].properties["First Name"].rich_text[0].plain_text,
+      firstName: response[0].properties["First Name"].rich_text[0].plain_text,
       lastName: response[0].properties["Last Name"].title[0].plain_text,
     };
 
@@ -206,7 +205,7 @@ async function DoesClubnameExist(clubname) {
     myFilter
   );
 
-  console.log(response); 
+  console.log(response);
 
   if (response.length > 0) {
     return true;
@@ -225,6 +224,21 @@ app.post("/api/create-user", (req, res) => {
 app.post("/api/login-user", (req, res) => {
   console.log(req.body);
   CheckLogin(req.body.username, req.body.password).then((data) => {
+    res.send(data);
+  });
+});
+
+app.get("/api/clubs", (req, res) => {
+  console.log("CLUB " + req.query.id);
+
+  let myFilter = {
+    property: "Club Name",
+    title: {
+      is_not_empty: true,
+    },
+  };
+
+  queryDatabase(process.env.NOTION_DATABASE_CLUBS_ID, myFilter).then((data) => {
     res.send(data);
   });
 });
