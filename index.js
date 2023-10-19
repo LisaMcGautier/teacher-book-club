@@ -3,8 +3,6 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 const app = express();
-import * as mongodb from "mongodb";
-var ObjectId = mongodb.ObjectId;
 import { Client } from "@notionhq/client";
 const PORT = process.env.PORT || 3000;
 
@@ -17,36 +15,6 @@ const openai = new OpenAI({
 app.use(express.static("public"));
 app.use(bodyParser.json());
 app.use(cors());
-
-// https://www.mongodb.com/docs/drivers/node/current/fundamentals/connection/connect/
-const uri =
-  "mongodb+srv://nixxxxer:" +
-  process.env.DB_PASSWORD +
-  "@cluster0.o44p6og.mongodb.net/?retryWrites=true&w=majority";
-
-// Create a MongoClient with a MongoClientOptions object to set the Stable API version
-const client = new mongodb.MongoClient(uri, {
-  serverApi: {
-    version: mongodb.ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-});
-
-app.get("/api/clubs-mongo", (req, res) => {
-  MongoClient.connect(uri)
-    .then((client) =>
-      client
-        .db("edbookclubs")
-        .collection("clubs")
-        .findOne({ _id: new ObjectId("64ded933d12c22a31d474bd4") })
-    )
-    .then((data) => {
-      console.log(data);
-      res.send(data);
-    })
-    .catch((err) => console.log(err));
-});
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
