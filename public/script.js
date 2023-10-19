@@ -142,40 +142,6 @@ function hamburger() {
   }
 }
 
-// connecting to the MongoDb database to get the data
-async function loadClubMongo() {
-  // call nodeJS and get the right club document from collection
-  // let searchterm = document.getElementById("searchterm");
-  let id = "64ded933d12c22a31d474bd4";
-  const response = await fetch("/api/clubs-mongo?id=" + id);
-  const club = await response.json();
-  console.log(club);
-
-  // update the DOM with data from the clubs collection
-  let clubHeading = document.getElementById("club-heading");
-  let clubCalendar = document.getElementById("club-calendar");
-  let clubThumbnail = document.getElementById("club-thumbnail");
-  let clubDetails = document.getElementById("club-details");
-
-  let thumbnailImage = document.createElement("img");
-
-  clubHeading.innerText = club.clubName;
-  clubCalendar.innerText = club.nextMeeting;
-  thumbnailImage.src =
-    "http://books.google.com/books/content?id=86HoBAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api";
-
-  clubThumbnail.innerText = "";
-  clubThumbnail.appendChild(thumbnailImage);
-
-  clubDetails.innerText = "";
-
-  for (i = 0; i < club.membersList.length; i++) {
-    const member = document.createElement("div");
-    member.innerText = club.membersList[i];
-    clubDetails.appendChild(member);
-  }
-}
-
 // https://www.pluralsight.com/guides/handling-nested-promises-using-asyncawait-in-react
 loadClub = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
