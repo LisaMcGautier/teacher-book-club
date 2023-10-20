@@ -19,12 +19,9 @@ app.use(cors());
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
 // https://www.twilio.com/blog/manipulate-notion-database-using-node-js
-async function queryDatabase(databaseId, myFilter) {
+async function queryDatabase(myQuery) {
   try {
-    const response = await notion.databases.query({
-      database_id: databaseId,
-      filter: myFilter,
-    });
+    const response = await notion.databases.query(myQuery);
     return response.results;
   } catch (error) {
     console.log(error.body);
@@ -95,19 +92,19 @@ async function CreateUser(body) {
 
 // https://developers.notion.com/reference/post-database-query-filter
 async function CheckUsername(username) {
-  let myFilter = {
-    property: "username",
-    formula: {
-      string: {
-        equals: username,
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID,
+    filter: {
+      property: "username",
+      formula: {
+        string: {
+          equals: username,
+        },
       },
     },
   };
 
-  const response = await queryDatabase(
-    process.env.NOTION_DATABASE_EMPLOYEES_ID,
-    myFilter
-  );
+  const response = await queryDatabase(myQuery);
 
   if (response.length > 0) {
     return response[0].id;
@@ -117,31 +114,31 @@ async function CheckUsername(username) {
 }
 
 async function CheckLogin(username, password) {
-  let myFilter = {
-    and: [
-      {
-        property: "username",
-        formula: {
-          string: {
-            equals: username,
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID,
+    filter: {
+      and: [
+        {
+          property: "username",
+          formula: {
+            string: {
+              equals: username,
+            },
           },
         },
-      },
-      {
-        property: "password",
-        formula: {
-          string: {
-            equals: password,
+        {
+          property: "password",
+          formula: {
+            string: {
+              equals: password,
+            },
           },
         },
-      },
-    ],
+      ],
+    },
   };
 
-  const response = await queryDatabase(
-    process.env.NOTION_DATABASE_EMPLOYEES_ID,
-    myFilter
-  );
+  const response = await queryDatabase(myQuery);
 
   if (response.length > 0) {
     let userInfo = {
@@ -191,19 +188,19 @@ async function CreateClub(body) {
 }
 
 async function DoesClubnameExist(clubname) {
-  let myFilter = {
-    property: "Club Name",
-    formula: {
-      string: {
-        equals: clubname,
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_CLUBS_ID,
+    filter: {
+      property: "Club Name",
+      formula: {
+        string: {
+          equals: clubname,
+        },
       },
     },
   };
 
-  const response = await queryDatabase(
-    process.env.NOTION_DATABASE_CLUBS_ID,
-    myFilter
-  );
+  const response = await queryDatabase(myQuery);
 
   console.log(response);
 
@@ -231,14 +228,17 @@ app.post("/api/login-user", (req, res) => {
 app.get("/api/clubs", (req, res) => {
   console.log("CLUB " + req.query.id);
 
-  let myFilter = {
-    property: "Club Name",
-    title: {
-      is_not_empty: true,
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_CLUBS_ID,
+    filter: {
+      property: "Club Name",
+      title: {
+        is_not_empty: true,
+      },
     },
   };
 
-  queryDatabase(process.env.NOTION_DATABASE_CLUBS_ID, myFilter).then((data) => {
+  queryDatabase(myQuery).then((data) => {
     res.send(data);
   });
 });
@@ -253,14 +253,65 @@ app.post("/api/create-club", (req, res) => {
 app.get("/api/clubs-notion", (req, res) => {
   console.log("CLUB " + req.query.id);
 
-  let myFilter = {
-    property: "club ID",
-    formula: {
-      string: { equals: req.query.id },
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_CLUBS_ID,
+    filter: {
+      property: "club ID",
+      formula: {
+        string: { equals: req.query.id },
+      },
     },
   };
 
-  queryDatabase(process.env.NOTION_DATABASE_CLUBS_ID, myFilter).then((data) => {
+  queryDatabase(myQuery).then((data) => {
+    res.send(data);
+  });
+});
+
+app.get("/api/meetings", (req, res) => {
+  console.log("MEETINGS " + req.query.id);
+
+  const date = new Date();
+
+  let month = date.getUTCMonth() + 1;
+  
+  // https://www.geeksforgeeks.org/how-to-format-the-current-date-in-mm-dd-yyyy-hhmmss-format-using-node-js/
+  if (month < 10) { 
+    month = `0${month}`; 
+  }
+
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_MEETINGS_ID,
+    filter: {
+      and: [
+        {
+          property: "👥 Clubs",
+          relation: {
+            contains: req.query.id,
+          },
+        },
+        {
+          property: "Date",
+          date: {
+            on_or_after:
+              date.getUTCFullYear() +
+              "-" +
+              month +
+              "-" +
+              date.getUTCDate(),
+          },
+        },
+      ],
+    },
+    sorts: [
+      {
+        property: "Date",
+        direction: "ascending",
+      },
+    ],
+  };
+
+  queryDatabase(myQuery).then((data) => {
     res.send(data);
   });
 });
@@ -268,14 +319,17 @@ app.get("/api/clubs-notion", (req, res) => {
 app.get("/api/book-notion", (req, res) => {
   console.log("BOOK " + req.query.id);
 
-  let myFilter = {
-    property: "book ID",
-    formula: {
-      string: { equals: req.query.id },
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_BOOKS_ID,
+    filter: {
+      property: "book ID",
+      formula: {
+        string: { equals: req.query.id },
+      },
     },
   };
 
-  queryDatabase(process.env.NOTION_DATABASE_BOOKS_ID, myFilter).then((data) => {
+  queryDatabase(myQuery).then((data) => {
     res.send(data);
   });
 });
@@ -283,86 +337,91 @@ app.get("/api/book-notion", (req, res) => {
 app.get("/api/reviews-notion", (req, res) => {
   console.log("REVIEW " + req.query.isbn);
 
-  let myFilter = {
-    property: "ISBN",
-    formula: {
-      string: { equals: req.query.isbn },
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_REVIEWS_ID,
+    filter: {
+      property: "ISBN",
+      formula: {
+        string: { equals: req.query.isbn },
+      },
     },
   };
 
-  queryDatabase(process.env.NOTION_DATABASE_REVIEWS_ID, myFilter).then(
-    (data) => {
-      res.send(data);
-    }
-  );
+  queryDatabase(myQuery).then((data) => {
+    res.send(data);
+  });
 });
 
 app.get("/api/discussion-notion", (req, res) => {
   console.log("DISCUSSION " + req.query.id);
 
-  let myFilter = {
-    property: "discussion ID",
-    formula: {
-      string: { equals: req.query.id },
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_DISCUSSIONS_ID,
+    filter: {
+      property: "discussion ID",
+      formula: {
+        string: { equals: req.query.id },
+      },
     },
   };
 
-  queryDatabase(process.env.NOTION_DATABASE_DISCUSSIONS_ID, myFilter).then(
-    (data) => {
-      res.send(data);
-    }
-  );
+  queryDatabase(myQuery).then((data) => {
+    res.send(data);
+  });
 });
 
 app.get("/api/teacher", (req, res) => {
   console.log("TEACHER " + req.query.id);
 
-  let myFilter = {
-    property: "Teacher ID",
-    formula: {
-      string: { equals: req.query.id },
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID,
+    filter: {
+      property: "Teacher ID",
+      formula: {
+        string: { equals: req.query.id },
+      },
     },
   };
 
-  queryDatabase(process.env.NOTION_DATABASE_EMPLOYEES_ID, myFilter).then(
-    (data) => {
-      res.send(data);
-    }
-  );
+  queryDatabase(myQuery).then((data) => {
+    res.send(data);
+  });
 });
 
 app.get("/api/wishlist", (req, res) => {
   console.log("WISHLIST " + req.query.id);
 
-  let myFilter = {
-    property: "🧑‍🏫 Employees",
-    relation: {
-      contains: req.query.id,
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_WISHLIST_ID,
+    filter: {
+      property: "🧑‍🏫 Employees",
+      relation: {
+        contains: req.query.id,
+      },
     },
   };
 
-  queryDatabase(process.env.NOTION_DATABASE_WISHLIST_ID, myFilter).then(
-    (data) => {
-      res.send(data);
-    }
-  );
+  queryDatabase(myQuery).then((data) => {
+    res.send(data);
+  });
 });
 
 app.get("/api/history", (req, res) => {
   console.log("HISTORY " + req.query.id);
 
-  let myFilter = {
-    property: "🧑‍🏫 Employees",
-    relation: {
-      contains: req.query.id,
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_HISTORY_ID,
+    filter: {
+      property: "🧑‍🏫 Employees",
+      relation: {
+        contains: req.query.id,
+      },
     },
   };
 
-  queryDatabase(process.env.NOTION_DATABASE_HISTORY_ID, myFilter).then(
-    (data) => {
-      res.send(data);
-    }
-  );
+  queryDatabase(myQuery).then((data) => {
+    res.send(data);
+  });
 });
 
 // app.get("/api/book", (req, res) => {

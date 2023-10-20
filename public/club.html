@@ -5,12 +5,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>TBC - Club (Notion)</title>
+    <title>TBC - Club</title>
     <meta name="description" content="View upcoming meeting info and the current book.">
 
     <!-- Bootstrap 5 CSS CDN link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <!-- https://github.com/jackducasse/caleandar -->
+    <link rel="stylesheet" href="theme2.css" />
     <!-- My Style Sheet -->
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -58,7 +60,7 @@
             <div class="row">
 
                 <div class="col col-left">
-                    <div id="club-calendar" class="calendar">Calendar view</div>
+                    <div id="club-calendar" class="calendar"></div>
                 </div>
 
                 <div class="col col-right">
@@ -69,10 +71,10 @@
                         </a>
                     </div>
                     <div id="club-details" class="details">Title, author, ISBN, etc.</div>
-                    
+
                     <a href="discussion.html?id=9fc5a018c95a47bea4b032cad3558858" class="btn btn-success">Click to join
                         discussion</a>
-                    
+
                 </div>
 
             </div>
@@ -103,6 +105,8 @@
 
     <footer>Copyright 2023</footer>
 
+    <!-- https://github.com/jackducasse/caleandar -->
+    <script type="text/javascript" src="caleandar.min.js"></script>
     <script src="script.js"></script>
 
 </body>
