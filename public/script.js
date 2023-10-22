@@ -221,38 +221,89 @@ loadClub = async () => {
   // https://github.com/jackducasse/caleandar
   var element = caleandar(document.getElementById("club-calendar"), events);
 
-  let bookId = meetings[0].properties.ISBN.rich_text[0].plain_text;
+  if (meetings.length > 0) {
+    let bookId = meetings[0].properties.ISBN.rich_text[0].plain_text;
 
-  const book = await fetch("/api/book?id=" + bookId).then((response) =>
-    response.json()
-  );
+    const book = await fetch("/api/book?id=" + bookId).then((response) =>
+      response.json()
+    );
 
-  // update the DOM with book information
-  console.log(book);
+    // update the DOM with book information
+    console.log(book);
 
-  let clubThumbnail = document.getElementById("club-thumbnail");
-  clubThumbnail.src = book.items[0].volumeInfo.imageLinks.smallThumbnail;
+    let clubThumbnail = document.createElement("img");
+    clubThumbnail.src = book.items[0].volumeInfo.imageLinks.smallThumbnail;
 
-  let clubDetails = document.getElementById("club-details");
-  clubDetails.innerText = "";
-  let title = document.createElement("h5");
-  title.innerText = book.items[0].volumeInfo.title;
-  let author = document.createElement("p");
-  author.innerText = "by " + book.items[0].volumeInfo.authors[0];
-  let isbnTen = document.createElement("p");
-  isbnTen.innerText =
-    "ISBN 10: " + book.items[0].volumeInfo.industryIdentifiers[1].identifier;
-  let isbnThirteen = document.createElement("p");
-  isbnThirteen.innerText =
-    "ISBN 13: " + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
+    let clubDetails = document.getElementById("club-details");
+    let title = document.createElement("h5");
+    title.innerText = book.items[0].volumeInfo.title;
+    let author = document.createElement("p");
+    author.innerText = "by " + book.items[0].volumeInfo.authors[0];
+    let isbnTen = document.createElement("p");
+    isbnTen.innerText =
+      "ISBN 10: " + book.items[0].volumeInfo.industryIdentifiers[1].identifier;
+    let isbnThirteen = document.createElement("p");
+    isbnThirteen.innerText =
+      "ISBN 13: " + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
+    let btnDiscussion = document.createElement("a");
+    btnDiscussion.href = "discussion.html?id=f7b52260126b49d192ab35e9eae4585b";
+    btnDiscussion.classList.add("btn", "btn-success");
+    btnDiscussion.innerText = "Click to join discussion";
 
-  clubDetails.appendChild(title);
-  clubDetails.appendChild(author);
-  clubDetails.appendChild(isbnTen);
-  clubDetails.appendChild(isbnThirteen);
+    clubDetails.appendChild(clubThumbnail);
+    clubDetails.appendChild(title);
+    clubDetails.appendChild(author);
+    clubDetails.appendChild(isbnTen);
+    clubDetails.appendChild(isbnThirteen);
+    clubDetails.appendChild(btnDiscussion);
+  } else {
+    let clubDetails = document.getElementById("club-details");
+    let title = document.createElement("h5");
+    title.innerText = "There are no books currently assigned to this club.";
+
+    clubDetails.appendChild(title);
+  }
 
   // ......
+  listClubBooks();
 };
+
+async function listClubBooks() {
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const clubId = urlParams.get("id");
+
+  const response = await fetch("/api/club/booklist?id=" + clubId);
+  const booklist = await response.json();
+  console.log(booklist);
+
+  let clubBooklist = document.getElementById("club-booklist");
+
+  for (i = 0; i < booklist.length; i++) {
+    const row = document.createElement("div");
+    const col1 = document.createElement("div");
+    const col2 = document.createElement("div");
+
+    const anchorTitle = document.createElement("a");
+
+    row.classList.add("row");
+    col1.classList.add("col");
+    // col2.classList.add("col");
+
+    anchorTitle.innerText =
+    // booklist[i].properties["Club Name"].title[0].plain_text;
+    booklist[i].properties.Title.title[0].plain_text;
+    anchorTitle.href = "club.html?id=" + booklist[i].id.replaceAll("-", "");
+
+    // <table class="table table-striped table-hover"> ... </table>
+
+    col1.appendChild(anchorTitle);
+
+    row.appendChild(col1);
+    // row.appendChild(col2);
+
+    clubBooklist.appendChild(row);
+  }
+}
 
 async function createClub() {
   let clubname = document.getElementById("clubname");
@@ -281,10 +332,14 @@ async function createClub() {
   // console.log(response.json());
 
   const clubInfo = await response.json();
+
   console.log(clubInfo);
 
   if (clubInfo != null && clubInfo.id != undefined) {
-    alert("HOORAY!");
+    // alert("HOORAY!");
+    location.replace(
+      "/club.html?id=" + clubInfo.id.replaceAll("-", "") + "&created=true"
+    );
   } else {
     alert("Oops! There is already a club named " + body.clubname);
   }
