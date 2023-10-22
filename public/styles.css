@@ -72,6 +72,12 @@ main {
     margin-bottom: 0;
 }
 
+.cbl-h1 {
+    background-color: transparent;
+    color: #0D498C;
+    margin-bottom: 0;
+}
+
 .section2 {
     /* border: purple solid 3px; */
     border: #40047b solid .5px;

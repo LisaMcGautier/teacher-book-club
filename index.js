@@ -268,6 +268,24 @@ app.get("/api/clubs-notion", (req, res) => {
   });
 });
 
+app.get("/api/club/booklist", (req, res) => {
+  console.log("CLUB " + req.query.id);
+
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_BOOKS_ID,
+    filter: {
+      property: "👥 Clubs",
+      relation: {
+        contains: req.query.id,
+      },
+    },
+  };
+
+  queryDatabase(myQuery).then((data) => {
+    res.send(data);
+  });
+});
+
 app.get("/api/meetings", (req, res) => {
   console.log("MEETINGS " + req.query.id);
 

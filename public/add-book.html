@@ -77,10 +77,10 @@
             <div class="row">
                 <div class="col"></div>
                 <div class="col">
-                    <h1 class="cbl-h1">Club Book List</h1>
+                    <h1 class="cbl-h1">Meetings List</h1>
                 </div>
                 <div class="col">
-                    <a href="add-book.html" class="btn btn-warning">Add book</a>
+                    <a href="add-book.html" class="btn btn-warning">Add meeting</a>
                 </div>
             </div>
 
@@ -89,7 +89,65 @@
                 <div class="col-sm-12">
 
                     <div id="club-booklist">
-                        
+
+                        <!-- https://getbootstrap.com/docs/5.3/content/tables/ -->
+                        <table class="table table-striped table-hover table-sm">
+                            <thead>
+                                <tr>
+                                    <!-- <th scope="col">#</th> -->
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Author</th>
+                                    <th scope="col">Meeting Date</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <!-- <th scope="row">1</th> -->
+                                    <td>The Professor and the Madman</td>
+                                    <td>Simon Winchester</td>
+                                    <td>TBD</td>
+                                    <td>
+                                        <!-- https://getbootstrap.com/docs/5.3/components/buttons/ -->
+                                        <button type="button" class="btn btn-primary btn-sm">EDIT</button>
+                                        <button type="button" class="btn btn-danger btn-sm">DELETE</button>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <!-- <th scope="row">2</th> -->
+                                    <td>Fahrenheit 451</td>
+                                    <td>Ray Bradbury</td>
+                                    <td>TBD</td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm">EDIT</button>
+                                        <button type="button" class="btn btn-danger btn-sm">DELETE</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <!-- <th scope="row">3</th> -->
+                                    <td>A Court of Thorns and Roses</td>
+                                    <td>Sarah J. Maas</td>
+                                    <td>TBD</td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm">EDIT</button>
+                                        <button type="button" class="btn btn-danger btn-sm">DELETE</button>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <!-- <th scope="row">4</th> -->
+                                    <td>Ella Minnow Pea</td>
+                                    <td>Mark Dunn</td>
+                                    <td>TBD</td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm">EDIT</button>
+                                        <button type="button" class="btn btn-danger btn-sm">DELETE</button>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                 </div>
