@@ -5,19 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>TBC - Club</title>
+    <title>TBC - Add Book</title>
     <meta name="description" content="View upcoming meeting info and the current book.">
 
     <!-- Bootstrap 5 CSS CDN link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <!-- https://github.com/jackducasse/caleandar -->
-    <link rel="stylesheet" href="theme2.css" />
+
     <!-- My Style Sheet -->
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="text-center" onload="loadClub()">
+<body class="text-center" onload="loadAddBook()">
     <!-- Mobile Nav -->
     <nav class="mobile-nav">
         <div id="menu-links">
@@ -60,12 +59,27 @@
             <div class="row">
 
                 <div class="col col-left">
-                    <div id="club-calendar" class="calendar"></div>
+                    <div id="add-book-search">
+                        <div>
+                            <form>
+                                <label for="searchterm">Enter seach term:</label><br>
+                                <input type="text" id="searchterm" name="searchterm"><br>
+
+                                <input type="button" value="Search" onclick="return adminSearchBooks()">
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="search-results"></div>
+
                 </div>
 
                 <div class="col col-right">
 
-                    <div id="club-details" class="details"></div>
+                    <div id="msg-select-book" class="details">
+                        <h3 id="demo"></h3>
+                    </div>
+                    <div id="msg-generate-questions" class="details"></div>
 
                 </div>
 
@@ -95,8 +109,8 @@
                             <thead>
                                 <tr>
                                     <!-- <th scope="col">#</th> -->
-                                    <th scope="col">Title</th>
-                                    <th scope="col">Author</th>
+                                    <!-- <th scope="col">Title</th>
+                                    <th scope="col">Author</th> -->
                                     <th scope="col">Meeting Date</th>
                                     <th scope="col">Actions</th>
                                 </tr>
@@ -104,8 +118,8 @@
                             <tbody>
                                 <tr>
                                     <!-- <th scope="row">1</th> -->
-                                    <td>The Professor and the Madman</td>
-                                    <td>Simon Winchester</td>
+                                    <!-- <td>The Professor and the Madman</td>
+                                    <td>Simon Winchester</td> -->
                                     <td>TBD</td>
                                     <td>
                                         <!-- https://getbootstrap.com/docs/5.3/components/buttons/ -->
@@ -116,8 +130,8 @@
                                 </tr>
                                 <tr>
                                     <!-- <th scope="row">2</th> -->
-                                    <td>Fahrenheit 451</td>
-                                    <td>Ray Bradbury</td>
+                                    <!-- <td>Fahrenheit 451</td>
+                                    <td>Ray Bradbury</td> -->
                                     <td>TBD</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-sm">EDIT</button>
@@ -126,8 +140,8 @@
                                 </tr>
                                 <tr>
                                     <!-- <th scope="row">3</th> -->
-                                    <td>A Court of Thorns and Roses</td>
-                                    <td>Sarah J. Maas</td>
+                                    <!-- <td>A Court of Thorns and Roses</td>
+                                    <td>Sarah J. Maas</td> -->
                                     <td>TBD</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-sm">EDIT</button>
@@ -137,8 +151,8 @@
                                 </tr>
                                 <tr>
                                     <!-- <th scope="row">4</th> -->
-                                    <td>Ella Minnow Pea</td>
-                                    <td>Mark Dunn</td>
+                                    <!-- <td>Ella Minnow Pea</td>
+                                    <td>Mark Dunn</td> -->
                                     <td>TBD</td>
                                     <td>
                                         <button type="button" class="btn btn-primary btn-sm">EDIT</button>
@@ -180,8 +194,6 @@
 
     <footer>Copyright 2023</footer>
 
-    <!-- https://github.com/jackducasse/caleandar -->
-    <script type="text/javascript" src="caleandar.min.js"></script>
     <script src="script.js"></script>
 
 </body>
