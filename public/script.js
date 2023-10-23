@@ -159,6 +159,9 @@ async function searchBooks() {
 
     // TODO: what if there are more than 10 results?
     // How to add pages of results...
+
+    // https://developers.google.com/books/docs/v1/using#PerformingSearch
+    // maxResults - default is 10, and the maximum allowable value is 40.
   }
 }
 
@@ -264,6 +267,15 @@ loadClub = async () => {
     clubDetails.appendChild(title);
   }
 
+  let divAddBook = document.getElementById("div-add-book");
+  let btnAddBook = document.createElement("a");
+  // <a href="add-book.html" class="btn btn-warning">Add book</a>
+  btnAddBook.href = "add-book.html?id=" + clubId;
+  btnAddBook.classList.add("btn", "btn-warning");
+  btnAddBook.innerText = "Add a book";
+
+  divAddBook.appendChild(btnAddBook);
+
   // ......
   listClubBooks();
 };
@@ -342,6 +354,160 @@ async function createClub() {
     );
   } else {
     alert("Oops! There is already a club named " + body.clubname);
+  }
+}
+
+loadAddBook = async () => {
+  // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const clubId = urlParams.get("id");
+
+  const club = await fetch("/api/clubs-notion?id=" + clubId).then((response) =>
+    response.json()
+  );
+
+  console.log(club);
+
+  // update the DOM with club information
+  let clubHeading = document.getElementById("club-heading");
+  clubHeading.innerText = club[0].properties["Club Name"].title[0].plain_text;
+
+  // // use the club id to query notion for that club's meetings
+  // const meetings = await fetch("/api/meetings?id=" + clubId).then((response) =>
+  //   response.json()
+  // );
+
+  // console.log(meetings);
+
+  // let events = [];
+
+  // for (i = 0; i < meetings.length; i++) {
+  //   console.log(meetings[i].properties.Date.date.start);
+
+  //   const meetingDate = new Date(meetings[i].properties.Date.date.start);
+
+  //   // https://www.w3schools.com/js/js_date_methods.asp
+  //   events.push({
+  //     Date: new Date(
+  //       meetingDate.getUTCFullYear(),
+  //       meetingDate.getUTCMonth(),
+  //       meetingDate.getUTCDate()
+  //     ),
+  //     Title: meetings[i].properties["Book Title"].rich_text[0].plain_text,
+  //     Link:
+  //       "book.html?id=" + meetings[i].properties.ISBN.rich_text[0].plain_text,
+  //   });
+  // }
+
+  // console.log(events);
+
+  // // https://github.com/jackducasse/caleandar
+  // var element = caleandar(document.getElementById("club-calendar"), events);
+
+  // if (meetings.length > 0) {
+  //   let bookId = meetings[0].properties.ISBN.rich_text[0].plain_text;
+
+  //   const book = await fetch("/api/book?id=" + bookId).then((response) =>
+  //     response.json()
+  //   );
+
+  //   // update the DOM with book information
+  //   console.log(book);
+
+  //   let clubThumbnail = document.createElement("img");
+  //   clubThumbnail.src = book.items[0].volumeInfo.imageLinks.smallThumbnail;
+
+  //   let clubDetails = document.getElementById("club-details");
+  //   let title = document.createElement("h5");
+  //   title.innerText = book.items[0].volumeInfo.title;
+  //   let author = document.createElement("p");
+  //   author.innerText = "by " + book.items[0].volumeInfo.authors[0];
+  //   let isbnTen = document.createElement("p");
+  //   isbnTen.innerText =
+  //     "ISBN 10: " + book.items[0].volumeInfo.industryIdentifiers[1].identifier;
+  //   let isbnThirteen = document.createElement("p");
+  //   isbnThirteen.innerText =
+  //     "ISBN 13: " + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
+  //   let btnDiscussion = document.createElement("a");
+  //   btnDiscussion.href = "discussion.html?id=f7b52260126b49d192ab35e9eae4585b";
+  //   btnDiscussion.classList.add("btn", "btn-success");
+  //   btnDiscussion.innerText = "Click to join discussion";
+
+  //   clubDetails.appendChild(clubThumbnail);
+  //   clubDetails.appendChild(title);
+  //   clubDetails.appendChild(author);
+  //   clubDetails.appendChild(isbnTen);
+  //   clubDetails.appendChild(isbnThirteen);
+  //   clubDetails.appendChild(btnDiscussion);
+  // } else {
+  //   let clubDetails = document.getElementById("club-details");
+  //   let title = document.createElement("h5");
+  //   title.innerText = "There are no books currently assigned to this club.";
+
+  //   clubDetails.appendChild(title);
+  // }
+
+  // ......
+  // listClubBooks();
+};
+
+async function adminSearchBooks() {
+  let searchterm = document.getElementById("searchterm");
+  const response = await fetch("/api?searchterm=" + searchterm.value);
+  const books = await response.json();
+  console.log(books);
+
+  let searchResults = document.getElementById("search-results");
+
+  // clear previous search results
+  while (searchResults.firstChild) {
+    searchResults.removeChild(searchResults.firstChild);
+  }
+
+  for (i = 0; i < books.length; i++) {
+    const row = document.createElement("div");
+    const col1 = document.createElement("div");
+    const col2 = document.createElement("div");
+    // const thumbnail = document.createElement("img");
+    // const anchorThumbnail = document.createElement("a");
+    const selectButton = document.createElement("button")
+    const anchorTitle = document.createElement("a");
+
+    // create an addtional element (button) for selecting this book
+    // attach an on click event (add event listener targeting the onClick property)
+    // on click, call another function that will pass the ISBN of this book
+    // append the button child 
+
+    row.classList.add("row");
+    col1.classList.add("col");
+    col2.classList.add("col");
+    selectButton.classList.add("btn", "btn-info");
+
+    // what if there are no thumbnails to display??
+    // generic image (no image)
+    /// thumbnail.src = books[i].volumeInfo.imageLinks.smallThumbnail;
+    anchorTitle.innerText = books[i].volumeInfo.title;
+    selectButton.innerText = "Select";
+    let buttonMessage = books[i].volumeInfo.industryIdentifiers[1].identifier;
+
+    // anchorThumbnail.href = "book.html?id=" + books[i].id;
+    // anchorThumbnail.appendChild(thumbnail);
+    anchorTitle.href = "book.html?id=" + books[i].id;
+    // https://www.w3schools.com/jsref/met_element_addeventlistener.asp
+    selectButton.addEventListener("click", function() {
+      document.getElementById("demo").innerText = buttonMessage;
+    });
+
+    col1.appendChild(anchorTitle);
+    col2.appendChild(selectButton);
+
+    row.appendChild(col1);
+    row.appendChild(col2);
+
+    searchResults.appendChild(row);
+
+    // TODO: what if there are more than 10 results?
+    // How to add pages of results...
   }
 }
 
