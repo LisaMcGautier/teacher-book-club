@@ -58,7 +58,7 @@
 
             <div class="row">
 
-                <div class="col col-left">
+                <div id="search" class="col col-left">
                     <div id="add-book-search">
                         <div>
                             <form>
@@ -68,22 +68,59 @@
                                 <input type="button" value="Search" onclick="return adminSearchBooks()">
                             </form>
                         </div>
+
+                        <div id="search-results"></div>
                     </div>
 
-                    <div id="search-results"></div>
+                    <div id="selected-book" class="d-none">
+                        <h3 id="selected-title"></h3>
+                        <img id="selected-thumbnail" />
+                        <br>
+                        <button id="btn-change" type="button" class="btn btn-danger">Select a different book</button>
+                    </div>
 
                 </div>
 
-                <div class="col col-right">
+                <div id="questions" class="col col-right">
 
-                    <div id="msg-select-book" class="details">
-                        <h3 id="demo"></h3>
+                    <div id="confirm-book" class="d-none">
+                        <h3 id="selection"></h3>
+                        <img id="thumbnail" />
+                        <br>
+                        <button id="btn-confirm" type="button" class="btn btn-success">Confirm selection</button>
                     </div>
-                    <div id="msg-generate-questions" class="details"></div>
+
+                    <div id="generate-questions" class="d-none">
+                        <div>
+                            <h3>Guiding Questions</h3>
+                            <textarea id="club-thumbnail" class="thumbnail">Content</textarea>
+
+                            <button type="button" class="btn btn-success" onclick="showChatGPT()">Ask AI to generate
+                                questions</button>
+                        </div>
+                    </div>
 
                 </div>
 
             </div>
+
+        </section>
+
+        <section id="chatGPT" class="section2 invisible">
+            <h1>ChatGPT API</h1>
+
+            <br>
+
+            <div class="row">
+                <form action="">
+                    <input type="text" mame="message" id="message">
+                    <button type="submit">Send</button>
+                </form>
+
+                <div id="chat-log"></div>
+            </div>
+
+            <br>
 
         </section>
 

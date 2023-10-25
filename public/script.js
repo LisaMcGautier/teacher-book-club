@@ -371,84 +371,6 @@ loadAddBook = async () => {
   // update the DOM with club information
   let clubHeading = document.getElementById("club-heading");
   clubHeading.innerText = club[0].properties["Club Name"].title[0].plain_text;
-
-  // // use the club id to query notion for that club's meetings
-  // const meetings = await fetch("/api/meetings?id=" + clubId).then((response) =>
-  //   response.json()
-  // );
-
-  // console.log(meetings);
-
-  // let events = [];
-
-  // for (i = 0; i < meetings.length; i++) {
-  //   console.log(meetings[i].properties.Date.date.start);
-
-  //   const meetingDate = new Date(meetings[i].properties.Date.date.start);
-
-  //   // https://www.w3schools.com/js/js_date_methods.asp
-  //   events.push({
-  //     Date: new Date(
-  //       meetingDate.getUTCFullYear(),
-  //       meetingDate.getUTCMonth(),
-  //       meetingDate.getUTCDate()
-  //     ),
-  //     Title: meetings[i].properties["Book Title"].rich_text[0].plain_text,
-  //     Link:
-  //       "book.html?id=" + meetings[i].properties.ISBN.rich_text[0].plain_text,
-  //   });
-  // }
-
-  // console.log(events);
-
-  // // https://github.com/jackducasse/caleandar
-  // var element = caleandar(document.getElementById("club-calendar"), events);
-
-  // if (meetings.length > 0) {
-  //   let bookId = meetings[0].properties.ISBN.rich_text[0].plain_text;
-
-  //   const book = await fetch("/api/book?id=" + bookId).then((response) =>
-  //     response.json()
-  //   );
-
-  //   // update the DOM with book information
-  //   console.log(book);
-
-  //   let clubThumbnail = document.createElement("img");
-  //   clubThumbnail.src = book.items[0].volumeInfo.imageLinks.smallThumbnail;
-
-  //   let clubDetails = document.getElementById("club-details");
-  //   let title = document.createElement("h5");
-  //   title.innerText = book.items[0].volumeInfo.title;
-  //   let author = document.createElement("p");
-  //   author.innerText = "by " + book.items[0].volumeInfo.authors[0];
-  //   let isbnTen = document.createElement("p");
-  //   isbnTen.innerText =
-  //     "ISBN 10: " + book.items[0].volumeInfo.industryIdentifiers[1].identifier;
-  //   let isbnThirteen = document.createElement("p");
-  //   isbnThirteen.innerText =
-  //     "ISBN 13: " + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
-  //   let btnDiscussion = document.createElement("a");
-  //   btnDiscussion.href = "discussion.html?id=f7b52260126b49d192ab35e9eae4585b";
-  //   btnDiscussion.classList.add("btn", "btn-success");
-  //   btnDiscussion.innerText = "Click to join discussion";
-
-  //   clubDetails.appendChild(clubThumbnail);
-  //   clubDetails.appendChild(title);
-  //   clubDetails.appendChild(author);
-  //   clubDetails.appendChild(isbnTen);
-  //   clubDetails.appendChild(isbnThirteen);
-  //   clubDetails.appendChild(btnDiscussion);
-  // } else {
-  //   let clubDetails = document.getElementById("club-details");
-  //   let title = document.createElement("h5");
-  //   title.innerText = "There are no books currently assigned to this club.";
-
-  //   clubDetails.appendChild(title);
-  // }
-
-  // ......
-  // listClubBooks();
 };
 
 async function adminSearchBooks() {
@@ -468,8 +390,6 @@ async function adminSearchBooks() {
     const row = document.createElement("div");
     const col1 = document.createElement("div");
     const col2 = document.createElement("div");
-    // const thumbnail = document.createElement("img");
-    // const anchorThumbnail = document.createElement("a");
     const selectButton = document.createElement("button")
     const anchorTitle = document.createElement("a");
 
@@ -483,19 +403,20 @@ async function adminSearchBooks() {
     col2.classList.add("col");
     selectButton.classList.add("btn", "btn-info");
 
-    // what if there are no thumbnails to display??
-    // generic image (no image)
-    /// thumbnail.src = books[i].volumeInfo.imageLinks.smallThumbnail;
     anchorTitle.innerText = books[i].volumeInfo.title;
     selectButton.innerText = "Select";
-    let buttonMessage = books[i].volumeInfo.industryIdentifiers[1].identifier;
+    let bookISBN= books[i].volumeInfo.industryIdentifiers[1].identifier;
+    let selectedTitle = books[i].volumeInfo.title;
+    let thumbnail = books[i].volumeInfo.imageLinks.smallThumbnail;
 
-    // anchorThumbnail.href = "book.html?id=" + books[i].id;
-    // anchorThumbnail.appendChild(thumbnail);
     anchorTitle.href = "book.html?id=" + books[i].id;
     // https://www.w3schools.com/jsref/met_element_addeventlistener.asp
     selectButton.addEventListener("click", function() {
-      document.getElementById("demo").innerText = buttonMessage;
+      document.getElementById("selection").innerText = selectedTitle;
+      document.getElementById("selected-title").innerText = selectedTitle;
+      document.getElementById("thumbnail").src = thumbnail;
+      document.getElementById("selected-thumbnail").src = thumbnail;
+      document.getElementById("confirm-book").className = 'd-block';
     });
 
     col1.appendChild(anchorTitle);
@@ -506,9 +427,28 @@ async function adminSearchBooks() {
 
     searchResults.appendChild(row);
 
-    // TODO: what if there are more than 10 results?
-    // How to add pages of results...
+    let buttonConfirm = document.getElementById("btn-confirm");
+    buttonConfirm.addEventListener("click", function() {
+
+      document.getElementById("add-book-search").className = 'd-none';
+      document.getElementById("confirm-book").className = 'd-none';
+      document.getElementById("selected-book").className = 'd-block';
+      document.getElementById("generate-questions").className = 'd-block';
+    });
+
+    let buttonChange = document.getElementById("btn-change");
+    buttonChange.addEventListener("click", function() {
+
+      document.getElementById("add-book-search").className = 'd-block';
+      document.getElementById("confirm-book").className = 'd-none';
+      document.getElementById("selected-book").className = 'd-none';
+      document.getElementById("generate-questions").className = 'd-none';
+    });
   }
+}
+
+showChatGPT= async () => {
+  document.getElementById("chatGPT").classList.remove("invisible");  
 }
 
 loadBook = async () => {
