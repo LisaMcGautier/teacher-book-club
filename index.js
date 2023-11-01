@@ -292,10 +292,15 @@ app.get("/api/meetings", (req, res) => {
   const date = new Date();
 
   let month = date.getUTCMonth() + 1;
+  let day = date.getUTCDate();
   
   // https://www.geeksforgeeks.org/how-to-format-the-current-date-in-mm-dd-yyyy-hhmmss-format-using-node-js/
   if (month < 10) { 
     month = `0${month}`; 
+  }
+
+  if (day < 10) { 
+    day = `0${day}`; 
   }
 
   let myQuery = {
@@ -316,7 +321,7 @@ app.get("/api/meetings", (req, res) => {
               "-" +
               month +
               "-" +
-              date.getUTCDate(),
+              day,
           },
         },
       ],

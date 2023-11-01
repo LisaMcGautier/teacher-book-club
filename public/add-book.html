@@ -93,34 +93,25 @@
                     <div id="generate-questions" class="d-none">
                         <div>
                             <h3>Guiding Questions</h3>
-                            <textarea id="club-thumbnail" class="thumbnail">Content</textarea>
 
-                            <button type="button" class="btn btn-success" onclick="showChatGPT()">Ask AI to generate
-                                questions</button>
+                            <textarea id="guiding-questions">Type your own questions here...</textarea>
+
+                            <div class="row">
+                                <div id="spinner" class="spinner-border invisible" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                           
+                            <button id="btnChatGPT" type="button" class="btn btn-success" onclick="generateGPTQuestions()">Ask AI to
+                                generate questions</button>
+
                         </div>
+
                     </div>
 
                 </div>
 
             </div>
-
-        </section>
-
-        <section id="chatGPT" class="section2 invisible">
-            <h1>ChatGPT API</h1>
-
-            <br>
-
-            <div class="row">
-                <form action="">
-                    <input type="text" mame="message" id="message">
-                    <button type="submit">Send</button>
-                </form>
-
-                <div id="chat-log"></div>
-            </div>
-
-            <br>
 
         </section>
 

@@ -302,8 +302,8 @@ async function listClubBooks() {
     // col2.classList.add("col");
 
     anchorTitle.innerText =
-    // booklist[i].properties["Club Name"].title[0].plain_text;
-    booklist[i].properties.Title.title[0].plain_text;
+      // booklist[i].properties["Club Name"].title[0].plain_text;
+      booklist[i].properties.Title.title[0].plain_text;
     anchorTitle.href = "club.html?id=" + booklist[i].id.replaceAll("-", "");
 
     // <table class="table table-striped table-hover"> ... </table>
@@ -390,13 +390,13 @@ async function adminSearchBooks() {
     const row = document.createElement("div");
     const col1 = document.createElement("div");
     const col2 = document.createElement("div");
-    const selectButton = document.createElement("button")
+    const selectButton = document.createElement("button");
     const anchorTitle = document.createElement("a");
 
     // create an addtional element (button) for selecting this book
     // attach an on click event (add event listener targeting the onClick property)
     // on click, call another function that will pass the ISBN of this book
-    // append the button child 
+    // append the button child
 
     row.classList.add("row");
     col1.classList.add("col");
@@ -405,18 +405,18 @@ async function adminSearchBooks() {
 
     anchorTitle.innerText = books[i].volumeInfo.title;
     selectButton.innerText = "Select";
-    let bookISBN= books[i].volumeInfo.industryIdentifiers[1].identifier;
+    let bookISBN = books[i].volumeInfo.industryIdentifiers[1].identifier;
     let selectedTitle = books[i].volumeInfo.title;
     let thumbnail = books[i].volumeInfo.imageLinks.smallThumbnail;
 
     anchorTitle.href = "book.html?id=" + books[i].id;
     // https://www.w3schools.com/jsref/met_element_addeventlistener.asp
-    selectButton.addEventListener("click", function() {
+    selectButton.addEventListener("click", function () {
       document.getElementById("selection").innerText = selectedTitle;
       document.getElementById("selected-title").innerText = selectedTitle;
       document.getElementById("thumbnail").src = thumbnail;
       document.getElementById("selected-thumbnail").src = thumbnail;
-      document.getElementById("confirm-book").className = 'd-block';
+      document.getElementById("confirm-book").className = "d-block";
     });
 
     col1.appendChild(anchorTitle);
@@ -428,28 +428,83 @@ async function adminSearchBooks() {
     searchResults.appendChild(row);
 
     let buttonConfirm = document.getElementById("btn-confirm");
-    buttonConfirm.addEventListener("click", function() {
-
-      document.getElementById("add-book-search").className = 'd-none';
-      document.getElementById("confirm-book").className = 'd-none';
-      document.getElementById("selected-book").className = 'd-block';
-      document.getElementById("generate-questions").className = 'd-block';
+    buttonConfirm.addEventListener("click", function () {
+      document.getElementById("add-book-search").className = "d-none";
+      document.getElementById("confirm-book").className = "d-none";
+      document.getElementById("selected-book").className = "d-block";
+      document.getElementById("generate-questions").className = "d-block";
     });
 
     let buttonChange = document.getElementById("btn-change");
-    buttonChange.addEventListener("click", function() {
-
-      document.getElementById("add-book-search").className = 'd-block';
-      document.getElementById("confirm-book").className = 'd-none';
-      document.getElementById("selected-book").className = 'd-none';
-      document.getElementById("generate-questions").className = 'd-none';
+    buttonChange.addEventListener("click", function () {
+      document.getElementById("add-book-search").className = "d-block";
+      document.getElementById("confirm-book").className = "d-none";
+      document.getElementById("selected-book").className = "d-none";
+      document.getElementById("generate-questions").className = "d-none";
     });
   }
 }
 
-showChatGPT= async () => {
-  document.getElementById("chatGPT").classList.remove("invisible");  
-}
+generateGPTQuestions = async () => {
+  let buttonChatGPT = document.getElementById("btnChatGPT");
+  buttonChatGPT.classList.add("disabled");
+  let spinner = document.getElementById("spinner");
+  spinner.classList.remove("invisible");
+  // https://www.youtube.com/watch?v=LX_DXLlaymg
+
+  let messages = [];
+  const guidingQuestions = document.getElementById("guiding-questions");
+
+  //const chatLog = document.getElementById("chat-log");
+  //const messageText = "What are the names of the planets in our solar system?";
+
+  const messageText =
+    "Please generate 5 discussion questions for the book " +
+    document.getElementById("selected-title").innerText;
+
+  const newMessage = { role: "user", content: `${messageText}` };
+  messages.push(newMessage);
+
+  const messageElement = document.createElement("div");
+  messageElement.classList.add("message");
+  messageElement.classList.add("message--sent");
+  messageElement.innerHTML = `
+        <div class="message__text">${messageText}</div>
+    `;
+
+  //chatLog.appendChild(messageElement);
+  //chatLog.scrollTop = chatLog.scrollHeight;
+
+  fetch("http://localhost:3000", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      messages,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      let newAssistantMessage = {
+        role: "assistant",
+        content: `${data.completion.content}`,
+      };
+      messages.push(newAssistantMessage);
+      const messageElement = document.createElement("div");
+      messageElement.classList.add("message");
+      messageElement.classList.add("message--received");
+      messageElement.innerHTML = `
+            <div class="message__text">${data.completion.content}</div>
+        `;
+
+      //chatLog.appendChild(messageElement);
+      //chatLog.scrollTop = chatLog.scrollHeight;
+
+      guidingQuestions.value = data.completion.content;
+      spinner.classList.add("invisible");
+    });
+};
 
 loadBook = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
