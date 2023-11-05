@@ -128,29 +128,59 @@ async function searchBooks() {
     searchResults.removeChild(searchResults.firstChild);
   }
 
-  for (i = 0; i < books.length; i++) {
+  let section2 = document.getElementsByClassName("section2");
+  section2[0].classList.remove("d-none");
+
+  for (i = 0; i < books.length; i++) {    
     const row = document.createElement("div");
     const col1 = document.createElement("div");
     const col2 = document.createElement("div");
     const thumbnail = document.createElement("img");
     const anchorThumbnail = document.createElement("a");
     const anchorTitle = document.createElement("a");
+    const wishlistButton = document.createElement("button");
+    const historyButton = document.createElement("button");
 
     row.classList.add("row");
-    col1.classList.add("col");
-    col2.classList.add("col");
+    col1.classList.add("col", "col-sm-3");
+    // col1.classList.add("d-flex");
+    // col1.classList.add("flex-row-reverse");
+    col2.classList.add("col", "col-sm-9");
+    // col2.classList.add("d-flex");
+    col2.classList.add("fs-5");
+    
+    wishlistButton.classList.add("btn", "btn-success", "btn-sm");
+    wishlistButton.innerText = "I want to read this book";
+    historyButton.classList.add("btn", "btn-info", "btn-sm");
+    historyButton.innerText = "I have read this book";
 
     // what if there are no thumbnails to display??
     // generic image (no image)
     thumbnail.src = books[i].volumeInfo.imageLinks.smallThumbnail;
     anchorTitle.innerText = books[i].volumeInfo.title;
 
-    anchorThumbnail.href = "book.html?id=" + books[i].id;
-    anchorTitle.href = "book.html?id=" + books[i].id;
+    // anchorThumbnail.href = "book.html?id=" + books[i].id;
+
+    let ISBNid = books[i].volumeInfo.industryIdentifiers[0].identifier;
+    console.log(ISBNid);
+
+    wishlistButton.addEventListener("click", function () {
+      alert(ISBNid);
+    });
+
+    historyButton.addEventListener("click", function () {
+      alert(ISBNid);
+    });
+
+    anchorThumbnail.href = "book.html?id=" + ISBNid;
+    anchorTitle.href = "book.html?id=" + ISBNid;
+
     anchorThumbnail.appendChild(thumbnail);
 
     col1.appendChild(anchorThumbnail);
     col2.appendChild(anchorTitle);
+    col2.appendChild(wishlistButton);
+    col2.appendChild(historyButton);
 
     row.appendChild(col1);
     row.appendChild(col2);
