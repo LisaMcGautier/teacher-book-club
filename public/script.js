@@ -1,3 +1,84 @@
+async function index() {
+  configureMenu();
+  listClubs();
+}
+
+async function addBook() {
+  configureMenu();
+  loadAddBook();
+}
+
+async function book() {
+  configureMenu();
+  loadBook();
+}
+
+async function club() {
+  configureMenu();
+  loadClub();
+}
+
+async function discussion() {
+  configureMenu();
+  loadDiscussion();
+}
+
+async function myProfile() {
+  configureMenu();
+}
+
+async function teacher() {
+  configureMenu();
+  loadTeacher();
+}
+
+
+async function configureMenu() {
+
+  let mProfile = document.getElementById("mob-my-profile");
+  let tdProfile = document.getElementById("td-my-profile");
+  let mCreateClub = document.getElementById("mob-create-club");
+  let tdCreateClub = document.getElementById("td-create-club");
+  let mLogin = document.getElementById("mob-login");
+  let tdLogin = document.getElementById("td-login");
+  let mRegister = document.getElementById("mob-register");
+  let tdRegister = document.getElementById("td-register");
+  let mLogout = document.getElementById("mob-logout");
+  let tdLogout = document.getElementById("td-logout");
+
+  // check localStorage for the presence of a logged in user
+  if (localStorage.getItem("userId") === null) {
+
+    // hide the member options by removing elements from the DOM
+    tdProfile.remove();
+    mProfile.remove();
+    mCreateClub.remove();
+    tdCreateClub.remove();
+    mLogout.remove();
+    tdLogout.remove();
+
+    // display the non-member options
+    mLogin.classList.remove("d-none");
+    tdLogin.classList.remove("d-none");
+    mRegister.classList.remove("d-none");
+    tdRegister.classList.remove("d-none");
+  } else {
+
+    mLogin.remove();
+    tdLogin.remove();
+    mRegister.remove();
+    tdRegister.remove();
+
+    // display the member options
+    tdProfile.classList.remove("d-none");
+    mProfile.classList.remove("d-none");
+    mCreateClub.classList.remove("d-none");
+    tdCreateClub.classList.remove("d-none");
+    mLogout.classList.remove("d-none");
+    tdLogout.classList.remove("d-none");
+  }
+}
+
 // Register a new user
 async function registerUser() {
   // grab the values from the register.html form
@@ -44,6 +125,9 @@ async function login() {
   // grab the values from the login.html form
   let username = document.getElementById("username");
   let password = document.getElementById("password");
+  let btnLogin = document.getElementById("btn-login");
+
+  btnLogin.classList.add("disabled");
 
   // construct a body JSON object using those values
   let body = {
@@ -80,7 +164,9 @@ async function login() {
     // redirect to the user's profile page
     location.replace("/my-profile.html");
   } else {
-    alert("Oops! Login failed!");
+    let loginFailed = document.getElementById("login-failed");
+    loginFailed.classList.remove("d-none");
+    btnLogin.classList.remove("disabled");
   }
 }
 
@@ -131,7 +217,7 @@ async function searchBooks() {
   let section2 = document.getElementsByClassName("section2");
   section2[0].classList.remove("d-none");
 
-  for (i = 0; i < books.length; i++) {    
+  for (i = 0; i < books.length; i++) {
     const row = document.createElement("div");
     const col1 = document.createElement("div");
     const col2 = document.createElement("div");
@@ -148,7 +234,7 @@ async function searchBooks() {
     col2.classList.add("col", "col-sm-9");
     // col2.classList.add("d-flex");
     col2.classList.add("fs-5");
-    
+
     wishlistButton.classList.add("btn", "btn-success", "btn-sm");
     wishlistButton.innerText = "I want to read this book";
     historyButton.classList.add("btn", "btn-info", "btn-sm");
