@@ -293,14 +293,14 @@ app.get("/api/meetings", (req, res) => {
 
   let month = date.getUTCMonth() + 1;
   let day = date.getUTCDate();
-  
+
   // https://www.geeksforgeeks.org/how-to-format-the-current-date-in-mm-dd-yyyy-hhmmss-format-using-node-js/
-  if (month < 10) { 
-    month = `0${month}`; 
+  if (month < 10) {
+    month = `0${month}`;
   }
 
-  if (day < 10) { 
-    day = `0${day}`; 
+  if (day < 10) {
+    day = `0${day}`;
   }
 
   let myQuery = {
@@ -316,12 +316,7 @@ app.get("/api/meetings", (req, res) => {
         {
           property: "Date",
           date: {
-            on_or_after:
-              date.getUTCFullYear() +
-              "-" +
-              month +
-              "-" +
-              day,
+            on_or_after: date.getUTCFullYear() + "-" + month + "-" + day,
           },
         },
       ],
@@ -490,6 +485,94 @@ app.get("/api", (req, res) => {
       // returns an array of books
       res.send(result.items);
     });
+});
+
+async function AddToWishlist(body) {
+  const response = await notion.pages.create({
+    parent: { database_id: process.env.NOTION_DATABASE_WISHLIST_ID },
+    properties: {
+      Name: {
+        title: [
+          {
+            type: "text",
+            text: {
+              content: body.bookTitle,
+            },
+          },
+        ],
+      },
+      ISBN: {
+        rich_text: [
+          {
+            text: {
+              content: body.isbn,
+            },
+          },
+        ],
+      },
+      "🧑‍🏫 Employees": {
+        relation: [
+          {
+            id: body.userID,
+          },
+        ],
+      },
+    },
+  });
+
+  console.log(`SUCCESS: Book added to wishlist with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/wishlist/create", (req, res) => {
+  console.log(req.body);
+  AddToWishlist(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
+async function AddToHistory(body) {
+  const response = await notion.pages.create({
+    parent: { database_id: process.env.NOTION_DATABASE_HISTORY_ID },
+    properties: {
+      Name: {
+        title: [
+          {
+            type: "text",
+            text: {
+              content: body.bookTitle,
+            },
+          },
+        ],
+      },
+      ISBN: {
+        rich_text: [
+          {
+            text: {
+              content: body.isbn,
+            },
+          },
+        ],
+      },
+      "🧑‍🏫 Employees": {
+        relation: [
+          {
+            id: body.userID,
+          },
+        ],
+      },
+    },
+  });
+
+  console.log(`SUCCESS: Book added to history with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/history/create", (req, res) => {
+  console.log(req.body);
+  AddToHistory(req.body).then((data) => {
+    res.send(data);
+  });
 });
 
 // https://www.youtube.com/watch?v=LX_DXLlaymg

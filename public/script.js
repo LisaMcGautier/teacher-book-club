@@ -32,9 +32,7 @@ async function teacher() {
   loadTeacher();
 }
 
-
 async function configureMenu() {
-
   let mProfile = document.getElementById("mob-my-profile");
   let tdProfile = document.getElementById("td-my-profile");
   let mCreateClub = document.getElementById("mob-create-club");
@@ -48,7 +46,6 @@ async function configureMenu() {
 
   // check localStorage for the presence of a logged in user
   if (localStorage.getItem("userId") === null) {
-
     // hide the member options by removing elements from the DOM
     tdProfile.remove();
     mProfile.remove();
@@ -63,7 +60,6 @@ async function configureMenu() {
     mRegister.classList.remove("d-none");
     tdRegister.classList.remove("d-none");
   } else {
-
     mLogin.remove();
     tdLogin.remove();
     mRegister.remove();
@@ -250,12 +246,50 @@ async function searchBooks() {
     let ISBNid = books[i].volumeInfo.industryIdentifiers[0].identifier;
     console.log(ISBNid);
 
-    wishlistButton.addEventListener("click", function () {
-      alert(ISBNid);
+    wishlistButton.addEventListener("click", async function () {
+      // alert(ISBNid);
+      // call node, passing userID, title & ISBN
+      let body = {
+        bookTitle: anchorTitle.innerText,
+        isbn: ISBNid,
+        userID: localStorage.getItem("userId").replaceAll("-", ""),
+      };
+
+      const response = await fetch("/api/wishlist/create", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+      });
     });
 
-    historyButton.addEventListener("click", function () {
-      alert(ISBNid);
+    historyButton.addEventListener("click", async function () {
+      // alert(ISBNid);
+      // call node, passing userID, title & ISBN
+      let body = {
+        bookTitle: anchorTitle.innerText,
+        isbn: ISBNid,
+        userID: localStorage.getItem("userId").replaceAll("-", ""),
+      };
+
+      const response = await fetch("/api/history/create", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+      });
     });
 
     anchorThumbnail.href = "book.html?id=" + ISBNid;
