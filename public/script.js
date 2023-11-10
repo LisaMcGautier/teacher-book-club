@@ -166,6 +166,13 @@ async function login() {
   }
 }
 
+function logout() {
+  localStorage.removeItem("userId");
+  localStorage.removeItem("userFirst");
+  localStorage.removeItem("userLast");
+  location.replace("/index.html");
+}
+
 async function listClubs() {
   const response = await fetch("/api/clubs");
   const clubs = await response.json();
