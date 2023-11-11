@@ -851,21 +851,78 @@ loadTeacher = async () => {
   shortBio.innerText =
     teacher[0].properties["Short bio"].rich_text[0].plain_text;
 
-  // IF there are books in the wishlist
+  // ==============================================
+
+  loadShelf("wishlist", teacherId);
+  loadShelf("history", teacherId);
+
+  // loop over the results to make one call to GB API per ISBN to render thumbnails on the page
+};
+
+async function loadShelf(shelfName, teacherId) {
+  let shelf = document.getElementById(shelfName + "-shelf");
+
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border");
+  spinnerDiv.setAttribute("role", "status");
+
+  shelf.appendChild(spinnerDiv);
 
   // make another call to Notion to get the Wishlist
-  const wishlist = await fetch("/api/wishlist?id=" + teacherId).then(
+  const booklist = await fetch("/api/" + shelfName + "?id=" + teacherId).then(
     (response) => response.json()
   );
 
-  console.log("WISHLIST: ", wishlist);
+  spinnerDiv.remove();
 
-  // loop over the results to make one call to GB API per ISBN to render thumbnails on the page
+  console.log(shelfName, booklist);
 
-  // make another call to Notion to get the History
-  const history = await fetch("/api/history?id=" + teacherId).then((response) =>
-    response.json()
-  );
+  // IF there are books in the booklist
+  if (booklist.length > 0) {
+    for (i = 0; i < booklist.length; i++) {
+      const thumbnailDiv = document.createElement("div");
+      const anchorThumbnail = document.createElement("a");
+      const thumbnailImg = document.createElement("img");
+      const detailsDiv = document.createElement("div");
+      const bookInfo = document.createElement("div");
+      const anchorTitle = document.createElement("a");
 
-  console.log("HISTORY: ", history);
-};
+      thumbnailDiv.classList.add("m-3");
+      detailsDiv.classList.add("my-3", "mx-2");
+      bookInfo.classList.add("details-small");
+
+      thumbnailImg.src = booklist[i].properties.thumbnail;
+      anchorThumbnail.href =
+        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
+      anchorThumbnail.appendChild(thumbnailImg);
+      thumbnailDiv.appendChild(anchorThumbnail);
+
+      anchorTitle.innerText = booklist[i].properties.title;
+      anchorTitle.href =
+        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
+
+      bookInfo.innerHTML =
+        "<a href=" +
+        anchorTitle.href +
+        ">" +
+        anchorTitle.innerText +
+        "</a><br>by<br>" +
+        booklist[i].properties.authors;
+
+      detailsDiv.appendChild(bookInfo);
+
+      shelf.appendChild(thumbnailDiv);
+      shelf.appendChild(detailsDiv);
+    }
+  } else {
+    const messageDiv = document.createElement("div");
+
+    messageDiv.innerText = "There are no books on this shelf yet.";
+
+    shelf.classList.remove("shelf");
+    shelf.classList.add("shelf-empty");
+
+    shelf.appendChild(messageDiv);
+  }
+}
