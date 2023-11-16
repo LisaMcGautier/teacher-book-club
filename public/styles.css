@@ -227,10 +227,31 @@ https://www.w3schools.com/css/css_align.asp
 
 .short-bio {
     background-color: #FFFFFF;
+    font-size: 1.25em;
     height: 100px;
-    border: solid 3px orange;
+    border: 1px solid #aaaaaa;
     margin-top: 10px;
     margin-right: 10px;
+}
+
+/* https://codepen.io/phpcodertech/pen/oNXVzWW */
+.textarea {
+    border: 1px solid #ccc;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 1px 6px;
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    resize: both;
+    min-height: 40px;
+    line-height: 20px;
+    text-align: left;
+}
+
+.textarea[contenteditable]:empty::before {
+    content: "Type your message here...";
+    color: gray;
 }
 
 .shelf {

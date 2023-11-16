@@ -406,8 +406,59 @@ app.get("/api/teacher", (req, res) => {
   });
 });
 
+async function SendMessage(body) {
+  const response = await notion.pages.create({
+    parent: { database_id: process.env.NOTION_DATABASE_MESSAGES_ID },
+    properties: {
+      Name: {
+        title: [
+          {
+            type: "text",
+            text: {
+              content: "",
+            },
+          },
+        ],
+      },
+      "Message": {
+        rich_text: [
+          {
+            text: {
+              content: body.message,
+            },
+          },
+        ],
+      },
+      "🧑‍🏫 Sender from Employees": {
+        relation: [
+          {
+            id: body.sender,
+          },
+        ],
+      },
+      "🧑‍🏫 Recipient to Employees": {
+        relation: [
+          {
+            id: body.recipient,
+          },
+        ],
+      },
+    },
+  });
+
+  console.log(`SUCCESS: Message successfully added with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/send-message", (req, res) => {
+  console.log(req.body);
+  SendMessage(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
 app.get("/api/wishlist", (req, res) => {
-  console.log("WISHLIST " + req.query.id);
+  // console.log("WISHLIST " + req.query.id);
 
   let myQuery = {
     database_id: process.env.NOTION_DATABASE_WISHLIST_ID,
@@ -437,13 +488,13 @@ app.get("/api/wishlist", (req, res) => {
             result.items[0].volumeInfo.imageLinks.smallThumbnail;
         });
     }
-    console.log(data);
+    // console.log(data);
     res.send(data);
   });
 });
 
 app.get("/api/history", (req, res) => {
-  console.log("HISTORY " + req.query.id);
+  // console.log("HISTORY " + req.query.id);
 
   let myQuery = {
     database_id: process.env.NOTION_DATABASE_HISTORY_ID,
@@ -473,7 +524,7 @@ app.get("/api/history", (req, res) => {
             result.items[0].volumeInfo.imageLinks.smallThumbnail;
         });
     }
-    console.log(data);
+    // console.log(data);
     res.send(data);
   });
 });

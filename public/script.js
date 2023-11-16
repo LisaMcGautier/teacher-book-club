@@ -851,7 +851,79 @@ loadTeacher = async () => {
   shortBio.innerText =
     teacher[0].properties["Short bio"].rich_text[0].plain_text;
 
-  // ==============================================
+  let messageSent = document.getElementById("message-sent");
+  let closeMsgBtn = document.getElementById("close-button");
+  let cancelMsgBtn = document.getElementById("cancel-button");
+  let sendMsgBtn = document.getElementById("send-button");
+  let messageWarning = document.getElementById("message-warning");
+  let messageContent = document.getElementById("message-content");
+
+  let sendMessageModal = new bootstrap.Modal(
+    document.getElementById("sendMessageModal"),
+    {
+      keyboard: false,
+    }
+  );
+
+  closeMsgBtn.addEventListener("click", async function () {
+    if (messageWarning.classList.contains("d-none") == false) {
+      messageWarning.classList.add("d-none");
+    }
+
+    messageContent.innerText = "";
+    sendMessageModal.hide();
+  });
+
+  cancelMsgBtn.addEventListener("click", async function () {
+    if (messageWarning.classList.contains("d-none") == false) {
+      messageWarning.classList.add("d-none");
+    }
+
+    messageContent.innerText = "";
+    sendMessageModal.hide();
+  });
+
+  sendMsgBtn.addEventListener("click", async function () {
+    if (messageContent.innerText.trim() == "") {
+      messageWarning.classList.remove("d-none");
+    } else {
+      console.log("Message: ", messageContent.innerText);
+
+      if (messageWarning.classList.contains("d-none") == false) {
+        messageWarning.classList.add("d-none");
+      }
+
+      let body = {
+        recipient: teacherId,
+        message: messageContent.innerText,
+        sender: localStorage.getItem("userId").replaceAll("-", ""),
+      };
+
+      sendMessageModal.hide();
+
+      // call nodeJS send-message endpoint -- POST
+      const response = await fetch("/api/send-message", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+      });
+
+      const confirmation = await response.json();
+
+      console.log(confirmation);
+
+      messageContent.innerText = "";
+
+      messageSent.classList.remove("d-none");
+    }
+  });
 
   loadShelf("wishlist", teacherId);
   loadShelf("history", teacherId);
