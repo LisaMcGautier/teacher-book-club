@@ -699,8 +699,6 @@ loadBook = async () => {
   bookDetails.appendChild(isbnTen);
   bookDetails.appendChild(isbnThirteen);
 
-  // .......
-
   const reviews = await fetch("/api/reviews-notion?isbn=" + bookId).then(
     (response) => response.json()
   );
@@ -708,7 +706,6 @@ loadBook = async () => {
   console.log(reviews[0]);
 
   let reviewSection = document.getElementById("review-section");
-  // reviewContent.innerText = reviews[1].properties.Review.rich_text[0].plain_text;
 
   for (i = 0; i < reviews.length; i++) {
     const row = document.createElement("div");
@@ -722,19 +719,14 @@ loadBook = async () => {
     col1.classList.add("col-sm-2");
     col2.classList.add("col-sm-10");
 
-    // what if there are no thumbnails to display??
-    // generic image (no image)
-
-    // thumbnail.src = books[i].volumeInfo.imageLinks.smallThumbnail;
-    // anchorTitle.innerText = books[i].volumeInfo.title;
-
     let teacherId = reviews[i].properties["🧑‍🏫 Employees"].relation[0].id;
     teacherId = teacherId.replaceAll("-", "");
 
-    anchorAvatar.href = "teacher.html?id=" + teacherId;
-    // anchorTitle.href = "book.html?id=" + books[i].id;
+    avatar.src = reviews[i].properties.avatarURL;
 
-    anchorAvatar.classList.add("avatar-thumbnail");
+    anchorAvatar.href = "teacher.html?id=" + teacherId;
+
+    avatar.classList.add("avatar-thumbnail");
     anchorAvatar.appendChild(avatar);
 
     reviewContent.innerText =
@@ -748,9 +740,6 @@ loadBook = async () => {
     row.appendChild(col2);
 
     reviewSection.appendChild(row);
-
-    // TODO: what if there are more than 10 results?
-    // How to add pages of results...
   }
 };
 

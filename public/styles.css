@@ -164,9 +164,9 @@ https://www.w3schools.com/css/css_align.asp
 
 /* Styles relevant to the BOOK page */
 .avatar-thumbnail {
-    background-color: #999999;
+    /* background-color: #999999; */
     width: 100px;
-    height: 100px;
+    height: auto;
     border: solid 1px #000000;
     margin: 10px;
     /* Centering the avatar in the column */
@@ -177,7 +177,7 @@ https://www.w3schools.com/css/css_align.asp
 
 .review-details {
     background-color: #FFFFFF;
-    height: 100px;
+    height: auto;
     border: solid 1px #000000;
     margin: 10px;
 }

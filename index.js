@@ -352,6 +352,24 @@ app.get("/api/book-notion", (req, res) => {
   });
 });
 
+async function getEmployeeByID(teacherID) {
+  console.log("EMPLOYEE " + teacherID);
+
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID,
+    filter: {
+      property: "Teacher ID",
+      formula: {
+        string: { equals: teacherID },
+      },
+    },
+  };
+
+  const employee = await queryDatabase(myQuery);
+
+  return employee;
+}
+
 app.get("/api/reviews-notion", (req, res) => {
   console.log("REVIEW " + req.query.isbn);
 
@@ -365,7 +383,20 @@ app.get("/api/reviews-notion", (req, res) => {
     },
   };
 
-  queryDatabase(myQuery).then((data) => {
+  queryDatabase(myQuery).then(async (data) => {
+    for (let i = 0; i < data.length; i++) {
+      // grab the TeacherID from the Employees relation
+      let employee = await getEmployeeByID(
+        data[i].properties["🧑‍🏫 Employees"].relation[0].id.replaceAll("-", "")
+      );
+      
+      // add the avatar to the Notion results
+      data[i].properties.avatarURL =
+        employee[0].properties["Avatar image"].files[0].external.url;
+
+      console.log(employee);
+    }
+
     res.send(data);
   });
 });
@@ -420,7 +451,7 @@ async function SendMessage(body) {
           },
         ],
       },
-      "Message": {
+      Message: {
         rich_text: [
           {
             text: {
