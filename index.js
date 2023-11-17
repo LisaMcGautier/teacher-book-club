@@ -352,6 +352,59 @@ app.get("/api/book-notion", (req, res) => {
   });
 });
 
+async function SubmitReview(body) {
+  const response = await notion.pages.create({
+    parent: { database_id: process.env.NOTION_DATABASE_REVIEWS_ID },
+    properties: {
+      Name: {
+        title: [
+          {
+            type: "text",
+            text: {
+              content: "",
+            },
+          },
+        ],
+      },
+      "🧑‍🏫 Employees": {
+        relation: [
+          {
+            id: body.sender,
+          },
+        ],
+      },
+      Review: {
+        rich_text: [
+          {
+            text: {
+              content: body.review,
+            },
+          },
+        ],
+      },
+      ISBN: {
+        rich_text: [
+          {
+            text: {
+              content: body.isbn,
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  console.log(`SUCCESS: Review successfully added with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/reviews/add", (req, res) => {
+  console.log(req.body);
+  SubmitReview(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
 async function getEmployeeByID(teacherID) {
   console.log("EMPLOYEE " + teacherID);
 
@@ -389,12 +442,16 @@ app.get("/api/reviews-notion", (req, res) => {
       let employee = await getEmployeeByID(
         data[i].properties["🧑‍🏫 Employees"].relation[0].id.replaceAll("-", "")
       );
-      
-      // add the avatar to the Notion results
-      data[i].properties.avatarURL =
-        employee[0].properties["Avatar image"].files[0].external.url;
 
-      console.log(employee);
+      // add the avatar to the Notion results
+      if (employee[0].properties["Avatar image"].files[0] == undefined) {
+        data[i].properties.avatarURL = null;
+      } else {
+        data[i].properties.avatarURL =
+          employee[0].properties["Avatar image"].files[0].external.url;
+
+        console.log(employee);
+      }
     }
 
     res.send(data);
