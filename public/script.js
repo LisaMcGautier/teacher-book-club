@@ -663,6 +663,67 @@ generateGPTQuestions = async () => {
     });
 };
 
+loadReviews = async (bookId) => {
+
+  let reviewSection = document.getElementById("review-section");
+  // clear previously rendered reviews and display all current reviews
+  reviewSection.innerHTML = "";
+
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border", "m-3");
+  spinnerDiv.setAttribute("role", "status");
+
+  reviewSection.appendChild(spinnerDiv);
+
+  const reviews = await fetch("/api/reviews-notion?isbn=" + bookId).then(
+    (response) => response.json()
+  );
+
+  console.log(reviews[0]);
+
+  spinnerDiv.remove();
+
+  for (i = 0; i < reviews.length; i++) {
+    const row = document.createElement("div");
+    const col1 = document.createElement("div");
+    const col2 = document.createElement("div");
+    const avatar = document.createElement("img");
+    const anchorAvatar = document.createElement("a");
+    const reviewContent = document.createElement("div");
+
+    row.classList.add("row");
+    col1.classList.add("col-sm-2");
+    col2.classList.add("col-sm-10");
+
+    let teacherId = reviews[i].properties["🧑‍🏫 Employees"].relation[0].id;
+    teacherId = teacherId.replaceAll("-", "");
+
+    if (reviews[i].properties.avatarURL == null) {
+      avatar.src = "images/default_avatar.png";
+    } else {
+      avatar.src = reviews[i].properties.avatarURL;
+    }
+
+    anchorAvatar.href = "teacher.html?id=" + teacherId;
+
+    avatar.classList.add("avatar-thumbnail");
+    anchorAvatar.appendChild(avatar);
+
+    reviewContent.innerText =
+      reviews[i].properties.Review.rich_text[0].plain_text;
+    reviewContent.classList.add("review-details");
+
+    col1.appendChild(anchorAvatar);
+    col2.appendChild(reviewContent);
+
+    row.appendChild(col1);
+    row.appendChild(col2);
+
+    reviewSection.appendChild(row);
+  }
+};
+
 loadBook = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
@@ -699,48 +760,83 @@ loadBook = async () => {
   bookDetails.appendChild(isbnTen);
   bookDetails.appendChild(isbnThirteen);
 
-  const reviews = await fetch("/api/reviews-notion?isbn=" + bookId).then(
-    (response) => response.json()
+  let reviewSubmitted = document.getElementById("review-submitted");
+  let closeReviewBtn = document.getElementById("close-button");
+  let cancelReviewBtn = document.getElementById("cancel-button");
+  let submitReviewBtn = document.getElementById("submit-button");
+  let messageWarning = document.getElementById("message-warning");
+  let reviewContent = document.getElementById("review-content");
+
+  let addReviewModal = new bootstrap.Modal(
+    document.getElementById("addReviewModal"),
+    {
+      keyboard: false,
+    }
   );
 
-  console.log(reviews[0]);
+  closeReviewBtn.addEventListener("click", async function () {
+    if (messageWarning.classList.contains("d-none") == false) {
+      messageWarning.classList.add("d-none");
+    }
 
-  let reviewSection = document.getElementById("review-section");
+    reviewContent.innerText = "";
+    addReviewModal.hide();
+  });
 
-  for (i = 0; i < reviews.length; i++) {
-    const row = document.createElement("div");
-    const col1 = document.createElement("div");
-    const col2 = document.createElement("div");
-    const avatar = document.createElement("img");
-    const anchorAvatar = document.createElement("a");
-    const reviewContent = document.createElement("div");
+  cancelReviewBtn.addEventListener("click", async function () {
+    if (messageWarning.classList.contains("d-none") == false) {
+      messageWarning.classList.add("d-none");
+    }
 
-    row.classList.add("row");
-    col1.classList.add("col-sm-2");
-    col2.classList.add("col-sm-10");
+    reviewContent.innerText = "";
+    addReviewModal.hide();
+  });
 
-    let teacherId = reviews[i].properties["🧑‍🏫 Employees"].relation[0].id;
-    teacherId = teacherId.replaceAll("-", "");
+  submitReviewBtn.addEventListener("click", async function () {
+    if (reviewContent.innerText.trim() == "") {
+      messageWarning.classList.remove("d-none");
+    } else {
+      console.log("Message: ", reviewContent.innerText);
 
-    avatar.src = reviews[i].properties.avatarURL;
+      if (messageWarning.classList.contains("d-none") == false) {
+        messageWarning.classList.add("d-none");
+      }
 
-    anchorAvatar.href = "teacher.html?id=" + teacherId;
+      let body = {
+        sender: localStorage.getItem("userId").replaceAll("-", ""),
+        review: reviewContent.innerText,
+        isbn: bookId,
+      };
 
-    avatar.classList.add("avatar-thumbnail");
-    anchorAvatar.appendChild(avatar);
+      addReviewModal.hide();
 
-    reviewContent.innerText =
-      reviews[i].properties.Review.rich_text[0].plain_text;
-    reviewContent.classList.add("review-details");
+      // call nodeJS add reviews endpoint -- POST
+      const response = await fetch("/api/reviews/add", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+      });
 
-    col1.appendChild(anchorAvatar);
-    col2.appendChild(reviewContent);
+      const confirmation = await response.json();
 
-    row.appendChild(col1);
-    row.appendChild(col2);
+      console.log(confirmation);
 
-    reviewSection.appendChild(row);
-  }
+      reviewContent.innerText = "";
+
+      reviewSubmitted.classList.remove("d-none");
+
+      loadReviews(bookId);
+    }
+  });
+
+  loadReviews(bookId);
 };
 
 loadDiscussion = async () => {
