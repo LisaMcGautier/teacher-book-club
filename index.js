@@ -458,16 +458,28 @@ app.get("/api/reviews-notion", (req, res) => {
   });
 });
 
-app.get("/api/discussion-notion", (req, res) => {
+app.get("/api/discussion-guide", (req, res) => {
   console.log("DISCUSSION " + req.query.id);
 
   let myQuery = {
-    database_id: process.env.NOTION_DATABASE_DISCUSSIONS_ID,
+    database_id: process.env.NOTION_DATABASE_DISCUSSION_GUIDES_ID,
     filter: {
-      property: "discussion ID",
-      formula: {
-        string: { equals: req.query.id },
-      },
+      and: [
+        {
+          property: "👥 Clubs",
+          relation: {
+            contains: req.query.id,
+          },
+        },
+        {
+          property: "ISBN",
+          formula: {
+            string: {
+              equals: req.query.isbn,
+            },
+          },
+        },
+      ],
     },
   };
 
