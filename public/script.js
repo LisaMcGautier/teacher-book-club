@@ -406,7 +406,11 @@ loadClub = async () => {
     isbnThirteen.innerText =
       "ISBN 13: " + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
     let btnDiscussion = document.createElement("a");
-    btnDiscussion.href = "discussion.html?id=f7b52260126b49d192ab35e9eae4585b";
+    btnDiscussion.href =
+      "discussion.html?id=" +
+      clubId +
+      "&isbn=" +
+      book.items[0].volumeInfo.industryIdentifiers[0].identifier;
     btnDiscussion.classList.add("btn", "btn-success");
     btnDiscussion.innerText = "Click to join discussion";
 
@@ -664,7 +668,6 @@ generateGPTQuestions = async () => {
 };
 
 loadReviews = async (bookId) => {
-
   let reviewSection = document.getElementById("review-section");
   // clear previously rendered reviews and display all current reviews
   reviewSection.innerHTML = "";
@@ -842,61 +845,53 @@ loadBook = async () => {
 loadDiscussion = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
-  const discussionId = urlParams.get("id");
+  const clubId = urlParams.get("id");
+  const isbn = urlParams.get("isbn");
 
   const discussion = await fetch(
-    "/api/discussion-notion?id=" + discussionId
+    "/api/discussion-guide?id=" + clubId + "&isbn=" + isbn
   ).then((response) => response.json());
 
   console.log(discussion);
 
   // update the DOM with discussion information
   let discussionHeading = document.getElementById("discussion-heading");
-  discussionHeading.innerText =
-    discussion[0].properties.Name.title[0].plain_text;
+  discussionHeading.innerText = "Club Name";
 
-  // ??????????????????????????????????????????????????????
-  // Is it possible to call GBooks API for book details
-  // and also call Notion API for discussion details?
+  const book = await fetch("/api/book?id=" + isbn).then((response) =>
+    response.json()
+  );
 
-  // let bookThumbnail = document.getElementById("book-thumbnail");
-  // bookThumbnail.src = book.volumeInfo.imageLinks.smallThumbnail;
+  // update the DOM with book information
+  console.log(book);
 
-  // let bookDetails = document.getElementById("book-details");
-  // bookDetails.innerText = "";
-  // let title = document.createElement("h5");
-  // title.innerText = book.volumeInfo.title;
-  // let author = document.createElement("p");
-  // author.innerText = "by " + book.volumeInfo.authors[0];
-  // let isbnTen = document.createElement("p");
-  // isbnTen.innerText = "ISBN 10: " + book.volumeInfo.industryIdentifiers[0].identifier;
-  // let isbnThirteen = document.createElement("p");
-  // isbnThirteen.innerText = "ISBN 13: " + book.volumeInfo.industryIdentifiers[1].identifier;
+  let bookThumbnail = document.createElement("img");
+  bookThumbnail.src = book.items[0].volumeInfo.imageLinks.smallThumbnail;
 
-  // bookDetails.appendChild(title);
-  // bookDetails.appendChild(author);
-  // bookDetails.appendChild(isbnTen);
-  // bookDetails.appendChild(isbnThirteen);
+  let bookDetails = document.getElementById("book-details");
+  let title = document.createElement("h5");
+  title.innerText = book.items[0].volumeInfo.title;
+  let author = document.createElement("p");
+  author.innerText = "by " + book.items[0].volumeInfo.authors[0];
+  let isbnTen = document.createElement("p");
+  isbnTen.innerText =
+    "ISBN 10: " + book.items[0].volumeInfo.industryIdentifiers[1].identifier;
+  let isbnThirteen = document.createElement("p");
+  isbnThirteen.innerText =
+    "ISBN 13: " + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
 
-  let questionOne = document.getElementById("question-one");
-  questionOne.innerText =
-    discussion[0].properties["Question 1"].rich_text[0].plain_text;
+  bookDetails.appendChild(bookThumbnail);
+  bookDetails.appendChild(title);
+  bookDetails.appendChild(author);
+  bookDetails.appendChild(isbnTen);
+  bookDetails.appendChild(isbnThirteen);
 
-  let questionTwo = document.getElementById("question-two");
-  questionTwo.innerText =
-    discussion[0].properties["Question 2"].rich_text[0].plain_text;
+  let questions = document.getElementById("questions");
+  questions.innerText =
+    discussion[0].properties["Guiding Questions"].rich_text[0].plain_text;
 
-  let questionThree = document.getElementById("question-three");
-  questionThree.innerText =
-    discussion[0].properties["Question 3"].rich_text[0].plain_text;
-
-  let questionFour = document.getElementById("question-four");
-  questionFour.innerText =
-    discussion[0].properties["Question 4"].rich_text[0].plain_text;
-
-  let questionFive = document.getElementById("question-five");
-  questionFive.innerText =
-    discussion[0].properties["Question 5"].rich_text[0].plain_text;
+  let goBackBtn = document.getElementById("go-back-button");
+  goBackBtn.href = "club.html?id=" + clubId;
 
   // .......
 };
