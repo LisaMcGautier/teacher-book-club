@@ -488,6 +488,92 @@ app.get("/api/discussion-guide", (req, res) => {
   });
 });
 
+app.get("/api/discussion-posts", (req, res) => {
+  console.log("COMMENT" + req.query.id);
+
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_DISCUSSION_POSTS_ID,
+    filter: {
+      property: "🧭 Discussion Guides",
+      relation: {
+        contains: req.query.id,
+      },
+    },
+  };
+
+  queryDatabase(myQuery).then(async (data) => {
+    for (let i = 0; i < data.length; i++) {
+      // grab the TeacherID from the Employees relation
+      let employee = await getEmployeeByID(
+        data[i].properties["🧑‍🏫 Employees"].relation[0].id.replaceAll("-", "")
+      );
+
+      // add the avatar to the Notion results
+      if (employee[0].properties["Avatar image"].files[0] == undefined) {
+        data[i].properties.avatarURL = null;
+      } else {
+        data[i].properties.avatarURL =
+          employee[0].properties["Avatar image"].files[0].external.url;
+
+        console.log(employee);
+      }
+    }
+
+    res.send(data);
+  });
+});
+
+async function SubmitComment(body) {
+  const response = await notion.pages.create({
+    parent: { database_id: process.env.NOTION_DATABASE_DISCUSSION_POSTS_ID },
+    properties: {
+      Name: {
+        title: [
+          {
+            type: "text",
+            text: {
+              content: "",
+            },
+          },
+        ],
+      },
+      "🧭 Discussion Guides": {
+        relation: [
+          {
+            id: body.discussionId,
+          },
+        ],
+      },
+      "🧑‍🏫 Employees": {
+        relation: [
+          {
+            id: body.sender,
+          },
+        ],
+      },
+      Comment: {
+        rich_text: [
+          {
+            text: {
+              content: body.comment,
+            },
+          },
+        ],
+      },      
+    },
+  });
+
+  console.log(`SUCCESS: Comment successfully added with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/comments/add", (req, res) => {
+  console.log(req.body);
+  SubmitComment(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
 app.get("/api/teacher", (req, res) => {
   console.log("TEACHER " + req.query.id);
 
