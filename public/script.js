@@ -842,6 +842,66 @@ loadBook = async () => {
   loadReviews(bookId);
 };
 
+loadComments = async (discussionId) => {
+  let commentSection = document.getElementById("comment-section");
+  // clear previously rendered reviews and display all current reviews
+  commentSection.innerHTML = "";
+
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border", "m-3");
+  spinnerDiv.setAttribute("role", "status");
+
+  commentSection.appendChild(spinnerDiv);
+
+  const comments = await fetch("/api/discussion-posts?id=" + discussionId).then(
+    (response) => response.json()
+  );
+
+  console.log(comments[0]);
+
+  spinnerDiv.remove();
+
+  for (i = 0; i < comments.length; i++) {
+    const row = document.createElement("div");
+    const col1 = document.createElement("div");
+    const col2 = document.createElement("div");
+    const avatar = document.createElement("img");
+    const anchorAvatar = document.createElement("a");
+    const commentContent = document.createElement("div");
+
+    row.classList.add("row");
+    col1.classList.add("col-sm-2");
+    col2.classList.add("col-sm-10");
+
+    let teacherId = comments[i].properties["🧑‍🏫 Employees"].relation[0].id;
+    teacherId = teacherId.replaceAll("-", "");
+
+    if (comments[i].properties.avatarURL == null) {
+      avatar.src = "images/default_avatar.png";
+    } else {
+      avatar.src = comments[i].properties.avatarURL;
+    }
+
+    anchorAvatar.href = "teacher.html?id=" + teacherId;
+
+    avatar.classList.add("avatar-thumbnail");
+    anchorAvatar.appendChild(avatar);
+
+    commentContent.innerText =
+      comments[i].properties.Comment.rich_text[0].plain_text;
+    commentContent.classList.add("review-details");
+
+    col1.appendChild(anchorAvatar);
+    col2.appendChild(commentContent);
+
+    row.appendChild(col1);
+    row.appendChild(col2);
+
+    commentSection.appendChild(row);
+  }
+};
+
 loadDiscussion = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
@@ -854,9 +914,12 @@ loadDiscussion = async () => {
 
   console.log(discussion);
 
+  let discussionId = discussion[0].properties["discussion ID"].formula.string;
+
   // update the DOM with discussion information
   let discussionHeading = document.getElementById("discussion-heading");
-  discussionHeading.innerText = "Club Name";
+  discussionHeading.innerText =
+    discussion[0].properties["Club Name"].rollup.array[0].title[0].plain_text;
 
   const book = await fetch("/api/book?id=" + isbn).then((response) =>
     response.json()
@@ -892,8 +955,84 @@ loadDiscussion = async () => {
 
   let goBackBtn = document.getElementById("go-back-button");
   goBackBtn.href = "club.html?id=" + clubId;
+ 
+  let commentSubmitted = document.getElementById("comment-submitted");
+  let closeCommentBtn = document.getElementById("close-button");
+  let cancelCommentBtn = document.getElementById("cancel-button");
+  let submitCommentBtn = document.getElementById("submit-button");
+  let messageWarning = document.getElementById("message-warning");
+  let commentContent = document.getElementById("comment-content");
 
-  // .......
+  let addCommentModal = new bootstrap.Modal(
+    document.getElementById("addCommentModal"),
+    {
+      keyboard: false,
+    }
+  );
+
+  closeCommentBtn.addEventListener("click", async function () {
+    if (messageWarning.classList.contains("d-none") == false) {
+      messageWarning.classList.add("d-none");
+    }
+
+    commentContent.innerText = "";
+    addCommentModal.hide();
+  });
+
+  cancelCommentBtn.addEventListener("click", async function () {
+    if (messageWarning.classList.contains("d-none") == false) {
+      messageWarning.classList.add("d-none");
+    }
+
+    commentContent.innerText = "";
+    addCommentModal.hide();
+  });
+
+  submitCommentBtn.addEventListener("click", async function () {
+    if (commentContent.innerText.trim() == "") {
+      messageWarning.classList.remove("d-none");
+    } else {
+      console.log("Message: ", commentContent.innerText);
+
+      if (messageWarning.classList.contains("d-none") == false) {
+        messageWarning.classList.add("d-none");
+      }
+
+      let body = {
+        discussionId: discussionId,
+        sender: localStorage.getItem("userId").replaceAll("-", ""),
+        comment: commentContent.innerText,        
+      };
+
+      addCommentModal.hide();
+
+      // call nodeJS add comments endpoint -- POST
+      const response = await fetch("/api/comments/add", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+      });
+
+      const confirmation = await response.json();
+
+      console.log(confirmation);
+
+      commentContent.innerText = "";
+
+      commentSubmitted.classList.remove("d-none");
+
+      loadComments(discussionId);
+    }
+  });
+
+  loadComments(discussionId);
 };
 
 loadTeacher = async () => {
