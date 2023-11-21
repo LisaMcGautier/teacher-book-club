@@ -215,9 +215,9 @@ https://www.w3schools.com/css/css_align.asp
 
 /* Styles relevant to the TEACHER page */
 .avatar-large {
-    background-color: #999999;
+    /* background-color: #999999; */
     width: 200px;
-    height: 200px;
+    height: auto;
     border: solid 1px #000000;
     /* Centering the avatar in the column */
     display: block;
