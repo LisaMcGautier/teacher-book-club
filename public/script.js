@@ -25,6 +25,7 @@ async function discussion() {
 
 async function myProfile() {
   configureMenu();
+  loadProfile();
 }
 
 async function teacher() {
@@ -172,6 +173,140 @@ function logout() {
   localStorage.removeItem("userLast");
   location.replace("/index.html");
 }
+
+loadAvatarBio = async () => {
+  // let reviewSection = document.getElementById("review-section");
+  // // clear previously rendered reviews and display all current reviews
+  // reviewSection.innerHTML = "";
+
+  // const spinnerDiv = document.createElement("div");
+  // spinnerDiv.setAttribute("id", "spinner");
+  // spinnerDiv.classList.add("spinner-border", "m-3");
+  // spinnerDiv.setAttribute("role", "status");
+
+  // reviewSection.appendChild(spinnerDiv);
+
+  const teacherId = localStorage.getItem("userId").replaceAll("-", "");
+
+  const teacher = await fetch("/api/teacher?id=" + teacherId).then((response) =>
+    response.json()
+  );
+
+  console.log(teacher);
+
+  let avatar = document.getElementById("avatar");
+  avatar.innerText = "";
+  let thumbnail = document.createElement("img");
+  thumbnail.classList.add("avatar-large");
+
+  if (teacher[0].properties["Avatar image"].files.length == 0) {
+    thumbnail.src = "images/default_avatar.png";
+  } else {
+    thumbnail.src = teacher[0].properties["Avatar image"].files[0].external.url;
+  }
+
+  avatar.appendChild(thumbnail);
+
+  let shortBio = document.getElementById("short-bio");
+  shortBio.innerText = "";
+
+  let bioContent = document.getElementById("bio-content");
+
+  if (teacher[0].properties["Short bio"].rich_text.length == 0) {
+    shortBio.innerText = "Once upon a time...";
+  } else {
+    shortBio.innerText =
+      teacher[0].properties["Short bio"].rich_text[0].plain_text;
+    bioContent.innerText =
+      teacher[0].properties["Short bio"].rich_text[0].plain_text;
+  }
+};
+
+loadProfile = async () => {
+  const teacherId = localStorage.getItem("userId").replaceAll("-", "");
+
+  loadAvatarBio();
+
+  let bioSaved = document.getElementById("bio-saved");
+  let closeBioBtn = document.getElementById("close-button");
+  let cancelBioBtn = document.getElementById("cancel-button");
+  let saveBioBtn = document.getElementById("save-button");
+  let messageWarning = document.getElementById("message-warning");
+  let bioContent = document.getElementById("bio-content");
+
+  let editBioModal = new bootstrap.Modal(
+    document.getElementById("editBioModal"),
+    {
+      keyboard: false,
+    }
+  );
+
+  closeBioBtn.addEventListener("click", async function () {
+    if (messageWarning.classList.contains("d-none") == false) {
+      messageWarning.classList.add("d-none");
+    }
+
+    bioContent.innerText = "";
+    editBioModal.hide();
+  });
+
+  cancelBioBtn.addEventListener("click", async function () {
+    if (messageWarning.classList.contains("d-none") == false) {
+      messageWarning.classList.add("d-none");
+    }
+
+    bioContent.innerText = "";
+    editBioModal.hide();
+  });
+
+  saveBioBtn.addEventListener("click", async function () {
+    if (bioContent.innerText.trim() == "") {
+      messageWarning.classList.remove("d-none");
+    } else {
+      console.log("Message: ", bioContent.innerText);
+
+      if (messageWarning.classList.contains("d-none") == false) {
+        messageWarning.classList.add("d-none");
+      }
+
+      let body = {
+        pageId: localStorage.getItem("userId"),
+        bio: bioContent.innerText,
+      };
+
+      editBioModal.hide();
+
+      // call nodeJS update bio endpoint -- POST
+      const response = await fetch("/api/bio/update", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+      });
+
+      const confirmation = await response.json();
+
+      console.log(confirmation);
+
+      bioContent.innerText = "";
+
+      bioSaved.classList.remove("d-none");
+    }
+
+    loadAvatarBio();
+  });
+
+  loadShelf("wishlist", teacherId);
+  loadShelf("history", teacherId);
+
+  // loop over the results to make one call to GB API per ISBN to render thumbnails on the page
+};
 
 async function listClubs() {
   const response = await fetch("/api/clubs");
@@ -955,7 +1090,7 @@ loadDiscussion = async () => {
 
   let goBackBtn = document.getElementById("go-back-button");
   goBackBtn.href = "club.html?id=" + clubId;
- 
+
   let commentSubmitted = document.getElementById("comment-submitted");
   let closeCommentBtn = document.getElementById("close-button");
   let cancelCommentBtn = document.getElementById("cancel-button");
@@ -1001,7 +1136,7 @@ loadDiscussion = async () => {
       let body = {
         discussionId: discussionId,
         sender: localStorage.getItem("userId").replaceAll("-", ""),
-        comment: commentContent.innerText,        
+        comment: commentContent.innerText,
       };
 
       addCommentModal.hide();

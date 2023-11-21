@@ -225,6 +225,34 @@ app.post("/api/login-user", (req, res) => {
   });
 });
 
+async function UpdateBio(body) {
+  const response = await notion.pages.update({
+    parent: { database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID },
+    page_id: body.pageId,
+    properties: {
+      "Short bio": {
+        rich_text: [
+          {
+            text: {
+              content: body.bio,
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  console.log(`Bio updated for teacher ${response.id}`);
+  return response;
+}
+
+app.post("/api/bio/update", (req, res) => {
+  console.log(req.body);
+  UpdateBio(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
 app.get("/api/clubs", (req, res) => {
   console.log("CLUB " + req.query.id);
 
@@ -559,7 +587,7 @@ async function SubmitComment(body) {
             },
           },
         ],
-      },      
+      },
     },
   });
 
