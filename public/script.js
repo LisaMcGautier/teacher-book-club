@@ -222,6 +222,78 @@ loadAvatarBio = async () => {
   }
 };
 
+loadMessages = async () => {
+  let recipientUserId = localStorage.getItem("userId").replaceAll("-", "");
+
+  let inboxMessages = document.getElementById("inbox-messages");
+  // clear previously rendered messages and display all current messages
+  inboxMessages.innerHTML = "";
+
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border", "m-3");
+  spinnerDiv.setAttribute("role", "status");
+
+  inboxMessages.appendChild(spinnerDiv);
+
+  const messages = await fetch("/api/messages?id=" + recipientUserId).then(
+    (response) => response.json()
+  );
+
+  console.log(messages[0]);
+
+  spinnerDiv.remove();
+
+  if (messages.length > 0) {
+    for (i = 0; i < messages.length; i++) {
+      const row = document.createElement("div");
+      const col1 = document.createElement("div");
+      const col2 = document.createElement("div");
+      const anchorFirstLast = document.createElement("a");
+      const msgDate = document.createElement("div");
+      const messageContent = document.createElement("div");
+
+      row.classList.add("row");
+      col1.classList.add("col-sm-2");
+      col2.classList.add("col-sm-10");
+
+      let teacherId =
+        messages[i].properties["🧑‍🏫 Sender from Employees"].relation[0].id;
+      teacherId = teacherId.replaceAll("-", "");
+
+      anchorFirstLast.href = "teacher.html?id=" + teacherId;
+      anchorFirstLast.innerText =
+        messages[i].properties["Sender First name"].rollup.array[0].rich_text[0]
+          .plain_text +
+        " " +
+        messages[i].properties["Sender Last name"].rollup.array[0].title[0]
+          .plain_text;
+
+      let createdDate = new Date(
+        messages[i].properties["Created time"].created_time
+      );
+
+      msgDate.innerText = createdDate.toLocaleString();
+
+      messageContent.innerText =
+        messages[i].properties.Message.rich_text[0].plain_text;
+      messageContent.classList.add("review-details");
+
+      col1.appendChild(anchorFirstLast);
+      col1.appendChild(msgDate);
+
+      col2.appendChild(messageContent);
+
+      row.appendChild(col1);
+      row.appendChild(col2);
+
+      inboxMessages.appendChild(row);
+    }
+  } else {
+    inboxMessages.innerHTML = "There are no messages to display.";
+  }
+};
+
 loadProfile = async () => {
   const teacherId = localStorage.getItem("userId").replaceAll("-", "");
 
@@ -301,6 +373,8 @@ loadProfile = async () => {
 
     loadAvatarBio();
   });
+
+  loadMessages();
 
   loadShelf("wishlist", teacherId);
   loadShelf("history", teacherId);

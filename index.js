@@ -671,6 +671,31 @@ app.post("/api/send-message", (req, res) => {
   });
 });
 
+app.get("/api/messages", (req, res) => {
+  // console.log("MESSAGES " + req.query.id);
+
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_MESSAGES_ID,
+    filter: {
+      property: "🧑‍🏫 Recipient to Employees",
+      relation: {
+        contains: req.query.id,
+      },
+    },
+    sorts: [
+      {
+        property: "Created time",
+        direction: "descending",
+      },
+    ],
+  };
+
+  queryDatabase(myQuery).then(async (data) => {
+    // console.log(data);
+    res.send(data);
+  });
+});
+
 app.get("/api/wishlist", (req, res) => {
   // console.log("WISHLIST " + req.query.id);
 
