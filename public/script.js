@@ -952,7 +952,11 @@ loadBook = async () => {
   bookHeading.innerText = book.items[0].volumeInfo.title;
 
   let bookThumbnail = document.getElementById("book-thumbnail");
-  bookThumbnail.src = book.items[0].volumeInfo.imageLinks.smallThumbnail;
+  let thumbnail = document.createElement("img");
+  thumbnail.src = book.items[0].volumeInfo.imageLinks.smallThumbnail;
+  thumbnail.alt = book.items[0].volumeInfo.title + " book cover";
+
+  bookThumbnail.appendChild(thumbnail);
 
   let bookDetails = document.getElementById("book-details");
   bookDetails.innerText = "";
