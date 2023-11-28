@@ -454,9 +454,16 @@ async function searchBooks() {
 
     // what if there are no thumbnails to display??
     // generic image (no image)
-    thumbnail.src = books[i].volumeInfo.imageLinks.smallThumbnail;
-    anchorTitle.innerText = books[i].volumeInfo.title;
 
+    // thumbnail.src = books[i].volumeInfo.imageLinks.smallThumbnail;
+
+    if (books[i].volumeInfo.imageLinks != undefined) {
+      thumbnail.src = books[i].volumeInfo.imageLinks.smallThumbnail;
+    } else {
+      thumbnail.src = "images/default_book_small.png";
+    }
+
+    anchorTitle.innerText = books[i].volumeInfo.title;
     // anchorThumbnail.href = "book.html?id=" + books[i].id;
 
     let ISBNid = books[i].volumeInfo.industryIdentifiers[0].identifier;
@@ -1007,7 +1014,6 @@ async function adminSearchBooks() {
     document.getElementById("generate-questions").className = "d-block";
 
     document.getElementById("create-meeting-btn").classList.remove("d-none");
-
   });
 }
 
@@ -1072,7 +1078,7 @@ generateGPTQuestions = async () => {
     });
 };
 
-saveQuestions = async() => {
+saveQuestions = async () => {
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const clubId = urlParams.get("id");
   const bookId = document.getElementById("book-id").value;
@@ -1080,7 +1086,7 @@ saveQuestions = async() => {
   const questions = document.getElementById("guiding-questions").value;
 
   let body = {
-    bookID: bookId,    
+    bookID: bookId,
     clubID: clubId,
     questions: questions,
   };
@@ -1184,8 +1190,13 @@ loadBook = async () => {
 
   bookThumbnail.appendChild(thumbnail);
 
+  // configure links to bookstore buttons
+  let amznBtn = document.getElementById("amzn-button");
+  let banBtn = document.getElementById("ban-button");
+  amznBtn.href = "https://www.amazon.com/s?i=stripbooks&rh=p_66%3a" + bookId;
+  banBtn.href = "https://www.barnesandnoble.com/w/?ean=" + bookId;
+
   let bookDetails = document.getElementById("book-details");
-  bookDetails.innerText = "";
   let title = document.createElement("h5");
   title.innerText = book.items[0].volumeInfo.title;
   let author = document.createElement("p");
@@ -1196,6 +1207,31 @@ loadBook = async () => {
   let isbnThirteen = document.createElement("p");
   isbnThirteen.innerText =
     "ISBN 13: " + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
+
+  // configure star icons for rating, if available
+  if (book.items[0].volumeInfo.averageRating != undefined) {
+    let avgRatingValue = book.items[0].volumeInfo.averageRating;
+    let starsRating = document.getElementById("stars-rating");
+    let halfPresent = false;
+
+    for (let i = 1; i < 6; i++) {
+      let star = document.createElement("span");
+
+      if (i <= avgRatingValue) {
+        star.classList.add("fa", "fa-star", "star");
+      } else if (avgRatingValue % 1 != 0 && halfPresent == false) {
+        star.classList.add("fa", "fa-star", "partial-star");
+        halfPresent = true;
+      } else {
+        star.classList.add("fa", "fa-star");
+      }
+
+      starsRating.appendChild(star);
+    }
+
+    let avgRating = document.getElementById("average-rating");
+    avgRating.innerText = avgRatingValue;
+  }
 
   bookDetails.appendChild(title);
   bookDetails.appendChild(author);

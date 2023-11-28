@@ -163,6 +163,49 @@ https://www.w3schools.com/css/css_align.asp
 }
 
 /* Styles relevant to the BOOK page */
+
+.btn-amzn {
+    background-color: #f7b756;
+    color: #222e3d;
+    font-weight: bold;
+    border: 1px solid #bb873b;
+}
+
+.btn-amzn:hover {
+    background-color: #222e3d;
+    color: #f7b756;
+    font-weight: bold;
+}
+
+.btn-ban {
+    background-color: #dcd6cf;
+    color: #345f4e;
+    font-weight: bold;
+    border: 1px solid #8a8178;
+}
+
+.btn-ban:hover {
+    background-color: #345f4e;
+    color: #dcd6cf;
+    font-weight: bold;
+}
+
+.star {
+    color: #ffff00;
+}
+
+/* https://fossheim.io/writing/posts/css-text-gradient/ */
+.partial-star {
+    background-color: #ffff00;
+    background: linear-gradient(90deg, rgba(255, 255, 0, 1) 50%, rgba(0, 0, 0, 1) 50%);
+    background-size: 100%;
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+}
+
 .avatar-thumbnail {
     /* background-color: #999999; */
     width: 100px;
