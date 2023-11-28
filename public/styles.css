@@ -295,6 +295,19 @@ https://www.w3schools.com/css/css_align.asp
     text-align: left;
 }
 
+/* styles for datepicker on add-book page */
+label {
+    margin-left: 20px;
+}
+
+#datepicker {
+    width: 180px;
+}
+
+#datepicker>span:hover {
+    cursor: pointer;
+}
+
 footer {
     margin-top: 10px;
     padding-top: 25px;

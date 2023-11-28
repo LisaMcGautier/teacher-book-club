@@ -559,8 +559,8 @@ loadClub = async () => {
   clubHeading.innerText = club[0].properties["Club Name"].title[0].plain_text;
 
   // use the club id to query notion for that club's meetings
-  const meetings = await fetch("/api/meetings?id=" + clubId).then((response) =>
-    response.json()
+  const meetings = await fetch("/api/club/meetings?id=" + clubId).then(
+    (response) => response.json()
   );
 
   console.log(meetings);
@@ -727,6 +727,70 @@ async function createClub() {
   }
 }
 
+loadMeetings = async () => {
+  let meetingsList = document.getElementById("meetings-list");
+  // clear previously rendered reviews and display all current reviews
+  meetingsList.innerHTML = "";
+
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border", "m-3");
+  spinnerDiv.setAttribute("role", "status");
+
+  meetingsList.appendChild(spinnerDiv);
+
+  let bookId = document.getElementById("book-id").value;
+
+  const meetings = await fetch("/api/book/meetings?bookId=" + bookId).then(
+    (response) => response.json()
+  );
+
+  console.log(meetings[0]);
+
+  spinnerDiv.remove();
+
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const tr = document.createElement("tr");
+  const thMeetingDate = document.createElement("th");
+  const thActions = document.createElement("th");
+  const tbody = document.createElement("tbody");
+
+  // https://getbootstrap.com/docs/5.3/content/tables/
+  table.classList.add("table", "table-striped", "table-hover", "table-sm");
+  thMeetingDate.setAttribute("scope", "col");
+  thActions.setAttribute("scope", "col");
+
+  meetingsList.appendChild(table);
+  table.appendChild(thead);
+  thead.appendChild(tr);
+  tr.appendChild(thMeetingDate);
+  tr.appendChild(thActions);
+  table.appendChild(tbody);
+
+  for (i = 0; i < meetings.length; i++) {
+    const tableRow = document.createElement("tr");
+    const tdDate = document.createElement("td");
+    const tdBtns = document.createElement("td");
+    const editBtn = document.createElement("button");
+    const deleteBtn = document.createElement("button");
+
+    editBtn.classList.add("btn", "btn-primary", "btn-sm");
+    deleteBtn.classList.add("btn", "btn-danger", "btn-sm");
+
+    editBtn.innerText = "EDIT";
+    deleteBtn.innerText = "DELETE";
+
+    tdDate.innerText = meetings[i].properties.Date.date.start;
+
+    tbody.appendChild(tableRow);
+    tableRow.appendChild(tdDate);
+    tableRow.appendChild(tdBtns);
+    tdBtns.appendChild(editBtn);
+    tdBtns.appendChild(deleteBtn);
+  }
+};
+
 loadAddBook = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
@@ -741,6 +805,84 @@ loadAddBook = async () => {
   // update the DOM with club information
   let clubHeading = document.getElementById("club-heading");
   clubHeading.innerText = club[0].properties["Club Name"].title[0].plain_text;
+
+  let meetingCreated = document.getElementById("meeting-created");
+  let closeMeetingBtn = document.getElementById("close-button");
+  let cancelMeetingBtn = document.getElementById("cancel-button");
+  let createMeetingBtn = document.getElementById("create-button");
+  let messageWarning = document.getElementById("message-warning");
+  let datepickerResult = document.getElementById("datepicker-result");
+
+  let createMeetingModal = new bootstrap.Modal(
+    document.getElementById("createMeetingModal"),
+    {
+      keyboard: false,
+    }
+  );
+
+  console.log("just want to see if it works...");
+
+  closeMeetingBtn.addEventListener("click", async function () {
+    if (messageWarning.classList.contains("d-none") == false) {
+      messageWarning.classList.add("d-none");
+    }
+
+    datepickerResult.value = "";
+    createMeetingModal.hide();
+  });
+
+  cancelMeetingBtn.addEventListener("click", async function () {
+    if (messageWarning.classList.contains("d-none") == false) {
+      messageWarning.classList.add("d-none");
+    }
+
+    datepickerResult.value = "";
+    createMeetingModal.hide();
+  });
+
+  createMeetingBtn.addEventListener("click", async function () {
+    if (datepickerResult.value.trim() == "") {
+      messageWarning.classList.remove("d-none");
+    } else {
+      console.log("Message: ", datepickerResult.value);
+
+      if (messageWarning.classList.contains("d-none") == false) {
+        messageWarning.classList.add("d-none");
+      }
+
+      let body = {
+        meetingDate: datepickerResult.value,
+        bookID: document.getElementById("book-id").value,
+        clubID: clubId,
+      };
+
+      createMeetingModal.hide();
+
+      // call nodeJS create meeting endpoint -- POST
+      const response = await fetch("/api/meeting/create", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+      });
+
+      const confirmation = await response.json();
+
+      console.log(confirmation);
+
+      datepickerResult.value = "";
+
+      meetingCreated.classList.remove("d-none");
+
+      loadMeetings();
+    }
+  });
 };
 
 async function adminSearchBooks() {
@@ -777,13 +919,20 @@ async function adminSearchBooks() {
     selectButton.innerText = "Select";
     let bookISBN = books[i].volumeInfo.industryIdentifiers[1].identifier;
     let selectedTitle = books[i].volumeInfo.title;
-    let thumbnail = books[i].volumeInfo.imageLinks.smallThumbnail;
+    let thumbnail;
+
+    if (books[i].volumeInfo.imageLinks != undefined) {
+      thumbnail = books[i].volumeInfo.imageLinks.smallThumbnail;
+    } else {
+      thumbnail = "images/default_book_small.png";
+    }
 
     anchorTitle.href = "book.html?id=" + books[i].id;
     // https://www.w3schools.com/jsref/met_element_addeventlistener.asp
     selectButton.addEventListener("click", function () {
       document.getElementById("selection").innerText = selectedTitle;
       document.getElementById("selected-title").innerText = selectedTitle;
+      document.getElementById("selection-isbn").value = bookISBN;
       document.getElementById("thumbnail").src = thumbnail;
       document.getElementById("selected-thumbnail").src = thumbnail;
       document.getElementById("confirm-book").className = "d-block";
@@ -796,23 +945,70 @@ async function adminSearchBooks() {
     row.appendChild(col2);
 
     searchResults.appendChild(row);
-
-    let buttonConfirm = document.getElementById("btn-confirm");
-    buttonConfirm.addEventListener("click", function () {
-      document.getElementById("add-book-search").className = "d-none";
-      document.getElementById("confirm-book").className = "d-none";
-      document.getElementById("selected-book").className = "d-block";
-      document.getElementById("generate-questions").className = "d-block";
-    });
-
-    let buttonChange = document.getElementById("btn-change");
-    buttonChange.addEventListener("click", function () {
-      document.getElementById("add-book-search").className = "d-block";
-      document.getElementById("confirm-book").className = "d-none";
-      document.getElementById("selected-book").className = "d-none";
-      document.getElementById("generate-questions").className = "d-none";
-    });
   }
+
+  let buttonChange = document.getElementById("btn-change");
+  buttonChange.addEventListener("click", function () {
+    document.getElementById("add-book-search").className = "d-block";
+    document.getElementById("confirm-book").className = "d-none";
+    document.getElementById("selected-book").className = "d-none";
+    document.getElementById("generate-questions").className = "d-none";
+  });
+
+  let buttonConfirm = document.getElementById("btn-confirm");
+  buttonConfirm.addEventListener("click", async function () {
+    console.log(
+      "confirm book " + document.getElementById("selection").innerText
+    );
+    const urlParams = new URL(window.location.toLocaleString()).searchParams;
+    const clubId = urlParams.get("id");
+
+    // save new book info to Notion
+    let body = {
+      bookTitle: document.getElementById("selection").innerText,
+      isbn: document.getElementById("selection-isbn").value,
+      clubID: clubId,
+    };
+
+    const spinnerDiv = document.createElement("div");
+    spinnerDiv.setAttribute("id", "spinner");
+    spinnerDiv.classList.add("spinner-border", "m-3");
+    spinnerDiv.setAttribute("role", "status");
+
+    document.getElementById("confirm-book").appendChild(spinnerDiv);
+
+    const response = await fetch("/api/book/create", {
+      method: "POST",
+      mode: "cors",
+      cache: "no-cache",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+      referrerPolicy: "no-referrer",
+      body: JSON.stringify(body),
+    }).then((response) => response.json());
+
+    spinnerDiv.remove();
+
+    console.log(response.id);
+
+    let bookId = document.createElement("input");
+    bookId.id = "book-id";
+    bookId.type = "hidden";
+    bookId.value = response.id;
+
+    searchResults.appendChild(bookId);
+
+    document.getElementById("add-book-search").className = "d-none";
+    document.getElementById("confirm-book").className = "d-none";
+    document.getElementById("selected-book").className = "d-block";
+    document.getElementById("generate-questions").className = "d-block";
+
+    document.getElementById("create-meeting-btn").classList.remove("d-none");
+
+  });
 }
 
 generateGPTQuestions = async () => {
@@ -874,6 +1070,36 @@ generateGPTQuestions = async () => {
       guidingQuestions.value = data.completion.content;
       spinner.classList.add("invisible");
     });
+};
+
+saveQuestions = async() => {
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const clubId = urlParams.get("id");
+  const bookId = document.getElementById("book-id").value;
+
+  const questions = document.getElementById("guiding-questions").value;
+
+  let body = {
+    bookID: bookId,    
+    clubID: clubId,
+    questions: questions,
+  };
+
+  const response = await fetch("/api/questions/create", {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(body),
+  }).then((response) => response.json());
+
+  // remove the save button to prevent user from adding multiple records to Notion
+  document.getElementById("btnSaveQuestions").remove();
 };
 
 loadReviews = async (bookId) => {
