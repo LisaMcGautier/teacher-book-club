@@ -278,6 +278,173 @@ app.post("/api/create-club", (req, res) => {
   });
 });
 
+async function AddBookToClub(body) {
+  const response = await notion.pages.create({
+    parent: { database_id: process.env.NOTION_DATABASE_BOOKS_ID },
+    properties: {
+      Title: {
+        title: [
+          {
+            type: "text",
+            text: {
+              content: body.bookTitle,
+            },
+          },
+        ],
+      },
+      ISBN: {
+        rich_text: [
+          {
+            text: {
+              content: body.isbn,
+            },
+          },
+        ],
+      },
+      "👥 Clubs": {
+        relation: [
+          {
+            id: body.clubID,
+          },
+        ],
+      },
+    },
+  });
+
+  // meetings will need response.id as a relation for this new book
+  console.log(`SUCCESS: Book added to club with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/book/create", (req, res) => {
+  console.log(req.body);
+  AddBookToClub(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
+app.get("/api/book/meetings", (req, res) => {
+  console.log("MEETINGS " + req.query.bookId);
+
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_MEETINGS_ID,
+    filter: {
+      property: "📚 Books",
+      relation: {
+        contains: req.query.bookId,
+      },
+    },
+    sorts: [
+      {
+        property: "Date",
+        direction: "ascending",
+      },
+    ],
+  };
+
+  queryDatabase(myQuery).then((data) => {
+    res.send(data);
+  });
+});
+
+async function CreateQuestions(body) {
+  const response = await notion.pages.create({
+    parent: { database_id: process.env.NOTION_DATABASE_DISCUSSION_GUIDES_ID },
+    properties: {
+      Name: {
+        title: [
+          {
+            type: "text",
+            text: {
+              content: "",
+            },
+          },
+        ],
+      },
+      "📚 Books": {
+        relation: [
+          {
+            id: body.bookID,
+          },
+        ],
+      },
+      "👥 Clubs": {
+        relation: [
+          {
+            id: body.clubID,
+          },
+        ],
+      },
+      "Guiding Questions": {
+        rich_text: [
+          {
+            text: {
+              content: body.questions,
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  console.log(`SUCCESS: Questions successfully added with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/questions/create", (req, res) => {
+  console.log(req.body);
+  CreateQuestions(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
+async function CreateMeeting(body) {
+  const response = await notion.pages.create({
+    parent: { database_id: process.env.NOTION_DATABASE_MEETINGS_ID },
+    properties: {
+      Name: {
+        title: [
+          {
+            type: "text",
+            text: {
+              content: "",
+            },
+          },
+        ],
+      },
+      "📚 Books": {
+        relation: [
+          {
+            id: body.bookID,
+          },
+        ],
+      },
+      "👥 Clubs": {
+        relation: [
+          {
+            id: body.clubID,
+          },
+        ],
+      },
+      Date: {
+        date: {
+          start: body.meetingDate,
+        },
+      },
+    },
+  });
+
+  console.log(`SUCCESS: Meeting successfully added with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/meeting/create", (req, res) => {
+  console.log(req.body);
+  CreateMeeting(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
 app.get("/api/clubs-notion", (req, res) => {
   console.log("CLUB " + req.query.id);
 
@@ -314,7 +481,7 @@ app.get("/api/club/booklist", (req, res) => {
   });
 });
 
-app.get("/api/meetings", (req, res) => {
+app.get("/api/club/meetings", (req, res) => {
   console.log("MEETINGS " + req.query.id);
 
   const date = new Date();
