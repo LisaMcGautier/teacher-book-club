@@ -28,6 +28,21 @@ async function myProfile() {
   loadProfile();
 }
 
+async function searchBooks() {
+  configureMenu();
+  loadSearchBooks();
+}
+
+async function searchClubs() {
+  configureMenu();
+  loadSearchClubs();
+}
+
+async function searchMembers() {
+  configureMenu();
+  loadSearchMembers();
+}
+
 async function teacher() {
   configureMenu();
   loadTeacher();
@@ -73,6 +88,25 @@ async function configureMenu() {
     tdCreateClub.classList.remove("d-none");
     mLogout.classList.remove("d-none");
     tdLogout.classList.remove("d-none");
+  }
+}
+
+function search() {
+  let searchCategory = document.getElementById("search-category");
+  let searchText = document.getElementById("search-text");
+
+  // check if searchText is empty
+  if (searchText.value.trim() == "") {
+    alert("Please enter a search term");
+  } else {
+    // redirect user to the corresponding search HTML page
+    if (searchCategory.value == "books") {
+      location.href = "/search-books.html?q=" + searchText.value;
+    } else if (searchCategory.value == "clubs") {
+      location.href = "/search-clubs.html?q=" + searchText.value;
+    } else {
+      location.href = "/search-members.html?q=" + searchText.value;
+    }
   }
 }
 
@@ -382,6 +416,16 @@ loadProfile = async () => {
   // loop over the results to make one call to GB API per ISBN to render thumbnails on the page
 };
 
+loadSearchBooks = async () => {
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const q = urlParams.get("q");
+
+  // perfrom the search if we have a query value in the URL
+  if (q.trim() != "") {
+    booksSearch(q);
+  }
+};
+
 async function listClubs() {
   const response = await fetch("/api/clubs");
   const clubs = await response.json();
@@ -413,9 +457,19 @@ async function listClubs() {
   }
 }
 
-async function searchBooks() {
-  let searchterm = document.getElementById("searchterm");
-  const response = await fetch("/api?searchterm=" + searchterm.value);
+async function booksSearch(q) {
+  let searchterm;
+
+  if (q != null) {
+    searchterm = q;
+    document.getElementById("searchterm").value = q;
+  } else {
+    // searchterm = document.getElementById("searchterm").value;
+    location.href =
+      "/search-books.html?q=" + document.getElementById("searchterm").value;
+  }
+
+  const response = await fetch("/api?searchterm=" + searchterm);
   const books = await response.json();
   console.log(books);
 

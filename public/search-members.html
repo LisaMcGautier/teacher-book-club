@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Teacher Book Club - Home</title>
+    <title>Teacher Book Club - Search</title>
     <meta name="description"
         content="Teacher Book Club is a website to help teachers connect via shared reading experiences.">
 
@@ -14,9 +14,10 @@
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <!-- My Style Sheet -->
     <link rel="stylesheet" href="styles.css">
+
 </head>
 
-<body class="text-center" onload="index()">
+<body class="text-center" onload="configureMenu()">
     <!-- Mobile Nav -->
     <nav class="mobile-nav">
         <div id="menu-links">
@@ -39,26 +40,8 @@
     <!-- Tablet & Desktop Nav -->
     <nav class="tablet-desktop">
         <ul>
-            <li>
-                <div class="input-group">
-                    <div class="input-group-text">
-                        <select id="search-category" class="form-select form-select-sm"
-                            aria-label="Small select example">
-                            <option selected value="books">Books</option>
-                            <option value="clubs">Clubs</option>
-                            <option value="members">Members</option>
-                        </select>
-                    </div>
-                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input" />
-                    <div class="input-group-text">
-                        <button id="search-btn" type="button" class="btn btn-light btn-sm" onclick="search()">
-                            Search
-                        </button>
-                    </div>
-                </div>
-            </li>
-            <!-- <li><a href="search.html">Search</a></li> -->
             <li><a href="index.html">Home</a></li>
+            <li><a href="search.html">Search</a></li>
             <li id="td-my-profile" class="d-none"><a href="my-profile.html">My Profile</a></li>
             <li id="td-create-club" class="d-none"><a href="create-club.html" class="btn btn-warning btn-sm">Create
                     club</a></li>
@@ -70,30 +53,37 @@
     </nav>
 
     <main class="container text-center">
-        On this page, users will be able to...
+        On this page, users will be able to search for books by title, author, or keyword.
 
         <section class="section1">
-            <h1>Available Clubs</h1>
+            <h1>Search for books</h1>
 
-            <div id="clubs-list"></div>
+            <form>
+                <label for="searchterm">Enter seach term:</label><br>
+                <input type="text" id="searchterm" name="searchterm"><br>
+
+                <input type="button" value="Search" onclick="return searchBooks()">
+
+            </form>
 
         </section>
 
-        <section class="section2">
-            <h1>Section 2</h1>
+        <section class="section2 d-none">
+            <h1>Search Results</h1>
 
-            <div class="row">
+            <div id="search-results">
 
-                <!-- <div class="col-sm-2">
+            </div>
+
+            <!-- <div class="row">
+                <div class="col-sm-2">
                     Column
                     <div class="avatar-thumbnail">Avatar image</div>
-                </div> -->
-
+                </div>
                 <div class="col">
                     <div class="review-details">Lorem ipsum...</div>
                 </div>
-
-            </div>
+            </div> -->
 
         </section>
 

@@ -387,7 +387,7 @@ footer {
         /* font-size: 1.2em; */
         font-family: Helvetica, Arial, sans-serif;
         /* font-weight: bold; */
-        border: 1px solid slategrey;
+        /* border: 1px solid slategrey; */
     }
 
     nav li a {
@@ -400,5 +400,26 @@ footer {
 
     nav li a:hover {
         color: orange;
+    }
+
+    .search-text {
+        margin-left: 10px;
+        height: 30px;
+        margin-top: 10px;
+    }
+
+    .input-group-text {
+        background-color: transparent;
+        border: none;
+    }
+
+    .input-group {
+        background-color: #106060;
+        height: 50px;
+    }
+
+    #search-btn {
+        margin: 0px;
+        font-weight: bold;
     }
 }
