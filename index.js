@@ -387,7 +387,9 @@ async function CreateQuestions(body) {
     },
   });
 
-  console.log(`SUCCESS: Questions successfully added with pageId ${response.id}`);
+  console.log(
+    `SUCCESS: Questions successfully added with pageId ${response.id}`
+  );
   return response;
 }
 
@@ -966,18 +968,78 @@ app.get("/api/book", (req, res) => {
 });
 
 // https://developers.google.com/books/docs/v1/using#PerformingSearch
-app.get("/api", (req, res) => {
+app.get("/api/books/search", (req, res) => {
+  // maxResults - default is 10, and the maximum allowable value is 40.
   fetch(
     "https://www.googleapis.com/books/v1/volumes?q=" +
-      req.query.searchterm +
+      req.query.q +
+      "&maxResults=20" +
       "&key=" +
       process.env.GOOGLE_BOOKS_API_KEY
   )
     .then((response) => response.json())
     .then((result) => {
-      // returns an array of books
-      res.send(result.items);
+      // returns either an array of books or an object with totalItems: 0
+      res.send(result);
     });
+});
+
+app.get("/api/clubs/search", (req, res) => {
+  console.log("CLUB " + req.query.q);
+
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_CLUBS_ID,
+    filter: {
+      or: [
+        {
+          property: "Club Name",
+          title: {
+            contains: req.query.q,
+          },
+        },
+        {
+          property: "Club Description",
+          rich_text: {
+            contains: req.query.q,
+          },
+        },
+      ],
+    },
+  };
+
+  queryDatabase(myQuery).then((data) => {
+    res.send(data);
+  });
+});
+
+app.get("/api/members/search", (req, res) => {
+  console.log("MEMBER " + req.query.q);
+
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID,
+    filter: {
+      or: [
+        {
+          property: "Full Name",
+          formula: {
+            string: {
+              contains: req.query.q,
+            },
+          },
+        },
+        {
+          property: "Short bio",
+          rich_text: {
+            contains: req.query.q,
+          },
+        },
+      ],
+    },
+  };
+
+  queryDatabase(myQuery).then((data) => {
+    res.send(data);
+  });
 });
 
 async function AddToWishlist(body) {

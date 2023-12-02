@@ -416,16 +416,6 @@ loadProfile = async () => {
   // loop over the results to make one call to GB API per ISBN to render thumbnails on the page
 };
 
-loadSearchBooks = async () => {
-  const urlParams = new URL(window.location.toLocaleString()).searchParams;
-  const q = urlParams.get("q");
-
-  // perfrom the search if we have a query value in the URL
-  if (q.trim() != "") {
-    booksSearch(q);
-  }
-};
-
 async function listClubs() {
   const response = await fetch("/api/clubs");
   const clubs = await response.json();
@@ -457,6 +447,16 @@ async function listClubs() {
   }
 }
 
+loadSearchBooks = async () => {
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const q = urlParams.get("q");
+
+  // perform the search if we have a query value in the URL
+  if (q.trim() != "") {
+    booksSearch(q);
+  }
+};
+
 async function booksSearch(q) {
   let searchterm;
 
@@ -464,131 +464,365 @@ async function booksSearch(q) {
     searchterm = q;
     document.getElementById("searchterm").value = q;
   } else {
-    // searchterm = document.getElementById("searchterm").value;
-    location.href =
-      "/search-books.html?q=" + document.getElementById("searchterm").value;
+    searchterm = document.getElementById("searchterm").value;
+
+    if (searchterm.trim() == "") {
+      alert("Please enter a search term");
+      return;
+    }
+
+    location.href = "/search-books.html?q=" + searchterm;
   }
 
-  const response = await fetch("/api?searchterm=" + searchterm);
+  let searchResults = document.getElementById("search-results");
+
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border", "m-3");
+  spinnerDiv.setAttribute("role", "status");
+
+  searchResults.appendChild(spinnerDiv);
+
+  const response = await fetch("/api/books/search?q=" + searchterm);
   const books = await response.json();
   console.log(books);
 
-  let searchResults = document.getElementById("search-results");
+  spinnerDiv.remove();
 
   // clear previous search results
   while (searchResults.firstChild) {
     searchResults.removeChild(searchResults.firstChild);
   }
 
-  let section2 = document.getElementsByClassName("section2");
-  section2[0].classList.remove("d-none");
+  // check if there are results available from Google Books API
+  if (books.totalItems > 0) {
+    for (i = 0; i < books.items.length; i++) {
+      // check if industryIdentifiers are provided by Google Books
+      // AND only create elements if they are ISBNs
+      if (
+        books.items[i].volumeInfo.industryIdentifiers != undefined &&
+        (books.items[i].volumeInfo.industryIdentifiers[0].type == "ISBN_13" ||
+          books.items[i].volumeInfo.industryIdentifiers[0].type == "ISBN_10")
+      ) {
+        const row = document.createElement("div");
+        const col1 = document.createElement("div");
+        const col2 = document.createElement("div");
+        const thumbnail = document.createElement("img");
+        const anchorThumbnail = document.createElement("a");
+        const anchorTitle = document.createElement("a");
+        const wishlistButton = document.createElement("button");
+        const historyButton = document.createElement("button");
 
-  for (i = 0; i < books.length; i++) {
-    const row = document.createElement("div");
-    const col1 = document.createElement("div");
-    const col2 = document.createElement("div");
-    const thumbnail = document.createElement("img");
-    const anchorThumbnail = document.createElement("a");
-    const anchorTitle = document.createElement("a");
-    const wishlistButton = document.createElement("button");
-    const historyButton = document.createElement("button");
+        row.classList.add("row");
+        col1.classList.add("col", "col-sm-3");
+        col2.classList.add("col", "col-sm-9");
+        col2.classList.add("fs-5");
 
-    row.classList.add("row");
-    col1.classList.add("col", "col-sm-3");
-    // col1.classList.add("d-flex");
-    // col1.classList.add("flex-row-reverse");
-    col2.classList.add("col", "col-sm-9");
-    // col2.classList.add("d-flex");
-    col2.classList.add("fs-5");
+        wishlistButton.classList.add("btn", "btn-success", "btn-sm");
+        wishlistButton.innerText = "I want to read this book";
+        historyButton.classList.add("btn", "btn-info", "btn-sm");
+        historyButton.innerText = "I have read this book";
 
-    wishlistButton.classList.add("btn", "btn-success", "btn-sm");
-    wishlistButton.innerText = "I want to read this book";
-    historyButton.classList.add("btn", "btn-info", "btn-sm");
-    historyButton.innerText = "I have read this book";
+        // if there are no thumbnails, display a generic image
+        if (books.items[i].volumeInfo.imageLinks != undefined) {
+          thumbnail.src = books.items[i].volumeInfo.imageLinks.smallThumbnail;
+        } else {
+          thumbnail.src = "images/default_book_small.png";
+        }
 
-    // what if there are no thumbnails to display??
-    // generic image (no image)
+        anchorTitle.innerText = books.items[i].volumeInfo.title;
 
-    // thumbnail.src = books[i].volumeInfo.imageLinks.smallThumbnail;
+        let ISBNid;
 
-    if (books[i].volumeInfo.imageLinks != undefined) {
-      thumbnail.src = books[i].volumeInfo.imageLinks.smallThumbnail;
-    } else {
-      thumbnail.src = "images/default_book_small.png";
+        // select the ISBN_13 object from the industryIdentifiers array (if available)
+        let isbnAvailable = books.items[
+          i
+        ].volumeInfo.industryIdentifiers.filter(
+          (element) => element.type == "ISBN_13"
+        );
+
+        // select the ISBN_10 only if the ISBN_13 is NOT available
+        if (isbnAvailable.length == 0) {
+          isbnAvailable = books.items[i].volumeInfo.industryIdentifiers.filter(
+            (element) => element.type == "ISBN_10"
+          );
+        }
+
+        // get the ISBN found in the previous step
+        ISBNid = isbnAvailable[0].identifier;
+        console.log(ISBNid);
+
+        wishlistButton.addEventListener("click", async function () {
+          // alert(ISBNid);
+          // call node, passing userID, title & ISBN
+          let body = {
+            bookTitle: anchorTitle.innerText,
+            isbn: ISBNid,
+            userID: localStorage.getItem("userId").replaceAll("-", ""),
+          };
+
+          const response = await fetch("/api/wishlist/create", {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(body),
+          });
+        });
+
+        historyButton.addEventListener("click", async function () {
+          // alert(ISBNid);
+          // call node, passing userID, title & ISBN
+          let body = {
+            bookTitle: anchorTitle.innerText,
+            isbn: ISBNid,
+            userID: localStorage.getItem("userId").replaceAll("-", ""),
+          };
+
+          const response = await fetch("/api/history/create", {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(body),
+          });
+        });
+
+        anchorThumbnail.href = "book.html?id=" + ISBNid;
+        anchorTitle.href = "book.html?id=" + ISBNid;
+
+        anchorThumbnail.appendChild(thumbnail);
+
+        col1.appendChild(anchorThumbnail);
+        col2.appendChild(anchorTitle);
+        col2.appendChild(wishlistButton);
+        col2.appendChild(historyButton);
+
+        row.appendChild(col1);
+        row.appendChild(col2);
+
+        searchResults.appendChild(row);
+      }
+    }
+  } else {
+    searchResults.innerText = "We didn't find any books to match your search.";
+    searchResults.classList.add("m-3");
+  }
+}
+
+loadSearchClubs = async () => {
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const q = urlParams.get("q");
+
+  // perform the search if we have a query value in the URL
+  if (q.trim() != "") {
+    clubsSearch(q);
+  }
+};
+
+async function clubsSearch(q) {
+  let searchterm;
+
+  if (q != null) {
+    searchterm = q;
+    document.getElementById("searchterm").value = q;
+  } else {
+    searchterm = document.getElementById("searchterm").value;
+
+    if (searchterm.trim() == "") {
+      alert("Please enter a search term");
+      return;
     }
 
-    anchorTitle.innerText = books[i].volumeInfo.title;
-    // anchorThumbnail.href = "book.html?id=" + books[i].id;
+    location.href = "/search-clubs.html?q=" + searchterm;
+  }
 
-    let ISBNid = books[i].volumeInfo.industryIdentifiers[0].identifier;
-    console.log(ISBNid);
+  let searchResults = document.getElementById("search-results");
 
-    wishlistButton.addEventListener("click", async function () {
-      // alert(ISBNid);
-      // call node, passing userID, title & ISBN
-      let body = {
-        bookTitle: anchorTitle.innerText,
-        isbn: ISBNid,
-        userID: localStorage.getItem("userId").replaceAll("-", ""),
-      };
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border", "m-3");
+  spinnerDiv.setAttribute("role", "status");
 
-      const response = await fetch("/api/wishlist/create", {
-        method: "POST",
-        mode: "cors",
-        cache: "no-cache",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        redirect: "follow",
-        referrerPolicy: "no-referrer",
-        body: JSON.stringify(body),
-      });
-    });
+  searchResults.appendChild(spinnerDiv);
 
-    historyButton.addEventListener("click", async function () {
-      // alert(ISBNid);
-      // call node, passing userID, title & ISBN
-      let body = {
-        bookTitle: anchorTitle.innerText,
-        isbn: ISBNid,
-        userID: localStorage.getItem("userId").replaceAll("-", ""),
-      };
+  const response = await fetch("/api/clubs/search?q=" + searchterm);
+  const clubs = await response.json();
+  console.log(clubs);
 
-      const response = await fetch("/api/history/create", {
-        method: "POST",
-        mode: "cors",
-        cache: "no-cache",
-        credentials: "same-origin",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        redirect: "follow",
-        referrerPolicy: "no-referrer",
-        body: JSON.stringify(body),
-      });
-    });
+  spinnerDiv.remove();
 
-    anchorThumbnail.href = "book.html?id=" + ISBNid;
-    anchorTitle.href = "book.html?id=" + ISBNid;
+  // clear previous search results
+  while (searchResults.firstChild) {
+    searchResults.removeChild(searchResults.firstChild);
+  }
 
-    anchorThumbnail.appendChild(thumbnail);
+  if (clubs.length > 0) {
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const tr = document.createElement("tr");
+    const thClubName = document.createElement("th");
+    const thClubDescription = document.createElement("th");
+    const tbody = document.createElement("tbody");
 
-    col1.appendChild(anchorThumbnail);
-    col2.appendChild(anchorTitle);
-    col2.appendChild(wishlistButton);
-    col2.appendChild(historyButton);
+    // https://getbootstrap.com/docs/5.3/content/tables/
+    table.classList.add("table", "table-striped", "table-hover", "table-sm");
+    thClubName.setAttribute("scope", "col");
+    thClubDescription.setAttribute("scope", "col");
 
-    row.appendChild(col1);
-    row.appendChild(col2);
+    searchResults.appendChild(table);
+    table.appendChild(thead);
+    thead.appendChild(tr);
+    tr.appendChild(thClubName);
+    tr.appendChild(thClubDescription);
+    table.appendChild(tbody);
 
-    searchResults.appendChild(row);
+    for (i = 0; i < clubs.length; i++) {
+      const tableRow = document.createElement("tr");
+      const tdName = document.createElement("td");
+      const tdDescription = document.createElement("td");
+      const anchorName = document.createElement("a");
+      const spanDescription = document.createElement("span");
 
-    // TODO: what if there are more than 10 results?
-    // How to add pages of results...
+      anchorName.href = "club.html?id=" + clubs[i].id.replaceAll("-", "");
+      anchorName.classList.add("fw-bold");
+      anchorName.innerText =
+        clubs[i].properties["Club Name"].title[0].plain_text;
 
-    // https://developers.google.com/books/docs/v1/using#PerformingSearch
-    // maxResults - default is 10, and the maximum allowable value is 40.
+      if (clubs[i].properties["Club Description"].length > 0) {
+        spanDescription.innerText =
+          clubs[i].properties["Club Description"].rich_text[0].plain_text;
+      } else {
+        spanDescription.innerText = "This description hasn't been written yet.";
+      }
+
+      tdName.appendChild(anchorName);
+      tdDescription.appendChild(spanDescription);
+
+      tbody.appendChild(tableRow);
+      tableRow.appendChild(tdName);
+      tableRow.appendChild(tdDescription);
+      tdDescription.appendChild(anchorName);
+      tdDescription.appendChild(spanDescription);
+    }
+  } else {
+    searchResults.innerText = "We didn't find any clubs to match your search.";
+    searchResults.classList.add("m-3");
+  }
+}
+
+loadSearchMembers = async () => {
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const q = urlParams.get("q");
+
+  // perform the search if we have a query value in the URL
+  if (q.trim() != "") {
+    membersSearch(q);
+  }
+};
+
+async function membersSearch(q) {
+  let searchterm;
+
+  if (q != null) {
+    searchterm = q;
+    document.getElementById("searchterm").value = q;
+  } else {
+    searchterm = document.getElementById("searchterm").value;
+
+    if (searchterm.trim() == "") {
+      alert("Please enter a search term");
+      return;
+    }
+
+    location.href = "/search-members.html?q=" + searchterm;
+  }
+
+  let searchResults = document.getElementById("search-results");
+
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border", "m-3");
+  spinnerDiv.setAttribute("role", "status");
+
+  searchResults.appendChild(spinnerDiv);
+
+  const response = await fetch("/api/members/search?q=" + searchterm);
+  const members = await response.json();
+  console.log(members);
+
+  spinnerDiv.remove();
+
+  // clear previous search results
+  while (searchResults.firstChild) {
+    searchResults.removeChild(searchResults.firstChild);
+  }
+
+  if (members.length > 0) {
+    for (i = 0; i < members.length; i++) {
+      const row = document.createElement("div");
+      const col1 = document.createElement("div");
+      const col2 = document.createElement("div");
+      const avatar = document.createElement("img");
+      const anchorAvatar = document.createElement("a");
+      const anchorName = document.createElement("a");
+      const bioContent = document.createElement("div");
+
+      row.classList.add("row");
+      col1.classList.add("col-sm-2");
+      col2.classList.add("col-sm-10");
+
+      let teacherId = members[i].id;
+      teacherId = teacherId.replaceAll("-", "");
+
+      if (members[i].properties["Avatar image"].files.length == 0) {
+        avatar.src = "images/default_avatar.png";
+      } else {
+        avatar.src =
+          members[i].properties["Avatar image"].files[0].external.url;
+      }
+
+      anchorAvatar.href = "teacher.html?id=" + teacherId;
+      anchorName.href = "teacher.html?id=" + teacherId;
+      anchorName.classList.add("fw-bold");
+
+      avatar.classList.add("avatar-thumbnail");
+      anchorAvatar.appendChild(avatar);
+
+      anchorName.innerText = members[i].properties["Full Name"].formula.string;
+
+      if (members[i].properties["Short bio"].rich_text.length > 0) {
+        bioContent.innerText =
+          members[i].properties["Short bio"].rich_text[0].plain_text;
+      } else {
+        bioContent.innerText = "This bio hasn't been written yet.";
+      }
+
+      bioContent.classList.add("review-details");
+
+      col1.appendChild(anchorAvatar);
+      col1.appendChild(anchorName);
+      col2.appendChild(bioContent);
+
+      row.appendChild(col1);
+      row.appendChild(col2);
+
+      searchResults.appendChild(row);
+    }
+  } else {
+    searchResults.innerText =
+      "We didn't find any members to match your search.";
+    searchResults.classList.add("m-3");
   }
 }
 
@@ -735,7 +969,7 @@ async function listClubBooks() {
     anchorTitle.innerText =
       // booklist[i].properties["Club Name"].title[0].plain_text;
       booklist[i].properties.Title.title[0].plain_text;
-    anchorTitle.href = "club.html?id=" + booklist[i].id.replaceAll("-", "");
+    anchorTitle.href = "club.html?id=" + clubId;
 
     // <table class="table table-striped table-hover"> ... </table>
 
