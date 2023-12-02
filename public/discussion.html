@@ -19,8 +19,22 @@
     <!-- Mobile Nav -->
     <nav class="mobile-nav">
         <div id="menu-links">
+            <div class="input-group">
+                <div class="input-group-text">
+                    <select id="search-category" class="form-select form-select-sm" aria-label="Small select example">
+                        <option selected value="books">Books</option>
+                        <option value="clubs">Clubs</option>
+                        <option value="members">Members</option>
+                    </select>
+                </div>
+                <input id="search-text" type="text" class="form-control search-text" aria-label="Text input" />
+                <div class="input-group-text">
+                    <button id="search-btn" type="button" class="btn btn-light btn-sm" onclick="search()">
+                        Search
+                    </button>
+                </div>
+            </div>
             <a href="index.html">Home</a>
-            <a href="search.html">Search</a>
             <a id="mob-my-profile" class="d-none" href="my-profile.html">My Profile</a>
             <a id="mob-create-club" class="d-none" href="create-club.html">Create club</a>
             <a id="mob-login" class="d-none" href="login.html">Login</a>
@@ -38,8 +52,25 @@
     <!-- Tablet & Desktop Nav -->
     <nav class="tablet-desktop">
         <ul>
+            <li>
+                <div class="input-group">
+                    <div class="input-group-text">
+                        <select id="search-category" class="form-select form-select-sm"
+                            aria-label="Small select example">
+                            <option selected value="books">Books</option>
+                            <option value="clubs">Clubs</option>
+                            <option value="members">Members</option>
+                        </select>
+                    </div>
+                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input" />
+                    <div class="input-group-text">
+                        <button id="search-btn" type="button" class="btn btn-light btn-sm" onclick="search()">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </li>
             <li><a href="index.html">Home</a></li>
-            <li><a href="search.html">Search</a></li>
             <li id="td-my-profile" class="d-none"><a href="my-profile.html">My Profile</a></li>
             <li id="td-create-club" class="d-none"><a href="create-club.html" class="btn btn-warning btn-sm">Create
                     club</a></li>

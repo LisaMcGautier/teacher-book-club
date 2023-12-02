@@ -361,7 +361,7 @@ footer {
 
 /* Media Query for Tablet Viewport */
 /* ==================================================================== */
-@media screen and (min-width: 700px) {
+@media screen and (min-width: 850px) {
 
     .tablet-desktop {
         display: block;
