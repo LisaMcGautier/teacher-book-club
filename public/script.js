@@ -91,9 +91,18 @@ async function configureMenu() {
   }
 }
 
-function search() {
-  let searchCategory = document.getElementById("search-category");
-  let searchText = document.getElementById("search-text");
+function search(src) {
+  let searchCategory;
+  let searchText;
+
+  // check whether search was triggered on mobile or desktop
+  if (src == "mob") {
+    searchCategory = document.getElementById("mob-search-category");
+    searchText = document.getElementById("mob-search-text");
+  } else {
+    searchCategory = document.getElementById("search-category");
+    searchText = document.getElementById("search-text");
+  }
 
   // check if searchText is empty
   if (searchText.value.trim() == "") {
@@ -525,7 +534,7 @@ async function booksSearch(q) {
 
         // if there are no thumbnails, display a generic image
         if (books.items[i].volumeInfo.imageLinks != undefined) {
-          thumbnail.src = books.items[i].volumeInfo.imageLinks.smallThumbnail;
+          thumbnail.src = books.items[i].volumeInfo.imageLinks.thumbnail;
         } else {
           thumbnail.src = "images/default_book_small.png";
         }
@@ -896,7 +905,7 @@ loadClub = async () => {
     console.log(book);
 
     let clubThumbnail = document.createElement("img");
-    clubThumbnail.src = book.items[0].volumeInfo.imageLinks.smallThumbnail;
+    clubThumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
 
     let clubDetails = document.getElementById("club-details");
     let title = document.createElement("h5");
@@ -1182,7 +1191,7 @@ loadAddBook = async () => {
 
 async function adminSearchBooks() {
   let searchterm = document.getElementById("searchterm");
-  const response = await fetch("/api?searchterm=" + searchterm.value);
+  const response = await fetch("/api/books/search?q=" + searchterm.value);
   const books = await response.json();
   console.log(books);
 
@@ -1193,53 +1202,69 @@ async function adminSearchBooks() {
     searchResults.removeChild(searchResults.firstChild);
   }
 
-  for (i = 0; i < books.length; i++) {
-    const row = document.createElement("div");
-    const col1 = document.createElement("div");
-    const col2 = document.createElement("div");
-    const selectButton = document.createElement("button");
-    const anchorTitle = document.createElement("a");
+  // check if there are results available from Google Books API
+  if (books.totalItems > 0) {
+    for (i = 0; i < books.items.length; i++) {
+      // check if industryIdentifiers are provided by Google Books
+      // AND only create elements if they are ISBNs
+      if (
+        books.items[i].volumeInfo.industryIdentifiers != undefined &&
+        (books.items[i].volumeInfo.industryIdentifiers[0].type == "ISBN_13" ||
+          books.items[i].volumeInfo.industryIdentifiers[0].type == "ISBN_10")
+      ) {
+        const row = document.createElement("div");
+        const col1 = document.createElement("div");
+        const col2 = document.createElement("div");
+        const selectButton = document.createElement("button");
+        const anchorTitle = document.createElement("a");
 
-    // create an addtional element (button) for selecting this book
-    // attach an on click event (add event listener targeting the onClick property)
-    // on click, call another function that will pass the ISBN of this book
-    // append the button child
+        // create an addtional element (button) for selecting this book
+        // attach an on click event (add event listener targeting the onClick property)
+        // on click, call another function that will pass the ISBN of this book
+        // append the button child
 
-    row.classList.add("row");
-    col1.classList.add("col");
-    col2.classList.add("col");
-    selectButton.classList.add("btn", "btn-info");
+        row.classList.add("row");
+        col1.classList.add("col");
+        col2.classList.add("col");
+        selectButton.classList.add("btn", "btn-info");
 
-    anchorTitle.innerText = books[i].volumeInfo.title;
-    selectButton.innerText = "Select";
-    let bookISBN = books[i].volumeInfo.industryIdentifiers[1].identifier;
-    let selectedTitle = books[i].volumeInfo.title;
-    let thumbnail;
+        anchorTitle.innerText = books.items[i].volumeInfo.title;
+        selectButton.innerText = "Select";
+        let bookISBN =
+          books.items[i].volumeInfo.industryIdentifiers[1].identifier;
+        let selectedTitle = books.items[i].volumeInfo.title;
+        let thumbnail;
 
-    if (books[i].volumeInfo.imageLinks != undefined) {
-      thumbnail = books[i].volumeInfo.imageLinks.smallThumbnail;
-    } else {
-      thumbnail = "images/default_book_small.png";
+        if (books.items[i].volumeInfo.imageLinks != undefined) {
+          thumbnail = books.items[i].volumeInfo.imageLinks.thumbnail;
+        } else {
+          thumbnail = "images/default_book_small.png";
+        }
+
+        anchorTitle.href = "book.html?id=" + books.items[i].id;
+
+        // https://www.w3schools.com/jsref/met_element_addeventlistener.asp
+        selectButton.addEventListener("click", function () {
+          document.getElementById("selection").innerText = selectedTitle;
+          document.getElementById("selected-title").innerText = selectedTitle;
+          document.getElementById("selection-isbn").value = bookISBN;
+          document.getElementById("thumbnail").src = thumbnail;
+          document.getElementById("selected-thumbnail").src = thumbnail;
+          document.getElementById("confirm-book").className = "d-block";
+        });
+
+        col1.appendChild(anchorTitle);
+        col2.appendChild(selectButton);
+
+        row.appendChild(col1);
+        row.appendChild(col2);
+
+        searchResults.appendChild(row);
+      }
     }
-
-    anchorTitle.href = "book.html?id=" + books[i].id;
-    // https://www.w3schools.com/jsref/met_element_addeventlistener.asp
-    selectButton.addEventListener("click", function () {
-      document.getElementById("selection").innerText = selectedTitle;
-      document.getElementById("selected-title").innerText = selectedTitle;
-      document.getElementById("selection-isbn").value = bookISBN;
-      document.getElementById("thumbnail").src = thumbnail;
-      document.getElementById("selected-thumbnail").src = thumbnail;
-      document.getElementById("confirm-book").className = "d-block";
-    });
-
-    col1.appendChild(anchorTitle);
-    col2.appendChild(selectButton);
-
-    row.appendChild(col1);
-    row.appendChild(col2);
-
-    searchResults.appendChild(row);
+  } else {
+    searchResults.innerText = "We didn't find any books to match your search.";
+    searchResults.classList.add("m-3");
   }
 
   let buttonChange = document.getElementById("btn-change");
@@ -1473,7 +1498,9 @@ loadBook = async () => {
 
   let bookThumbnail = document.getElementById("book-thumbnail");
   let thumbnail = document.createElement("img");
-  thumbnail.src = book.items[0].volumeInfo.imageLinks.smallThumbnail;
+
+  // what if there is no thumbnail for this book?
+  thumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
   thumbnail.alt = book.items[0].volumeInfo.title + " book cover";
 
   bookThumbnail.appendChild(thumbnail);
