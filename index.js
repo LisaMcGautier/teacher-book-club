@@ -172,6 +172,13 @@ async function CreateClub(body) {
             },
           ],
         },
+        "Club Leader": {
+          relation: [
+            {
+              id: body.clubleader,
+            },
+          ],
+        },
       },
     });
 
@@ -767,6 +774,24 @@ async function SubmitComment(body) {
 app.post("/api/comments/add", (req, res) => {
   console.log(req.body);
   SubmitComment(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
+async function RemoveComment(body) {
+  const response = await notion.pages.update({
+    parent: { database_id: process.env.NOTION_DATABASE_DISCUSSION_POSTS_ID },
+    page_id: body.pageId,
+	  archived: true,
+  });
+
+  console.log(`SUCCESS: Comment archived with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/comments/remove", (req, res) => {
+  console.log(req.body);
+  RemoveComment(req.body).then((data) => {
     res.send(data);
   });
 });
