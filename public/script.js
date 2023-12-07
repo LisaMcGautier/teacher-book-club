@@ -883,9 +883,12 @@ loadClub = async () => {
         meetingDate.getUTCMonth(),
         meetingDate.getUTCDate()
       ),
-      Title: meetings[i].properties["Book Title"].rich_text[0].plain_text,
+      Title:
+        meetings[i].properties["Book Title"].rollup.array[0].title[0]
+          .plain_text,
       Link:
-        "book.html?id=" + meetings[i].properties.ISBN.rich_text[0].plain_text,
+        "book.html?id=" +
+        meetings[i].properties.ISBN.rollup.array[0].rich_text[0].plain_text,
     });
   }
 
@@ -918,7 +921,8 @@ loadClub = async () => {
   var element = caleandar(document.getElementById("club-calendar"), events);
 
   if (meetings.length > 0) {
-    let bookId = meetings[0].properties.ISBN.rich_text[0].plain_text;
+    let bookId =
+      meetings[0].properties.ISBN.rollup.array[0].rich_text[0].plain_text;
 
     const book = await fetch("/api/book?id=" + bookId).then((response) =>
       response.json()
@@ -964,43 +968,154 @@ loadClub = async () => {
     clubDetails.appendChild(title);
   }
 
-  listClubBooks();
+  listClubBooks(club[0].properties["Club Leader"].relation[0].id);
 };
 
-async function listClubBooks() {
+// async function listClubBooks() {
+//   const urlParams = new URL(window.location.toLocaleString()).searchParams;
+//   const clubId = urlParams.get("id");
+
+//   const response = await fetch("/api/club/booklist?id=" + clubId);
+//   const booklist = await response.json();
+//   console.log(booklist);
+
+//   let clubBooklist = document.getElementById("club-booklist");
+
+//   for (i = 0; i < booklist.length; i++) {
+//     const row = document.createElement("div");
+//     const col1 = document.createElement("div");
+//     const col2 = document.createElement("div");
+
+//     const anchorTitle = document.createElement("a");
+
+//     row.classList.add("row");
+//     col1.classList.add("col");
+//     // col2.classList.add("col");
+
+//     anchorTitle.innerText =
+//       // booklist[i].properties["Club Name"].title[0].plain_text;
+//       booklist[i].properties.Title.title[0].plain_text;
+//     anchorTitle.href = "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
+
+//     // <table class="table table-striped table-hover"> ... </table>
+
+//     col1.appendChild(anchorTitle);
+
+//     row.appendChild(col1);
+//     // row.appendChild(col2);
+
+//     clubBooklist.appendChild(row);
+//   }
+// }
+
+async function listClubBooks(clubLeader) {
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const clubId = urlParams.get("id");
 
+  let shelf = document.getElementById("club-booklist");
+  shelf.innerHTML = "";
+
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border");
+  spinnerDiv.setAttribute("role", "status");
+
+  shelf.appendChild(spinnerDiv);
+
+  // make another call to Notion to get the club bookklist
   const response = await fetch("/api/club/booklist?id=" + clubId);
   const booklist = await response.json();
+
+  spinnerDiv.remove();
+
   console.log(booklist);
 
-  let clubBooklist = document.getElementById("club-booklist");
+  // IF there are books in the booklist
+  if (booklist.length > 0) {
+    for (i = 0; i < booklist.length; i++) {
+      const thumbnailDiv = document.createElement("div");
+      const anchorThumbnail = document.createElement("a");
+      const thumbnailImg = document.createElement("img");
+      const detailsDiv = document.createElement("div");
+      const bookInfo = document.createElement("div");
+      const anchorTitle = document.createElement("a");
 
-  for (i = 0; i < booklist.length; i++) {
-    const row = document.createElement("div");
-    const col1 = document.createElement("div");
-    const col2 = document.createElement("div");
+      thumbnailDiv.classList.add("m-3");
+      detailsDiv.classList.add("my-3", "mx-2");
+      bookInfo.classList.add("details-small");
 
-    const anchorTitle = document.createElement("a");
+      thumbnailImg.src = booklist[i].properties.thumbnail;
+      anchorThumbnail.href =
+        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
+      anchorThumbnail.appendChild(thumbnailImg);
+      thumbnailDiv.appendChild(anchorThumbnail);
 
-    row.classList.add("row");
-    col1.classList.add("col");
-    // col2.classList.add("col");
+      anchorTitle.innerText = booklist[i].properties.title;
+      anchorTitle.href =
+        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
 
-    anchorTitle.innerText =
-      // booklist[i].properties["Club Name"].title[0].plain_text;
-      booklist[i].properties.Title.title[0].plain_text;
-    anchorTitle.href = "club.html?id=" + clubId;
+      bookInfo.innerHTML =
+        "<a href=" +
+        anchorTitle.href +
+        ">" +
+        anchorTitle.innerText +
+        "</a><br>by<br>" +
+        booklist[i].properties.authors;
 
-    // <table class="table table-striped table-hover"> ... </table>
+      detailsDiv.appendChild(bookInfo);
 
-    col1.appendChild(anchorTitle);
+      // if the current logged in user is this club's leader
+      if (clubLeader == localStorage.getItem("userId")) {
+        // display a button to delete this book
+        let btnDeleteBook = document.createElement("a");
+        btnDeleteBook.classList.add("btn", "btn-sm", "btn-danger");
+        btnDeleteBook.innerText = "Delete";
 
-    row.appendChild(col1);
-    // row.appendChild(col2);
+        const pageId = booklist[i].id;
 
-    clubBooklist.appendChild(row);
+        btnDeleteBook.addEventListener("click", async function () {
+          if (confirm("Are you sure you want to delete?") == true) {
+            let body = {
+              pageId: pageId,
+            };
+
+            // call nodeJS remove books endpoint -- POST
+            const response = await fetch("/api/books/remove", {
+              method: "POST",
+              mode: "cors",
+              cache: "no-cache",
+              credentials: "same-origin",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              redirect: "follow",
+              referrerPolicy: "no-referrer",
+              body: JSON.stringify(body),
+            });
+
+            const confirmation = await response.json();
+
+            console.log(confirmation);
+
+            listClubBooks(clubLeader);
+          }
+        });
+
+        detailsDiv.appendChild(btnDeleteBook);
+      }
+
+      shelf.appendChild(thumbnailDiv);
+      shelf.appendChild(detailsDiv);
+    }
+  } else {
+    const messageDiv = document.createElement("div");
+
+    messageDiv.innerText = "There are no books on this shelf yet.";
+
+    shelf.classList.remove("shelf");
+    shelf.classList.add("shelf-empty");
+
+    shelf.appendChild(messageDiv);
   }
 }
 
@@ -1502,6 +1617,34 @@ loadReviews = async (bookId) => {
       btnDeleteReview.classList.add("btn", "btn-sm", "btn-danger");
       btnDeleteReview.innerText = "Delete review";
 
+      const pageId = reviews[i].id;
+
+      btnDeleteReview.addEventListener("click", async function () {
+        let body = {
+          pageId: pageId,
+        };
+
+        // call nodeJS remove reviews endpoint -- POST
+        const response = await fetch("/api/reviews/remove", {
+          method: "POST",
+          mode: "cors",
+          cache: "no-cache",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          redirect: "follow",
+          referrerPolicy: "no-referrer",
+          body: JSON.stringify(body),
+        });
+
+        const confirmation = await response.json();
+
+        console.log(confirmation);
+
+        loadReviews(bookId);
+      });
+
       col3.appendChild(btnDeleteReview);
       col2.classList.add("col-sm-9");
       col3.classList.add("col-sm-1");
@@ -1738,7 +1881,7 @@ loadComments = async (discussionId) => {
           pageId: pageId,
         };
 
-        // call nodeJS add comments endpoint -- POST
+        // call nodeJS remove comments endpoint -- POST
         const response = await fetch("/api/comments/remove", {
           method: "POST",
           mode: "cors",
