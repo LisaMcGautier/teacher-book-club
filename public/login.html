@@ -16,13 +16,14 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="text-center" onload="configureMenu()">
+<body class="text-center" onload="login()">
     <!-- Mobile Nav -->
     <nav class="mobile-nav">
         <div id="menu-links">
             <div class="input-group">
                 <div class="input-group-text">
-                    <select id="mob-search-category" class="form-select form-select-sm" aria-label="Small select example">
+                    <select id="mob-search-category" class="form-select form-select-sm"
+                        aria-label="Small select example">
                         <option selected value="books">Books</option>
                         <option value="clubs">Clubs</option>
                         <option value="members">Members</option>
@@ -99,6 +100,15 @@
                 </symbol>
             </svg>
 
+            <div id="empty-fields" class="alert alert-danger align-items-center d-none" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                    <use xlink:href="#exclamation-triangle-fill" />
+                </svg>
+                <div>
+                    Please enter your username and password.
+                </div>
+            </div>
+
             <div id="login-failed" class="alert alert-danger align-items-center d-none" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
                     <use xlink:href="#exclamation-triangle-fill" />
@@ -118,7 +128,7 @@
 
             <br>
 
-            <button id="btn-login" onclick="login()" type="button" class="btn btn-success">Click to Log In</button>
+            <button id="btn-login" onclick="loginUser()" type="button" class="btn btn-success">Click to Log In</button>
 
         </section>
 

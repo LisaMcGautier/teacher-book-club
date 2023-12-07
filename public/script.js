@@ -23,6 +23,14 @@ async function discussion() {
   loadDiscussion();
 }
 
+async function login() {
+  configureMenu();
+
+  // allow user to login by pressing enter key
+  handleEnter("username", "btn-login");
+  handleEnter("password", "btn-login");
+}
+
 async function myProfile() {
   configureMenu();
   loadProfile();
@@ -89,6 +97,28 @@ async function configureMenu() {
     mLogout.classList.remove("d-none");
     tdLogout.classList.remove("d-none");
   }
+
+  // allow user to trigger search by pressing enter key
+  handleEnter("mob-search-text", "mob-search-btn");
+  handleEnter("search-text", "search-btn");
+}
+
+function handleEnter(inputId, btnId) {
+  // https://www.w3schools.com/howto/howto_js_trigger_button_enter.asp
+
+  // Get the input field
+  var input = document.getElementById(inputId);
+
+  // Execute a function when the user presses a key on the keyboard
+  input.addEventListener("keypress", function (event) {
+    // If the user presses the "Enter" key on the keyboard
+    if (event.key === "Enter") {
+      // Cancel the default action, if needed
+      event.preventDefault();
+      // Trigger the button element with a click
+      document.getElementById(btnId).click();
+    }
+  });
 }
 
 function search(src) {
@@ -161,7 +191,7 @@ async function registerUser() {
 }
 
 // Allow user to log in
-async function login() {
+async function loginUser() {
   // grab the values from the login.html form
   let username = document.getElementById("username");
   let password = document.getElementById("password");
@@ -169,43 +199,49 @@ async function login() {
 
   btnLogin.classList.add("disabled");
 
-  // construct a body JSON object using those values
-  let body = {
-    username: username.value,
-    password: password.value,
-  };
+  if (username.value.trim() != "" && password.value.trim() != "") {
+    // construct a body JSON object using those values
+    let body = {
+      username: username.value,
+      password: password.value,
+    };
 
-  // call nodeJS login-user endpoint -- POST
-  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-  const response = await fetch("/api/login-user", {
-    method: "POST",
-    mode: "cors",
-    cache: "no-cache",
-    credentials: "same-origin",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    redirect: "follow",
-    referrerPolicy: "no-referrer",
-    body: JSON.stringify(body),
-  });
+    // call nodeJS login-user endpoint -- POST
+    // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+    const response = await fetch("/api/login-user", {
+      method: "POST",
+      mode: "cors",
+      cache: "no-cache",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+      referrerPolicy: "no-referrer",
+      body: JSON.stringify(body),
+    });
 
-  // TODO: update the UI based on the result (success) or (error)
-  const userInfo = await response.json();
-  console.log(userInfo);
+    // TODO: update the UI based on the result (success) or (error)
+    const userInfo = await response.json();
+    console.log(userInfo);
 
-  // Check if user login was successful
-  if (userInfo != null && userInfo != false) {
-    // store userInfo to Local Storage
-    localStorage.setItem("userId", userInfo.id);
-    localStorage.setItem("userFirst", userInfo.firstName);
-    localStorage.setItem("userLast", userInfo.lastName);
+    // Check if user login was successful
+    if (userInfo != null && userInfo != false) {
+      // store userInfo to Local Storage
+      localStorage.setItem("userId", userInfo.id);
+      localStorage.setItem("userFirst", userInfo.firstName);
+      localStorage.setItem("userLast", userInfo.lastName);
 
-    // redirect to the user's profile page
-    location.replace("/my-profile.html");
+      // redirect to the user's profile page
+      location.replace("/my-profile.html");
+    } else {
+      let loginFailed = document.getElementById("login-failed");
+      loginFailed.classList.remove("d-none");
+      btnLogin.classList.remove("disabled");
+    }
   } else {
-    let loginFailed = document.getElementById("login-failed");
-    loginFailed.classList.remove("d-none");
+    let emptyFields = document.getElementById("empty-fields");
+    emptyFields.classList.remove("d-none");
     btnLogin.classList.remove("disabled");
   }
 }
@@ -464,6 +500,9 @@ loadSearchBooks = async () => {
   if (q.trim() != "") {
     booksSearch(q);
   }
+
+  // allow user to trigger search by pressing enter key
+  handleEnter("searchterm", "search-books-btn");
 };
 
 async function booksSearch(q) {
@@ -637,6 +676,9 @@ loadSearchClubs = async () => {
   if (q.trim() != "") {
     clubsSearch(q);
   }
+
+  // allow user to trigger search by pressing enter key
+  handleEnter("searchterm", "search-clubs-btn");
 };
 
 async function clubsSearch(q) {
@@ -738,6 +780,9 @@ loadSearchMembers = async () => {
   if (q.trim() != "") {
     membersSearch(q);
   }
+
+  // allow user to trigger search by pressing enter key
+  handleEnter("searchterm", "search-members-btn");
 };
 
 async function membersSearch(q) {
@@ -883,9 +928,12 @@ loadClub = async () => {
         meetingDate.getUTCMonth(),
         meetingDate.getUTCDate()
       ),
-      Title: meetings[i].properties["Book Title"].rich_text[0].plain_text,
+      Title:
+        meetings[i].properties["Book Title"].rollup.array[0].title[0]
+          .plain_text,
       Link:
-        "book.html?id=" + meetings[i].properties.ISBN.rich_text[0].plain_text,
+        "book.html?id=" +
+        meetings[i].properties.ISBN.rollup.array[0].rich_text[0].plain_text,
     });
   }
 
@@ -918,7 +966,8 @@ loadClub = async () => {
   var element = caleandar(document.getElementById("club-calendar"), events);
 
   if (meetings.length > 0) {
-    let bookId = meetings[0].properties.ISBN.rich_text[0].plain_text;
+    let bookId =
+      meetings[0].properties.ISBN.rollup.array[0].rich_text[0].plain_text;
 
     const book = await fetch("/api/book?id=" + bookId).then((response) =>
       response.json()
@@ -1113,6 +1162,9 @@ loadAddBook = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const clubId = urlParams.get("id");
+
+  // allow user to trigger search by pressing enter key
+  handleEnter("searchterm", "admin-search-books-btn");
 
   const club = await fetch("/api/clubs-notion?id=" + clubId).then((response) =>
     response.json()
