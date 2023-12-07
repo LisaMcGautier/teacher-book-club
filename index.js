@@ -153,6 +153,13 @@ async function CheckLogin(username, password) {
   }
 }
 
+app.post("/api/login-user", (req, res) => {
+  console.log(req.body);
+  CheckLogin(req.body.username, req.body.password).then((data) => {
+    res.send(data);
+  });
+});
+
 async function CreateClub(body) {
   let foundClub = await DoesClubnameExist(body.clubname);
   console.log("found club equals " + foundClub);
@@ -221,13 +228,6 @@ async function DoesClubnameExist(clubname) {
 app.post("/api/create-user", (req, res) => {
   console.log(req.body);
   CreateUser(req.body).then((data) => {
-    res.send(data);
-  });
-});
-
-app.post("/api/login-user", (req, res) => {
-  console.log(req.body);
-  CheckLogin(req.body.username, req.body.password).then((data) => {
     res.send(data);
   });
 });
@@ -782,7 +782,7 @@ async function RemoveComment(body) {
   const response = await notion.pages.update({
     parent: { database_id: process.env.NOTION_DATABASE_DISCUSSION_POSTS_ID },
     page_id: body.pageId,
-	  archived: true,
+    archived: true,
   });
 
   console.log(`SUCCESS: Comment archived with pageId ${response.id}`);
