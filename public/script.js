@@ -253,6 +253,53 @@ function logout() {
   location.replace("/index.html");
 }
 
+function loadKudosCount(teacher) {
+  let kudosEmpatheticCount = document.getElementById("kudos-empathetic-count");
+  let kudosHelpfulCount = document.getElementById("kudos-helpful-count");
+  let kudosInsightfulCount = document.getElementById("kudos-insightful-count");
+  let kudosMotivatingCount = document.getElementById("kudos-motivating-count");
+  let kudosSupportiveCount = document.getElementById("kudos-supportive-count");
+
+  if (
+    teacher[0].properties["Kudos Empathetic"].number != null &&
+    teacher[0].properties["Kudos Empathetic"].number > 0
+  ) {
+    kudosEmpatheticCount.innerText =
+      teacher[0].properties["Kudos Empathetic"].number;
+  }
+
+  if (
+    teacher[0].properties["Kudos Helpful"].number != null &&
+    teacher[0].properties["Kudos Helpful"].number > 0
+  ) {
+    kudosHelpfulCount.innerText = teacher[0].properties["Kudos Helpful"].number;
+  }
+
+  if (
+    teacher[0].properties["Kudos Insightful"].number != null &&
+    teacher[0].properties["Kudos Insightful"].number > 0
+  ) {
+    kudosInsightfulCount.innerText =
+      teacher[0].properties["Kudos Insightful"].number;
+  }
+
+  if (
+    teacher[0].properties["Kudos Motivating"].number != null &&
+    teacher[0].properties["Kudos Motivating"].number > 0
+  ) {
+    kudosMotivatingCount.innerText =
+      teacher[0].properties["Kudos Motivating"].number;
+  }
+
+  if (
+    teacher[0].properties["Kudos Supportive"].number != null &&
+    teacher[0].properties["Kudos Supportive"].number > 0
+  ) {
+    kudosSupportiveCount.innerText =
+      teacher[0].properties["Kudos Supportive"].number;
+  }
+}
+
 loadAvatarBio = async () => {
   // let reviewSection = document.getElementById("review-section");
   // // clear previously rendered reviews and display all current reviews
@@ -299,6 +346,8 @@ loadAvatarBio = async () => {
     bioContent.innerText =
       teacher[0].properties["Short bio"].rich_text[0].plain_text;
   }
+
+  loadKudosCount(teacher);
 };
 
 loadMessages = async () => {
@@ -2065,14 +2114,82 @@ loadTeacher = async () => {
     }
   });
 
+  // if the teacherId matches the logged in user
+  // do NOT allow the buttons to send kudos
+
+  if (teacherId == localStorage.getItem("userId").replaceAll("-", "")) {
+    let kudosEmpathetic = document.getElementById("kudos-empathetic");
+    let kudosHelpful = document.getElementById("kudos-helpful");
+    let kudosInsightful = document.getElementById("kudos-insightful");
+    let kudosMotivating = document.getElementById("kudos-motivating");
+    let kudosSupportive = document.getElementById("kudos-supportive");
+
+    kudosEmpathetic.classList.add("disabled");
+    kudosHelpful.classList.add("disabled");
+    kudosInsightful.classList.add("disabled");
+    kudosMotivating.classList.add("disabled");
+    kudosSupportive.classList.add("disabled");
+  }
+
+  loadKudosCount(teacher);
+
+  document.getElementById("kudos-empathetic").classList.remove("disabled");
+  document.getElementById("kudos-helpful").classList.remove("disabled");
+  document.getElementById("kudos-insightful").classList.remove("disabled");
+  document.getElementById("kudos-motivating").classList.remove("disabled");
+  document.getElementById("kudos-supportive").classList.remove("disabled");
+
   loadShelf("wishlist", teacherId);
   loadShelf("history", teacherId);
 
   // loop over the results to make one call to GB API per ISBN to render thumbnails on the page
 };
 
+async function giveKudos(sender) {
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const teacherId = urlParams.get("id");
+
+  document.getElementById("kudos-empathetic").classList.add("disabled");
+  document.getElementById("kudos-helpful").classList.add("disabled");
+  document.getElementById("kudos-insightful").classList.add("disabled");
+  document.getElementById("kudos-motivating").classList.add("disabled");
+  document.getElementById("kudos-supportive").classList.add("disabled");
+
+  let kudosCount = document.getElementById(
+    sender.getAttribute("id") + "-count"
+  );
+
+  console.log(null + 1);
+  // construct a json body to update the count in the correct kudos column
+  let body = {
+    teacherId: teacherId,
+    kudosType: sender.getAttribute("id"),
+    kudosCount: parseInt(kudosCount.innerText) + 1,
+  };
+
+  // make another call to Notion to update the number of kudos
+  const response = await fetch("/api/kudos/update", {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(body),
+  });
+
+  const confirmation = await response.json();
+
+  loadTeacher();
+}
+
 async function loadShelf(shelfName, teacherId) {
   let shelf = document.getElementById(shelfName + "-shelf");
+
+  shelf.innerHTML = "";
 
   const spinnerDiv = document.createElement("div");
   spinnerDiv.setAttribute("id", "spinner");

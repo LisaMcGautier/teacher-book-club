@@ -260,6 +260,44 @@ app.post("/api/bio/update", (req, res) => {
   });
 });
 
+async function UpdateKudos(body) {
+  let kudosColumnName;
+
+  // the column that gets updated depends on which button was clicked
+  if (body.kudosType == "kudos-empathetic") {
+    kudosColumnName = "Kudos Empathetic";
+  } else if (body.kudosType == "kudos-helpful") {
+    kudosColumnName = "Kudos Helpful";
+  } else if (body.kudosType == "kudos-insightful") {
+    kudosColumnName = "Kudos Insightful";
+  } else if (body.kudosType == "kudos-motivating") {
+    kudosColumnName = "Kudos Motivating";
+  } else {
+    kudosColumnName = "Kudos Supportive";
+  }
+
+  // https://www.samanthaming.com/tidbits/37-dynamic-property-name-with-es6/
+  const response = await notion.pages.update({
+    parent: { database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID },
+    page_id: body.teacherId,
+    properties: {
+      [kudosColumnName]: {
+        number: body.kudosCount
+      },
+    },
+  });
+
+  console.log(`Kudos updated for teacher ${response.id}`);
+  return response;
+}
+
+app.post("/api/kudos/update", (req, res) => {
+  console.log(req.body);
+  UpdateKudos(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
 app.get("/api/clubs", (req, res) => {
   console.log("CLUB " + req.query.id);
 
