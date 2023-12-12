@@ -31,13 +31,13 @@ body {
     display: none;
 }
 
-header {
+header > a {
     height: 150px;
     background-color: #000000;
     color: #FFFFFF;
     font-family: Georgia, 'Times New Roman', Times, serif;
     font-size: 3em;
-    /* margin-bottom: 10px; */
+    text-decoration: none;
     display: flex;
     justify-content: center;
     align-items: center;

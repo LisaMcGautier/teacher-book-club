@@ -517,27 +517,61 @@ async function listClubs() {
 
   let clubsList = document.getElementById("clubs-list");
 
-  for (i = 0; i < clubs.length; i++) {
-    const row = document.createElement("div");
-    const col1 = document.createElement("div");
-    const col2 = document.createElement("div");
+  
+  if (clubs.length > 0) {
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const tr = document.createElement("tr");
+    const thClubName = document.createElement("th");
+    const thClubDescription = document.createElement("th");
+    const tbody = document.createElement("tbody");
 
-    const anchorTitle = document.createElement("a");
+    // https://getbootstrap.com/docs/5.3/content/tables/
+    table.classList.add("table", "table-striped", "table-hover", "table-sm");
+    table.classList.add("my-3");
+    thClubName.setAttribute("scope", "col");
+    thClubDescription.setAttribute("scope", "col");
+    thClubName.innerText = "Name";
+    thClubDescription.innerText = "Description";
 
-    row.classList.add("row");
-    col1.classList.add("col");
-    // col2.classList.add("col");
+    clubsList.appendChild(table);
 
-    anchorTitle.innerText =
-      clubs[i].properties["Club Name"].title[0].plain_text;
-    anchorTitle.href = "club.html?id=" + clubs[i].id.replaceAll("-", "");
+    table.appendChild(thead);
+    thead.appendChild(tr);
+    tr.appendChild(thClubName);
+    tr.appendChild(thClubDescription);
+    table.appendChild(tbody);
 
-    col1.appendChild(anchorTitle);
+    for (i = 0; i < clubs.length; i++) {
+      const tableRow = document.createElement("tr");
+      const tdName = document.createElement("td");
+      const tdDescription = document.createElement("td");
+      const anchorName = document.createElement("a");
+      const spanDescription = document.createElement("span");
 
-    row.appendChild(col1);
-    // row.appendChild(col2);
+      anchorName.href = "club.html?id=" + clubs[i].id.replaceAll("-", "");
+      anchorName.classList.add("fw-bold");
+      anchorName.innerText =
+        clubs[i].properties["Club Name"].title[0].plain_text;
 
-    clubsList.appendChild(row);
+      if (clubs[i].properties["Club Description"].rich_text.length > 0) {
+        spanDescription.innerText =
+          clubs[i].properties["Club Description"].rich_text[0].plain_text;
+      } else {
+        spanDescription.innerText = "This description hasn't been written yet.";
+      }
+
+      tdName.appendChild(anchorName);
+      tdDescription.appendChild(spanDescription);
+
+      tbody.appendChild(tableRow);
+      tableRow.appendChild(tdName);
+      tableRow.appendChild(tdDescription);
+      tdDescription.appendChild(spanDescription);
+    }
+  } else {
+    clubsList.innerText = "There aren't any clubs yet. Create one to get started.";
+    clubsList.classList.add("m-3");
   }
 }
 
@@ -779,8 +813,11 @@ async function clubsSearch(q) {
     table.classList.add("table", "table-striped", "table-hover", "table-sm");
     thClubName.setAttribute("scope", "col");
     thClubDescription.setAttribute("scope", "col");
+    thClubName.innerText = "Name";
+    thClubDescription.innerText = "Description";
 
     searchResults.appendChild(table);
+
     table.appendChild(thead);
     thead.appendChild(tr);
     tr.appendChild(thClubName);
@@ -799,7 +836,7 @@ async function clubsSearch(q) {
       anchorName.innerText =
         clubs[i].properties["Club Name"].title[0].plain_text;
 
-      if (clubs[i].properties["Club Description"].length > 0) {
+      if (clubs[i].properties["Club Description"].rich_text.length > 0) {
         spanDescription.innerText =
           clubs[i].properties["Club Description"].rich_text[0].plain_text;
       } else {
@@ -812,7 +849,6 @@ async function clubsSearch(q) {
       tbody.appendChild(tableRow);
       tableRow.appendChild(tdName);
       tableRow.appendChild(tdDescription);
-      tdDescription.appendChild(anchorName);
       tdDescription.appendChild(spanDescription);
     }
   } else {
@@ -1027,6 +1063,8 @@ loadClub = async () => {
 
     let clubThumbnail = document.createElement("img");
     clubThumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
+    let anchorThumbnail = document.createElement("a");
+    anchorThumbnail.href = "book.html?id=" + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
 
     let clubDetails = document.getElementById("club-details");
     let title = document.createElement("h5");
@@ -1048,7 +1086,8 @@ loadClub = async () => {
     btnDiscussion.classList.add("btn", "btn-success");
     btnDiscussion.innerText = "Click to join discussion";
 
-    clubDetails.appendChild(clubThumbnail);
+    anchorThumbnail.appendChild(clubThumbnail);
+    clubDetails.appendChild(anchorThumbnail);
     clubDetails.appendChild(title);
     clubDetails.appendChild(author);
     clubDetails.appendChild(isbnTen);
@@ -1062,7 +1101,7 @@ loadClub = async () => {
     clubDetails.appendChild(title);
   }
 
-  listClubBooks();
+  loadClubShelf(clubId);
 };
 
 async function listClubBooks() {
@@ -1089,7 +1128,7 @@ async function listClubBooks() {
     anchorTitle.innerText =
       // booklist[i].properties["Club Name"].title[0].plain_text;
       booklist[i].properties.Title.title[0].plain_text;
-    anchorTitle.href = "club.html?id=" + clubId;
+    anchorTitle.href = "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
 
     // <table class="table table-striped table-hover"> ... </table>
 
@@ -2206,6 +2245,76 @@ async function loadShelf(shelfName, teacherId) {
   spinnerDiv.remove();
 
   console.log(shelfName, booklist);
+
+  // IF there are books in the booklist
+  if (booklist.length > 0) {
+    for (i = 0; i < booklist.length; i++) {
+      const thumbnailDiv = document.createElement("div");
+      const anchorThumbnail = document.createElement("a");
+      const thumbnailImg = document.createElement("img");
+      const detailsDiv = document.createElement("div");
+      const bookInfo = document.createElement("div");
+      const anchorTitle = document.createElement("a");
+
+      thumbnailDiv.classList.add("m-3");
+      detailsDiv.classList.add("my-3", "mx-2");
+      bookInfo.classList.add("details-small");
+
+      thumbnailImg.src = booklist[i].properties.thumbnail;
+      anchorThumbnail.href =
+        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
+      anchorThumbnail.appendChild(thumbnailImg);
+      thumbnailDiv.appendChild(anchorThumbnail);
+
+      anchorTitle.innerText = booklist[i].properties.title;
+      anchorTitle.href =
+        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
+
+      bookInfo.innerHTML =
+        "<a href=" +
+        anchorTitle.href +
+        ">" +
+        anchorTitle.innerText +
+        "</a><br>by<br>" +
+        booklist[i].properties.authors;
+
+      detailsDiv.appendChild(bookInfo);
+
+      shelf.appendChild(thumbnailDiv);
+      shelf.appendChild(detailsDiv);
+    }
+  } else {
+    const messageDiv = document.createElement("div");
+
+    messageDiv.innerText = "There are no books on this shelf yet.";
+
+    shelf.classList.remove("shelf");
+    shelf.classList.add("shelf-empty");
+
+    shelf.appendChild(messageDiv);
+  }
+}
+
+async function loadClubShelf(clubId) {
+  let shelf = document.getElementById("club-booklist");
+
+  shelf.innerHTML = "";
+
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border");
+  spinnerDiv.setAttribute("role", "status");
+
+  shelf.appendChild(spinnerDiv);
+
+  // make another call to Notion to get the Wishlist
+  const booklist = await fetch("/api/club/booklist?id=" + clubId).then(
+    (response) => response.json()
+  );
+
+  spinnerDiv.remove();
+
+  console.log(shelf, booklist);
 
   // IF there are books in the booklist
   if (booklist.length > 0) {

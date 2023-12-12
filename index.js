@@ -523,7 +523,23 @@ app.get("/api/club/booklist", (req, res) => {
     },
   };
 
-  queryDatabase(myQuery).then((data) => {
+  queryDatabase(myQuery).then(async (data) => {
+    for (let i = 0; i < data.length; i++) {
+      await fetch(
+        "https://www.googleapis.com/books/v1/volumes?q=isbn:" +
+          data[i].properties.ISBN.rich_text[0].plain_text +
+          "&key=" +
+          process.env.GOOGLE_BOOKS_API_KEY
+      )
+        .then((response) => response.json())
+        .then((result) => {
+          // add the thumbnail property to the Notion results
+          data[i].properties.title = result.items[0].volumeInfo.title;
+          data[i].properties.authors = result.items[0].volumeInfo.authors;
+          data[i].properties.thumbnail =
+            result.items[0].volumeInfo.imageLinks.thumbnail;
+        });
+    }
     res.send(data);
   });
 });
@@ -956,7 +972,7 @@ app.get("/api/wishlist", (req, res) => {
           data[i].properties.title = result.items[0].volumeInfo.title;
           data[i].properties.authors = result.items[0].volumeInfo.authors;
           data[i].properties.thumbnail =
-            result.items[0].volumeInfo.imageLinks.smallThumbnail;
+            result.items[0].volumeInfo.imageLinks.thumbnail;
         });
     }
     // console.log(data);
@@ -992,7 +1008,7 @@ app.get("/api/history", (req, res) => {
           data[i].properties.title = result.items[0].volumeInfo.title;
           data[i].properties.authors = result.items[0].volumeInfo.authors;
           data[i].properties.thumbnail =
-            result.items[0].volumeInfo.imageLinks.smallThumbnail;
+            result.items[0].volumeInfo.imageLinks.thumbnail;
         });
     }
     // console.log(data);
