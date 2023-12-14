@@ -21,7 +21,8 @@
         <div id="menu-links">
             <div class="input-group">
                 <div class="input-group-text">
-                    <select id="mob-search-category" class="form-select form-select-sm" aria-label="Small select example">
+                    <select id="mob-search-category" class="form-select form-select-sm"
+                        aria-label="Small select example">
                         <option selected value="books">Books</option>
                         <option value="clubs">Clubs</option>
                         <option value="members">Members</option>
@@ -47,7 +48,7 @@
         </a>
     </nav>
 
-    <header>Teacher Book Club</header>
+    <header><a href="index.html">Teacher Book Club</a></header>
 
     <!-- Tablet & Desktop Nav -->
     <nav class="tablet-desktop">
@@ -112,7 +113,8 @@
 
                 <div class="col-sm-4">
                     <div id="avatar" class="avatar-large">Large avatar image</div>
-                    <button type="button" class="btn btn-primary">Click to edit image</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="alert('This feature is coming soon.');">Click
+                        to edit image</button>
                 </div>
 
                 <div class="col-sm-8">
@@ -169,17 +171,27 @@
         </section>
 
         <section class="section1">
-            <h1>My Clubs</h1>
+            <h1>My Kudos
+            </h1>
 
             <div class="row">
 
                 <div class="col-sm-12">
-                    <button type="button" class="btn btn-success">Success</button>
-                    <button type="button" class="btn btn-primary">Primary</button>
-                    <button type="button" class="btn btn-warning">Warning</button>
-                    <button type="button" class="btn btn-info">Info</button>
-                    <button type="button" class="btn btn-danger">Danger</button>
-
+                    <span id="kudos-empathetic" class="badge rounded-pill text-bg-success fs-6 fw-normal">Empathetic
+                        <span id="kudos-empathetic-count" class="badge bg-dark">0</span>
+                    </span>
+                    <span id="kudos-helpful" class="badge rounded-pill text-bg-info fs-6 fw-normal">Helpful
+                        <span id="kudos-helpful-count" class="badge bg-dark">0</span>
+                    </span>
+                    <span id="kudos-insightful" class="badge rounded-pill text-bg-primary fs-6 fw-normal">Insightful
+                        <span id="kudos-insightful-count" class="badge bg-dark">0</span>
+                    </span>
+                    <span id="kudos-motivating" class="badge rounded-pill text-bg-warning fs-6 fw-normal">Motivating
+                        <span id="kudos-motivating-count" class="badge bg-dark">0</span>
+                    </span>
+                    <span id="kudos-supportive" class="badge rounded-pill text-bg-danger fs-6 fw-normal">Supportive
+                        <span id="kudos-supportive-count" class="badge bg-dark">0</span>
+                    </span>
                 </div>
 
             </div>

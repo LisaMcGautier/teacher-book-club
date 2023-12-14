@@ -153,6 +153,13 @@ async function CheckLogin(username, password) {
   }
 }
 
+app.post("/api/login-user", (req, res) => {
+  console.log(req.body);
+  CheckLogin(req.body.username, req.body.password).then((data) => {
+    res.send(data);
+  });
+});
+
 async function CreateClub(body) {
   let foundClub = await DoesClubnameExist(body.clubname);
   console.log("found club equals " + foundClub);
@@ -225,13 +232,6 @@ app.post("/api/create-user", (req, res) => {
   });
 });
 
-app.post("/api/login-user", (req, res) => {
-  console.log(req.body);
-  CheckLogin(req.body.username, req.body.password).then((data) => {
-    res.send(data);
-  });
-});
-
 async function UpdateBio(body) {
   const response = await notion.pages.update({
     parent: { database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID },
@@ -256,6 +256,44 @@ async function UpdateBio(body) {
 app.post("/api/bio/update", (req, res) => {
   console.log(req.body);
   UpdateBio(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
+async function UpdateKudos(body) {
+  let kudosColumnName;
+
+  // the column that gets updated depends on which button was clicked
+  if (body.kudosType == "kudos-empathetic") {
+    kudosColumnName = "Kudos Empathetic";
+  } else if (body.kudosType == "kudos-helpful") {
+    kudosColumnName = "Kudos Helpful";
+  } else if (body.kudosType == "kudos-insightful") {
+    kudosColumnName = "Kudos Insightful";
+  } else if (body.kudosType == "kudos-motivating") {
+    kudosColumnName = "Kudos Motivating";
+  } else {
+    kudosColumnName = "Kudos Supportive";
+  }
+
+  // https://www.samanthaming.com/tidbits/37-dynamic-property-name-with-es6/
+  const response = await notion.pages.update({
+    parent: { database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID },
+    page_id: body.teacherId,
+    properties: {
+      [kudosColumnName]: {
+        number: body.kudosCount
+      },
+    },
+  });
+
+  console.log(`Kudos updated for teacher ${response.id}`);
+  return response;
+}
+
+app.post("/api/kudos/update", (req, res) => {
+  console.log(req.body);
+  UpdateKudos(req.body).then((data) => {
     res.send(data);
   });
 });
@@ -844,7 +882,7 @@ async function RemoveComment(body) {
   const response = await notion.pages.update({
     parent: { database_id: process.env.NOTION_DATABASE_DISCUSSION_POSTS_ID },
     page_id: body.pageId,
-	  archived: true,
+    archived: true,
   });
 
   console.log(`SUCCESS: Comment archived with pageId ${response.id}`);
@@ -980,7 +1018,7 @@ app.get("/api/wishlist", (req, res) => {
           data[i].properties.title = result.items[0].volumeInfo.title;
           data[i].properties.authors = result.items[0].volumeInfo.authors;
           data[i].properties.thumbnail =
-            result.items[0].volumeInfo.imageLinks.smallThumbnail;
+            result.items[0].volumeInfo.imageLinks.thumbnail;
         });
     }
     // console.log(data);
@@ -1016,7 +1054,7 @@ app.get("/api/history", (req, res) => {
           data[i].properties.title = result.items[0].volumeInfo.title;
           data[i].properties.authors = result.items[0].volumeInfo.authors;
           data[i].properties.thumbnail =
-            result.items[0].volumeInfo.imageLinks.smallThumbnail;
+            result.items[0].volumeInfo.imageLinks.thumbnail;
         });
     }
     // console.log(data);

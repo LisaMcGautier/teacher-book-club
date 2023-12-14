@@ -23,6 +23,14 @@ async function discussion() {
   loadDiscussion();
 }
 
+async function login() {
+  configureMenu();
+
+  // allow user to login by pressing enter key
+  handleEnter("username", "btn-login");
+  handleEnter("password", "btn-login");
+}
+
 async function myProfile() {
   configureMenu();
   loadProfile();
@@ -89,6 +97,28 @@ async function configureMenu() {
     mLogout.classList.remove("d-none");
     tdLogout.classList.remove("d-none");
   }
+
+  // allow user to trigger search by pressing enter key
+  handleEnter("mob-search-text", "mob-search-btn");
+  handleEnter("search-text", "search-btn");
+}
+
+function handleEnter(inputId, btnId) {
+  // https://www.w3schools.com/howto/howto_js_trigger_button_enter.asp
+
+  // Get the input field
+  var input = document.getElementById(inputId);
+
+  // Execute a function when the user presses a key on the keyboard
+  input.addEventListener("keypress", function (event) {
+    // If the user presses the "Enter" key on the keyboard
+    if (event.key === "Enter") {
+      // Cancel the default action, if needed
+      event.preventDefault();
+      // Trigger the button element with a click
+      document.getElementById(btnId).click();
+    }
+  });
 }
 
 function search(src) {
@@ -161,7 +191,7 @@ async function registerUser() {
 }
 
 // Allow user to log in
-async function login() {
+async function loginUser() {
   // grab the values from the login.html form
   let username = document.getElementById("username");
   let password = document.getElementById("password");
@@ -169,43 +199,49 @@ async function login() {
 
   btnLogin.classList.add("disabled");
 
-  // construct a body JSON object using those values
-  let body = {
-    username: username.value,
-    password: password.value,
-  };
+  if (username.value.trim() != "" && password.value.trim() != "") {
+    // construct a body JSON object using those values
+    let body = {
+      username: username.value,
+      password: password.value,
+    };
 
-  // call nodeJS login-user endpoint -- POST
-  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-  const response = await fetch("/api/login-user", {
-    method: "POST",
-    mode: "cors",
-    cache: "no-cache",
-    credentials: "same-origin",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    redirect: "follow",
-    referrerPolicy: "no-referrer",
-    body: JSON.stringify(body),
-  });
+    // call nodeJS login-user endpoint -- POST
+    // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+    const response = await fetch("/api/login-user", {
+      method: "POST",
+      mode: "cors",
+      cache: "no-cache",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+      referrerPolicy: "no-referrer",
+      body: JSON.stringify(body),
+    });
 
-  // TODO: update the UI based on the result (success) or (error)
-  const userInfo = await response.json();
-  console.log(userInfo);
+    // TODO: update the UI based on the result (success) or (error)
+    const userInfo = await response.json();
+    console.log(userInfo);
 
-  // Check if user login was successful
-  if (userInfo != null && userInfo != false) {
-    // store userInfo to Local Storage
-    localStorage.setItem("userId", userInfo.id);
-    localStorage.setItem("userFirst", userInfo.firstName);
-    localStorage.setItem("userLast", userInfo.lastName);
+    // Check if user login was successful
+    if (userInfo != null && userInfo != false) {
+      // store userInfo to Local Storage
+      localStorage.setItem("userId", userInfo.id);
+      localStorage.setItem("userFirst", userInfo.firstName);
+      localStorage.setItem("userLast", userInfo.lastName);
 
-    // redirect to the user's profile page
-    location.replace("/my-profile.html");
+      // redirect to the user's profile page
+      location.replace("/my-profile.html");
+    } else {
+      let loginFailed = document.getElementById("login-failed");
+      loginFailed.classList.remove("d-none");
+      btnLogin.classList.remove("disabled");
+    }
   } else {
-    let loginFailed = document.getElementById("login-failed");
-    loginFailed.classList.remove("d-none");
+    let emptyFields = document.getElementById("empty-fields");
+    emptyFields.classList.remove("d-none");
     btnLogin.classList.remove("disabled");
   }
 }
@@ -215,6 +251,53 @@ function logout() {
   localStorage.removeItem("userFirst");
   localStorage.removeItem("userLast");
   location.replace("/index.html");
+}
+
+function loadKudosCount(teacher) {
+  let kudosEmpatheticCount = document.getElementById("kudos-empathetic-count");
+  let kudosHelpfulCount = document.getElementById("kudos-helpful-count");
+  let kudosInsightfulCount = document.getElementById("kudos-insightful-count");
+  let kudosMotivatingCount = document.getElementById("kudos-motivating-count");
+  let kudosSupportiveCount = document.getElementById("kudos-supportive-count");
+
+  if (
+    teacher[0].properties["Kudos Empathetic"].number != null &&
+    teacher[0].properties["Kudos Empathetic"].number > 0
+  ) {
+    kudosEmpatheticCount.innerText =
+      teacher[0].properties["Kudos Empathetic"].number;
+  }
+
+  if (
+    teacher[0].properties["Kudos Helpful"].number != null &&
+    teacher[0].properties["Kudos Helpful"].number > 0
+  ) {
+    kudosHelpfulCount.innerText = teacher[0].properties["Kudos Helpful"].number;
+  }
+
+  if (
+    teacher[0].properties["Kudos Insightful"].number != null &&
+    teacher[0].properties["Kudos Insightful"].number > 0
+  ) {
+    kudosInsightfulCount.innerText =
+      teacher[0].properties["Kudos Insightful"].number;
+  }
+
+  if (
+    teacher[0].properties["Kudos Motivating"].number != null &&
+    teacher[0].properties["Kudos Motivating"].number > 0
+  ) {
+    kudosMotivatingCount.innerText =
+      teacher[0].properties["Kudos Motivating"].number;
+  }
+
+  if (
+    teacher[0].properties["Kudos Supportive"].number != null &&
+    teacher[0].properties["Kudos Supportive"].number > 0
+  ) {
+    kudosSupportiveCount.innerText =
+      teacher[0].properties["Kudos Supportive"].number;
+  }
 }
 
 loadAvatarBio = async () => {
@@ -263,6 +346,8 @@ loadAvatarBio = async () => {
     bioContent.innerText =
       teacher[0].properties["Short bio"].rich_text[0].plain_text;
   }
+
+  loadKudosCount(teacher);
 };
 
 loadMessages = async () => {
@@ -432,27 +517,61 @@ async function listClubs() {
 
   let clubsList = document.getElementById("clubs-list");
 
-  for (i = 0; i < clubs.length; i++) {
-    const row = document.createElement("div");
-    const col1 = document.createElement("div");
-    const col2 = document.createElement("div");
+  
+  if (clubs.length > 0) {
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const tr = document.createElement("tr");
+    const thClubName = document.createElement("th");
+    const thClubDescription = document.createElement("th");
+    const tbody = document.createElement("tbody");
 
-    const anchorTitle = document.createElement("a");
+    // https://getbootstrap.com/docs/5.3/content/tables/
+    table.classList.add("table", "table-striped", "table-hover", "table-sm");
+    table.classList.add("my-3");
+    thClubName.setAttribute("scope", "col");
+    thClubDescription.setAttribute("scope", "col");
+    thClubName.innerText = "Name";
+    thClubDescription.innerText = "Description";
 
-    row.classList.add("row");
-    col1.classList.add("col");
-    // col2.classList.add("col");
+    clubsList.appendChild(table);
 
-    anchorTitle.innerText =
-      clubs[i].properties["Club Name"].title[0].plain_text;
-    anchorTitle.href = "club.html?id=" + clubs[i].id.replaceAll("-", "");
+    table.appendChild(thead);
+    thead.appendChild(tr);
+    tr.appendChild(thClubName);
+    tr.appendChild(thClubDescription);
+    table.appendChild(tbody);
 
-    col1.appendChild(anchorTitle);
+    for (i = 0; i < clubs.length; i++) {
+      const tableRow = document.createElement("tr");
+      const tdName = document.createElement("td");
+      const tdDescription = document.createElement("td");
+      const anchorName = document.createElement("a");
+      const spanDescription = document.createElement("span");
 
-    row.appendChild(col1);
-    // row.appendChild(col2);
+      anchorName.href = "club.html?id=" + clubs[i].id.replaceAll("-", "");
+      anchorName.classList.add("fw-bold");
+      anchorName.innerText =
+        clubs[i].properties["Club Name"].title[0].plain_text;
 
-    clubsList.appendChild(row);
+      if (clubs[i].properties["Club Description"].rich_text.length > 0) {
+        spanDescription.innerText =
+          clubs[i].properties["Club Description"].rich_text[0].plain_text;
+      } else {
+        spanDescription.innerText = "This description hasn't been written yet.";
+      }
+
+      tdName.appendChild(anchorName);
+      tdDescription.appendChild(spanDescription);
+
+      tbody.appendChild(tableRow);
+      tableRow.appendChild(tdName);
+      tableRow.appendChild(tdDescription);
+      tdDescription.appendChild(spanDescription);
+    }
+  } else {
+    clubsList.innerText = "There aren't any clubs yet. Create one to get started.";
+    clubsList.classList.add("m-3");
   }
 }
 
@@ -464,6 +583,9 @@ loadSearchBooks = async () => {
   if (q.trim() != "") {
     booksSearch(q);
   }
+
+  // allow user to trigger search by pressing enter key
+  handleEnter("searchterm", "search-books-btn");
 };
 
 async function booksSearch(q) {
@@ -637,6 +759,9 @@ loadSearchClubs = async () => {
   if (q.trim() != "") {
     clubsSearch(q);
   }
+
+  // allow user to trigger search by pressing enter key
+  handleEnter("searchterm", "search-clubs-btn");
 };
 
 async function clubsSearch(q) {
@@ -688,8 +813,11 @@ async function clubsSearch(q) {
     table.classList.add("table", "table-striped", "table-hover", "table-sm");
     thClubName.setAttribute("scope", "col");
     thClubDescription.setAttribute("scope", "col");
+    thClubName.innerText = "Name";
+    thClubDescription.innerText = "Description";
 
     searchResults.appendChild(table);
+
     table.appendChild(thead);
     thead.appendChild(tr);
     tr.appendChild(thClubName);
@@ -708,7 +836,7 @@ async function clubsSearch(q) {
       anchorName.innerText =
         clubs[i].properties["Club Name"].title[0].plain_text;
 
-      if (clubs[i].properties["Club Description"].length > 0) {
+      if (clubs[i].properties["Club Description"].rich_text.length > 0) {
         spanDescription.innerText =
           clubs[i].properties["Club Description"].rich_text[0].plain_text;
       } else {
@@ -721,7 +849,6 @@ async function clubsSearch(q) {
       tbody.appendChild(tableRow);
       tableRow.appendChild(tdName);
       tableRow.appendChild(tdDescription);
-      tdDescription.appendChild(anchorName);
       tdDescription.appendChild(spanDescription);
     }
   } else {
@@ -738,6 +865,9 @@ loadSearchMembers = async () => {
   if (q.trim() != "") {
     membersSearch(q);
   }
+
+  // allow user to trigger search by pressing enter key
+  handleEnter("searchterm", "search-members-btn");
 };
 
 async function membersSearch(q) {
@@ -933,6 +1063,8 @@ loadClub = async () => {
 
     let clubThumbnail = document.createElement("img");
     clubThumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
+    let anchorThumbnail = document.createElement("a");
+    anchorThumbnail.href = "book.html?id=" + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
 
     let clubDetails = document.getElementById("club-details");
     let title = document.createElement("h5");
@@ -954,7 +1086,8 @@ loadClub = async () => {
     btnDiscussion.classList.add("btn", "btn-success");
     btnDiscussion.innerText = "Click to join discussion";
 
-    clubDetails.appendChild(clubThumbnail);
+    anchorThumbnail.appendChild(clubThumbnail);
+    clubDetails.appendChild(anchorThumbnail);
     clubDetails.appendChild(title);
     clubDetails.appendChild(author);
     clubDetails.appendChild(isbnTen);
@@ -968,7 +1101,7 @@ loadClub = async () => {
     clubDetails.appendChild(title);
   }
 
-  listClubBooks(club[0].properties["Club Leader"].relation[0].id);
+  loadClubShelf(clubId);
 };
 
 // async function listClubBooks() {
@@ -1040,82 +1173,23 @@ async function listClubBooks(clubLeader) {
       const bookInfo = document.createElement("div");
       const anchorTitle = document.createElement("a");
 
-      thumbnailDiv.classList.add("m-3");
-      detailsDiv.classList.add("my-3", "mx-2");
-      bookInfo.classList.add("details-small");
+    row.classList.add("row");
+    col1.classList.add("col");
+    // col2.classList.add("col");
 
-      thumbnailImg.src = booklist[i].properties.thumbnail;
-      anchorThumbnail.href =
-        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
-      anchorThumbnail.appendChild(thumbnailImg);
-      thumbnailDiv.appendChild(anchorThumbnail);
+    anchorTitle.innerText =
+      // booklist[i].properties["Club Name"].title[0].plain_text;
+      booklist[i].properties.Title.title[0].plain_text;
+    anchorTitle.href = "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
 
-      anchorTitle.innerText = booklist[i].properties.title;
-      anchorTitle.href =
-        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
+    // <table class="table table-striped table-hover"> ... </table>
 
-      bookInfo.innerHTML =
-        "<a href=" +
-        anchorTitle.href +
-        ">" +
-        anchorTitle.innerText +
-        "</a><br>by<br>" +
-        booklist[i].properties.authors;
+    col1.appendChild(anchorTitle);
 
-      detailsDiv.appendChild(bookInfo);
+    row.appendChild(col1);
+    // row.appendChild(col2);
 
-      // if the current logged in user is this club's leader
-      if (clubLeader == localStorage.getItem("userId")) {
-        // display a button to delete this book
-        let btnDeleteBook = document.createElement("a");
-        btnDeleteBook.classList.add("btn", "btn-sm", "btn-danger");
-        btnDeleteBook.innerText = "Delete";
-
-        const pageId = booklist[i].id;
-
-        btnDeleteBook.addEventListener("click", async function () {
-          if (confirm("Are you sure you want to delete?") == true) {
-            let body = {
-              pageId: pageId,
-            };
-
-            // call nodeJS remove books endpoint -- POST
-            const response = await fetch("/api/books/remove", {
-              method: "POST",
-              mode: "cors",
-              cache: "no-cache",
-              credentials: "same-origin",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              redirect: "follow",
-              referrerPolicy: "no-referrer",
-              body: JSON.stringify(body),
-            });
-
-            const confirmation = await response.json();
-
-            console.log(confirmation);
-
-            listClubBooks(clubLeader);
-          }
-        });
-
-        detailsDiv.appendChild(btnDeleteBook);
-      }
-
-      shelf.appendChild(thumbnailDiv);
-      shelf.appendChild(detailsDiv);
-    }
-  } else {
-    const messageDiv = document.createElement("div");
-
-    messageDiv.innerText = "There are no books on this shelf yet.";
-
-    shelf.classList.remove("shelf");
-    shelf.classList.add("shelf-empty");
-
-    shelf.appendChild(messageDiv);
+    clubBooklist.appendChild(row);
   }
 }
 
@@ -1228,6 +1302,9 @@ loadAddBook = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const clubId = urlParams.get("id");
+
+  // allow user to trigger search by pressing enter key
+  handleEnter("searchterm", "admin-search-books-btn");
 
   const club = await fetch("/api/clubs-notion?id=" + clubId).then((response) =>
     response.json()
@@ -2156,14 +2233,82 @@ loadTeacher = async () => {
     }
   });
 
+  // if the teacherId matches the logged in user
+  // do NOT allow the buttons to send kudos
+
+  if (teacherId == localStorage.getItem("userId").replaceAll("-", "")) {
+    let kudosEmpathetic = document.getElementById("kudos-empathetic");
+    let kudosHelpful = document.getElementById("kudos-helpful");
+    let kudosInsightful = document.getElementById("kudos-insightful");
+    let kudosMotivating = document.getElementById("kudos-motivating");
+    let kudosSupportive = document.getElementById("kudos-supportive");
+
+    kudosEmpathetic.classList.add("disabled");
+    kudosHelpful.classList.add("disabled");
+    kudosInsightful.classList.add("disabled");
+    kudosMotivating.classList.add("disabled");
+    kudosSupportive.classList.add("disabled");
+  }
+
+  loadKudosCount(teacher);
+
+  document.getElementById("kudos-empathetic").classList.remove("disabled");
+  document.getElementById("kudos-helpful").classList.remove("disabled");
+  document.getElementById("kudos-insightful").classList.remove("disabled");
+  document.getElementById("kudos-motivating").classList.remove("disabled");
+  document.getElementById("kudos-supportive").classList.remove("disabled");
+
   loadShelf("wishlist", teacherId);
   loadShelf("history", teacherId);
 
   // loop over the results to make one call to GB API per ISBN to render thumbnails on the page
 };
 
+async function giveKudos(sender) {
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const teacherId = urlParams.get("id");
+
+  document.getElementById("kudos-empathetic").classList.add("disabled");
+  document.getElementById("kudos-helpful").classList.add("disabled");
+  document.getElementById("kudos-insightful").classList.add("disabled");
+  document.getElementById("kudos-motivating").classList.add("disabled");
+  document.getElementById("kudos-supportive").classList.add("disabled");
+
+  let kudosCount = document.getElementById(
+    sender.getAttribute("id") + "-count"
+  );
+
+  console.log(null + 1);
+  // construct a json body to update the count in the correct kudos column
+  let body = {
+    teacherId: teacherId,
+    kudosType: sender.getAttribute("id"),
+    kudosCount: parseInt(kudosCount.innerText) + 1,
+  };
+
+  // make another call to Notion to update the number of kudos
+  const response = await fetch("/api/kudos/update", {
+    method: "POST",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    redirect: "follow",
+    referrerPolicy: "no-referrer",
+    body: JSON.stringify(body),
+  });
+
+  const confirmation = await response.json();
+
+  loadTeacher();
+}
+
 async function loadShelf(shelfName, teacherId) {
   let shelf = document.getElementById(shelfName + "-shelf");
+
+  shelf.innerHTML = "";
 
   const spinnerDiv = document.createElement("div");
   spinnerDiv.setAttribute("id", "spinner");
@@ -2180,6 +2325,76 @@ async function loadShelf(shelfName, teacherId) {
   spinnerDiv.remove();
 
   console.log(shelfName, booklist);
+
+  // IF there are books in the booklist
+  if (booklist.length > 0) {
+    for (i = 0; i < booklist.length; i++) {
+      const thumbnailDiv = document.createElement("div");
+      const anchorThumbnail = document.createElement("a");
+      const thumbnailImg = document.createElement("img");
+      const detailsDiv = document.createElement("div");
+      const bookInfo = document.createElement("div");
+      const anchorTitle = document.createElement("a");
+
+      thumbnailDiv.classList.add("m-3");
+      detailsDiv.classList.add("my-3", "mx-2");
+      bookInfo.classList.add("details-small");
+
+      thumbnailImg.src = booklist[i].properties.thumbnail;
+      anchorThumbnail.href =
+        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
+      anchorThumbnail.appendChild(thumbnailImg);
+      thumbnailDiv.appendChild(anchorThumbnail);
+
+      anchorTitle.innerText = booklist[i].properties.title;
+      anchorTitle.href =
+        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
+
+      bookInfo.innerHTML =
+        "<a href=" +
+        anchorTitle.href +
+        ">" +
+        anchorTitle.innerText +
+        "</a><br>by<br>" +
+        booklist[i].properties.authors;
+
+      detailsDiv.appendChild(bookInfo);
+
+      shelf.appendChild(thumbnailDiv);
+      shelf.appendChild(detailsDiv);
+    }
+  } else {
+    const messageDiv = document.createElement("div");
+
+    messageDiv.innerText = "There are no books on this shelf yet.";
+
+    shelf.classList.remove("shelf");
+    shelf.classList.add("shelf-empty");
+
+    shelf.appendChild(messageDiv);
+  }
+}
+
+async function loadClubShelf(clubId) {
+  let shelf = document.getElementById("club-booklist");
+
+  shelf.innerHTML = "";
+
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border");
+  spinnerDiv.setAttribute("role", "status");
+
+  shelf.appendChild(spinnerDiv);
+
+  // make another call to Notion to get the Wishlist
+  const booklist = await fetch("/api/club/booklist?id=" + clubId).then(
+    (response) => response.json()
+  );
+
+  spinnerDiv.remove();
+
+  console.log(shelf, booklist);
 
   // IF there are books in the booklist
   if (booklist.length > 0) {

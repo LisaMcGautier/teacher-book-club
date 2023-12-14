@@ -21,7 +21,8 @@
         <div id="menu-links">
             <div class="input-group">
                 <div class="input-group-text">
-                    <select id="mob-search-category" class="form-select form-select-sm" aria-label="Small select example">
+                    <select id="mob-search-category" class="form-select form-select-sm"
+                        aria-label="Small select example">
                         <option selected value="books">Books</option>
                         <option value="clubs">Clubs</option>
                         <option value="members">Members</option>
@@ -47,7 +48,7 @@
         </a>
     </nav>
 
-    <header>Teacher Book Club</header>
+    <header><a href="index.html">Teacher Book Club</a></header>
 
     <!-- Tablet & Desktop Nav -->
     <nav class="tablet-desktop">
@@ -167,25 +168,39 @@
 
         </section>
 
-        <section class="section1">
-            <h1>My Clubs</h1>
+        <section class="section2">
+            <h1><span class="first-name">First </span>
+                <span class="last-name">Last</span>'s Kudos
+            </h1>
 
             <div class="row">
 
                 <div class="col-sm-12">
-                    <button type="button" class="btn btn-success">Success</button>
-                    <button type="button" class="btn btn-primary">Primary</button>
-                    <button type="button" class="btn btn-warning">Warning</button>
-                    <button type="button" class="btn btn-info">Info</button>
-                    <button type="button" class="btn btn-danger">Danger</button>
+                    Give this teacher kudos by clicking one or more of the buttons.
+                    <br>
 
+                    <button id="kudos-empathetic" type="button" onclick="giveKudos(this)" class="btn btn-success">Empathetic
+                        <span id="kudos-empathetic-count" class="badge bg-dark">0</span>
+                    </button>
+                    <button id="kudos-helpful" type="button" onclick="giveKudos(this)" class="btn btn-info">Helpful
+                        <span id="kudos-helpful-count" class="badge bg-dark">0</span>
+                    </button>
+                    <button id="kudos-insightful" type="button" onclick="giveKudos(this)" class="btn btn-primary">Insightful
+                        <span id="kudos-insightful-count" class="badge bg-dark">0</span>
+                    </button>
+                    <button id="kudos-motivating" type="button" onclick="giveKudos(this)" class="btn btn-warning">Motivating
+                        <span id="kudos-motivating-count" class="badge bg-dark">0</span>
+                    </button>
+                    <button id="kudos-supportive" type="button" onclick="giveKudos(this)" class="btn btn-danger">Supportive
+                        <span id="kudos-supportive-count" class="badge bg-dark">0</span>
+                    </button>
                 </div>
 
             </div>
 
         </section>
 
-        <section class="section2">
+        <section class="section1">
             <h1><span class="first-name">First </span>
                 <span class="last-name">Last</span>'s Shelves
             </h1>
@@ -196,23 +211,7 @@
                 </div>
             </div>
 
-            <div id="wishlist-shelf" class="shelf">
-
-                <!-- <div class="m-3">
-                    <img
-                        src="http://books.google.com/books/content?id=EIqoiww1r9sC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api">
-                </div>
-
-                <div class="my-3 mx-2">
-                    <div class="details-small"><a href="">Outlander</a>
-                        <br>by<br>
-                        Diana Gabaldon
-                    </div>
-                </div> -->
-
-                <!-- <div id="spinner" class="spinner-border" role="status"></div> -->
-
-            </div>
+            <div id="wishlist-shelf" class="shelf"></div>
 
             <br>
 

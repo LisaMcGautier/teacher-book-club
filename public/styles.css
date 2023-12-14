@@ -31,13 +31,13 @@ body {
     display: none;
 }
 
-header {
+header > a {
     height: 150px;
     background-color: #000000;
     color: #FFFFFF;
     font-family: Georgia, 'Times New Roman', Times, serif;
     font-size: 3em;
-    /* margin-bottom: 10px; */
+    text-decoration: none;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -133,11 +133,17 @@ main {
 A bit of a struggle to get the button centered on the page. <<<<<<<<<<<<<<
 https://www.w3schools.com/css/css_align.asp
 */
-.btn {
+.btn, .badge {
     margin: 10px;
     /* position: absolute;
     top: 50%;
     left: 50%; */
+}
+
+/* https://www.w3schools.com/cssref/css_selectors.php */
+/* Selects all badge class elements where the parent has an id beginning with kudos*/
+[id^=kudos-] > .badge {
+    margin: 0;
 }
 
 .thumbnail {

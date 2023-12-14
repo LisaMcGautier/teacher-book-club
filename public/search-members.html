@@ -23,7 +23,8 @@
         <div id="menu-links">
             <div class="input-group">
                 <div class="input-group-text">
-                    <select id="mob-search-category" class="form-select form-select-sm" aria-label="Small select example">
+                    <select id="mob-search-category" class="form-select form-select-sm"
+                        aria-label="Small select example">
                         <option selected value="books">Books</option>
                         <option value="clubs">Clubs</option>
                         <option value="members">Members</option>
@@ -49,7 +50,7 @@
         </a>
     </nav>
 
-    <header>Teacher Book Club</header>
+    <header><a href="index.html">Teacher Book Club</a></header>
 
     <!-- Tablet & Desktop Nav -->
     <nav class="tablet-desktop">
@@ -93,7 +94,7 @@
                 <label for="searchterm">Enter seach term:</label><br>
                 <input type="text" id="searchterm" name="searchterm"><br>
 
-                <input type="button" value="Search" onclick="return membersSearch(null)">
+                <input type="button" id="search-members-btn" value="Search" onclick="return membersSearch(null)">
 
             </form>
 
