@@ -525,6 +525,7 @@ app.get("/api/club/booklist", (req, res) => {
 
   queryDatabase(myQuery).then(async (data) => {
     for (let i = 0; i < data.length; i++) {
+      // grab the bookID from the page URL
       await fetch(
         "https://www.googleapis.com/books/v1/volumes?q=isbn:" +
           data[i].properties.ISBN.rich_text[0].plain_text +
@@ -537,9 +538,36 @@ app.get("/api/club/booklist", (req, res) => {
           data[i].properties.title = result.items[0].volumeInfo.title;
           data[i].properties.authors = result.items[0].volumeInfo.authors;
           data[i].properties.thumbnail =
-            result.items[0].volumeInfo.imageLinks.thumbnail;
+            result.items[0].volumeInfo.imageLinks.smallThumbnail;
         });
     }
+    // console.log(data);
+    res.send(data);
+  });
+});
+
+async function RemoveBook(body) {
+  const responseBook = await notion.pages.update({
+    parent: { database_id: process.env.NOTION_DATABASE_BOOKS_ID },
+    page_id: body.pageId,
+	  archived: true,
+  });
+
+  console.log(`SUCCESS: Book archived with pageId ${responseBook.id}`);
+
+  const responseMeeting = await notion.pages.update({
+    parent: { database_id: process.env.NOTION_DATABASE_MEETINGS_ID },
+    page_id: body.pageId,
+	  archived: true,
+  });
+
+  console.log(`SUCCESS: Book archived with pageId ${responseMeeting.id}`);
+  return response;
+}
+
+app.post("/api/books/remove", (req, res) => {
+  console.log(req.body);
+  RemoveBook(req.body).then((data) => {
     res.send(data);
   });
 });
@@ -659,6 +687,24 @@ async function SubmitReview(body) {
 app.post("/api/reviews/add", (req, res) => {
   console.log(req.body);
   SubmitReview(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
+async function RemoveReview(body) {
+  const response = await notion.pages.update({
+    parent: { database_id: process.env.NOTION_DATABASE_REVIEWS_ID },
+    page_id: body.pageId,
+	  archived: true,
+  });
+
+  console.log(`SUCCESS: Review archived with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/reviews/remove", (req, res) => {
+  console.log(req.body);
+  RemoveReview(req.body).then((data) => {
     res.send(data);
   });
 });
