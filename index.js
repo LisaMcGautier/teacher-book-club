@@ -179,6 +179,15 @@ async function CreateClub(body) {
             },
           ],
         },
+        "Club Description": {
+          rich_text: [
+            {
+              text: {
+                content: body.clubdescription,
+              },
+            },
+          ],
+        },
         "Club Leader": {
           relation: [
             {
@@ -282,7 +291,7 @@ async function UpdateKudos(body) {
     page_id: body.teacherId,
     properties: {
       [kudosColumnName]: {
-        number: body.kudosCount
+        number: body.kudosCount,
       },
     },
   });
@@ -420,6 +429,15 @@ async function CreateQuestions(body) {
           },
         ],
       },
+      ISBN: {
+        rich_text: [
+          {
+            text: {
+              content: body.bookISBN,
+            },
+          },
+        ],
+      },
       "Guiding Questions": {
         rich_text: [
           {
@@ -492,7 +510,7 @@ app.post("/api/meeting/create", (req, res) => {
   });
 });
 
-app.get("/api/clubs-notion", (req, res) => {
+app.get("/api/club", (req, res) => {
   console.log("CLUB " + req.query.id);
 
   let myQuery = {
@@ -538,10 +556,28 @@ app.get("/api/club/booklist", (req, res) => {
           data[i].properties.title = result.items[0].volumeInfo.title;
           data[i].properties.authors = result.items[0].volumeInfo.authors;
           data[i].properties.thumbnail =
-            result.items[0].volumeInfo.imageLinks.smallThumbnail;
+            result.items[0].volumeInfo.imageLinks.thumbnail;
         });
     }
     // console.log(data);
+    res.send(data);
+  });
+});
+
+app.get("/api/club/members", (req, res) => {
+  console.log("CLUB " + req.query.clubId);
+
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID,
+    filter: {
+      property: "👥 Clubs",
+      relation: {
+        contains: req.query.clubId,
+      },
+    },
+  };
+
+  queryDatabase(myQuery).then((data) => {
     res.send(data);
   });
 });
@@ -550,7 +586,7 @@ async function RemoveBook(body) {
   const responseBook = await notion.pages.update({
     parent: { database_id: process.env.NOTION_DATABASE_BOOKS_ID },
     page_id: body.pageId,
-	  archived: true,
+    archived: true,
   });
 
   console.log(`SUCCESS: Book archived with pageId ${responseBook.id}`);
@@ -558,7 +594,7 @@ async function RemoveBook(body) {
   const responseMeeting = await notion.pages.update({
     parent: { database_id: process.env.NOTION_DATABASE_MEETINGS_ID },
     page_id: body.pageId,
-	  archived: true,
+    archived: true,
   });
 
   console.log(`SUCCESS: Book archived with pageId ${responseMeeting.id}`);
@@ -695,7 +731,7 @@ async function RemoveReview(body) {
   const response = await notion.pages.update({
     parent: { database_id: process.env.NOTION_DATABASE_REVIEWS_ID },
     page_id: body.pageId,
-	  archived: true,
+    archived: true,
   });
 
   console.log(`SUCCESS: Review archived with pageId ${response.id}`);
