@@ -517,7 +517,6 @@ async function listClubs() {
 
   let clubsList = document.getElementById("clubs-list");
 
-  
   if (clubs.length > 0) {
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -570,7 +569,8 @@ async function listClubs() {
       tdDescription.appendChild(spanDescription);
     }
   } else {
-    clubsList.innerText = "There aren't any clubs yet. Create one to get started.";
+    clubsList.innerText =
+      "There aren't any clubs yet. Create one to get started.";
     clubsList.classList.add("m-3");
   }
 }
@@ -982,7 +982,7 @@ loadClub = async () => {
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const clubId = urlParams.get("id");
 
-  const club = await fetch("/api/clubs-notion?id=" + clubId).then((response) =>
+  const club = await fetch("/api/club?id=" + clubId).then((response) =>
     response.json()
   );
 
@@ -1064,7 +1064,25 @@ loadClub = async () => {
     let clubThumbnail = document.createElement("img");
     clubThumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
     let anchorThumbnail = document.createElement("a");
-    anchorThumbnail.href = "book.html?id=" + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
+
+    let ISBNid;
+
+    // select the ISBN_13 object from the industryIdentifiers array (if available)
+    let isbnAvailable = book.items[0].volumeInfo.industryIdentifiers.filter(
+      (element) => element.type == "ISBN_13"
+    );
+
+    // select the ISBN_10 only if the ISBN_13 is NOT available
+    if (isbnAvailable.length == 0) {
+      isbnAvailable = book.items[0].volumeInfo.industryIdentifiers.filter(
+        (element) => element.type == "ISBN_10"
+      );
+    }
+
+    // get the ISBN found in the previous step
+    ISBNid = isbnAvailable[0].identifier;
+
+    anchorThumbnail.href = "book.html?id=" + ISBNid;
 
     let clubDetails = document.getElementById("club-details");
     let title = document.createElement("h5");
@@ -1073,16 +1091,24 @@ loadClub = async () => {
     author.innerText = "by " + book.items[0].volumeInfo.authors[0];
     let isbnTen = document.createElement("p");
     isbnTen.innerText =
-      "ISBN 10: " + book.items[0].volumeInfo.industryIdentifiers[1].identifier;
+      book.items[0].volumeInfo.industryIdentifiers[1].type.replaceAll(
+        "_",
+        " "
+      ) +
+      ": " +
+      book.items[0].volumeInfo.industryIdentifiers[1].identifier;
     let isbnThirteen = document.createElement("p");
     isbnThirteen.innerText =
-      "ISBN 13: " + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
-    let btnDiscussion = document.createElement("a");
-    btnDiscussion.href =
-      "discussion.html?id=" +
-      clubId +
-      "&isbn=" +
+      book.items[0].volumeInfo.industryIdentifiers[0].type.replaceAll(
+        "_",
+        " "
+      ) +
+      ": " +
       book.items[0].volumeInfo.industryIdentifiers[0].identifier;
+
+    let btnDiscussion = document.createElement("a");
+    btnDiscussion.href = "discussion.html?id=" + clubId + "&isbn=" + ISBNid;
+
     btnDiscussion.classList.add("btn", "btn-success");
     btnDiscussion.innerText = "Click to join discussion";
 
@@ -1102,6 +1128,7 @@ loadClub = async () => {
   }
 
   loadClubShelf(clubId);
+  loadMembersShelf(clubId);
 };
 
 // async function listClubBooks() {
@@ -1173,64 +1200,79 @@ async function listClubBooks(clubLeader) {
       const bookInfo = document.createElement("div");
       const anchorTitle = document.createElement("a");
 
-    row.classList.add("row");
-    col1.classList.add("col");
-    // col2.classList.add("col");
+      row.classList.add("row");
+      col1.classList.add("col");
+      // col2.classList.add("col");
 
-    anchorTitle.innerText =
-      // booklist[i].properties["Club Name"].title[0].plain_text;
-      booklist[i].properties.Title.title[0].plain_text;
-    anchorTitle.href = "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
+      anchorTitle.innerText =
+        // booklist[i].properties["Club Name"].title[0].plain_text;
+        booklist[i].properties.Title.title[0].plain_text;
+      anchorTitle.href =
+        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
 
-    // <table class="table table-striped table-hover"> ... </table>
+      // <table class="table table-striped table-hover"> ... </table>
 
-    col1.appendChild(anchorTitle);
+      col1.appendChild(anchorTitle);
 
-    row.appendChild(col1);
-    // row.appendChild(col2);
+      row.appendChild(col1);
+      // row.appendChild(col2);
 
-    clubBooklist.appendChild(row);
+      clubBooklist.appendChild(row);
+    }
   }
 }
 
 async function createClub() {
   let clubname = document.getElementById("clubname");
+  let clubdescription = document.getElementById("clubdescription");
+  let btnCreateClub = document.getElementById("btn-create-club");
 
-  let body = {
-    clubname: clubname.value,
-    clubleader: localStorage.getItem("userId").replaceAll("-", ""),
-  };
+  btnCreateClub.classList.add("disabled");
 
-  // call nodeJS create-club endpoint -- POST
-  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-  const response = await fetch("/api/create-club", {
-    method: "POST",
-    mode: "cors",
-    cache: "no-cache",
-    credentials: "same-origin",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    redirect: "follow",
-    referrerPolicy: "no-referrer",
-    body: JSON.stringify(body),
-  });
+  if (clubname.value.trim() != "" && clubdescription.value.trim() != "") {
+    // construct a body JSON object using those values
 
-  // TODO: update the UI based on the result (success) or (error)
-  //return response.json(); // parses JSON response into native JavaScript objects
-  // console.log(response.json());
+    let body = {
+      clubname: clubname.value,
+      clubdescription: clubdescription.value,
+      clubleader: localStorage.getItem("userId").replaceAll("-", ""),
+    };
 
-  const clubInfo = await response.json();
+    // call nodeJS create-club endpoint -- POST
+    // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+    const response = await fetch("/api/create-club", {
+      method: "POST",
+      mode: "cors",
+      cache: "no-cache",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+      referrerPolicy: "no-referrer",
+      body: JSON.stringify(body),
+    });
 
-  console.log(clubInfo);
+    // TODO: update the UI based on the result (success) or (error)
+    //return response.json(); // parses JSON response into native JavaScript objects
+    // console.log(response.json());
 
-  if (clubInfo != null && clubInfo.id != undefined) {
-    // alert("HOORAY!");
-    location.replace(
-      "/club.html?id=" + clubInfo.id.replaceAll("-", "") + "&created=true"
-    );
+    const clubInfo = await response.json();
+
+    console.log(clubInfo);
+
+    if (clubInfo != null && clubInfo.id != undefined) {
+      // alert("HOORAY!");
+      location.replace(
+        "/club.html?id=" + clubInfo.id.replaceAll("-", "") + "&created=true"
+      );
+    } else {
+      alert("Oops! There is already a club named " + body.clubname);
+    }
   } else {
-    alert("Oops! There is already a club named " + body.clubname);
+    let emptyFields = document.getElementById("empty-fields");
+    emptyFields.classList.remove("d-none");
+    btnCreateClub.classList.remove("disabled");
   }
 }
 
@@ -1306,7 +1348,7 @@ loadAddBook = async () => {
   // allow user to trigger search by pressing enter key
   handleEnter("searchterm", "admin-search-books-btn");
 
-  const club = await fetch("/api/clubs-notion?id=" + clubId).then((response) =>
+  const club = await fetch("/api/club?id=" + clubId).then((response) =>
     response.json()
   );
 
@@ -1420,6 +1462,7 @@ async function adminSearchBooks() {
       ) {
         const row = document.createElement("div");
         const col1 = document.createElement("div");
+        const authorName = document.createElement("div");
         const col2 = document.createElement("div");
         const selectButton = document.createElement("button");
         const anchorTitle = document.createElement("a");
@@ -1431,13 +1474,33 @@ async function adminSearchBooks() {
 
         row.classList.add("row");
         col1.classList.add("col");
-        col2.classList.add("col");
+        col2.classList.add("col", "col-md-2");
         selectButton.classList.add("btn", "btn-info");
 
         anchorTitle.innerText = books.items[i].volumeInfo.title;
         selectButton.innerText = "Select";
-        let bookISBN =
-          books.items[i].volumeInfo.industryIdentifiers[1].identifier;
+
+        authorName.innerText = books.items[i].volumeInfo.authors;
+
+        let bookISBN;
+
+        // select the ISBN_13 object from the industryIdentifiers array (if available)
+        let isbnAvailable = books.items[
+          i
+        ].volumeInfo.industryIdentifiers.filter(
+          (element) => element.type == "ISBN_13"
+        );
+
+        // select the ISBN_10 only if the ISBN_13 is NOT available
+        if (isbnAvailable.length == 0) {
+          isbnAvailable = books.items[i].volumeInfo.industryIdentifiers.filter(
+            (element) => element.type == "ISBN_10"
+          );
+        }
+
+        // get the ISBN found in the previous step
+        bookISBN = isbnAvailable[0].identifier;
+
         let selectedTitle = books.items[i].volumeInfo.title;
         let thumbnail;
 
@@ -1447,7 +1510,7 @@ async function adminSearchBooks() {
           thumbnail = "images/default_book_small.png";
         }
 
-        anchorTitle.href = "book.html?id=" + books.items[i].id;
+        anchorTitle.href = "book.html?id=" + bookISBN;
 
         // https://www.w3schools.com/jsref/met_element_addeventlistener.asp
         selectButton.addEventListener("click", function () {
@@ -1460,6 +1523,8 @@ async function adminSearchBooks() {
         });
 
         col1.appendChild(anchorTitle);
+        col1.appendChild(authorName);
+
         col2.appendChild(selectButton);
 
         row.appendChild(col1);
@@ -1518,14 +1583,21 @@ async function adminSearchBooks() {
 
     spinnerDiv.remove();
 
-    console.log(response.id);
+    // console.log(response.id);
+    console.log(response.id.replaceAll("-", ""));
 
     let bookId = document.createElement("input");
     bookId.id = "book-id";
     bookId.type = "hidden";
     bookId.value = response.id;
 
+    // let bookISBN = document.createElement("input");
+    // bookISBN.id = "book-isbn";
+    // bookISBN.type = "hidden";
+    // bookISBN.value = document.getElementById("selection-isbn").value;
+
     searchResults.appendChild(bookId);
+    // searchResults.appendChild(bookISBN);
 
     document.getElementById("add-book-search").className = "d-none";
     document.getElementById("confirm-book").className = "d-none";
@@ -1539,6 +1611,11 @@ async function adminSearchBooks() {
 generateGPTQuestions = async () => {
   let buttonChatGPT = document.getElementById("btnChatGPT");
   buttonChatGPT.classList.add("disabled");
+  let btnChange = document.getElementById("btn-change");
+  btnChange.classList.add("disabled");
+  let btnSaveQuestions = document.getElementById("btnSaveQuestions");
+  btnSaveQuestions.classList.add("disabled");
+
   let spinner = document.getElementById("spinner");
   spinner.classList.remove("invisible");
   // https://www.youtube.com/watch?v=LX_DXLlaymg
@@ -1586,14 +1663,16 @@ generateGPTQuestions = async () => {
       messageElement.classList.add("message");
       messageElement.classList.add("message--received");
       messageElement.innerHTML = `
-            <div class="message__text">${data.completion.content}</div>
+            <div class="message__text">${data.completion.content}</div>            
         `;
 
       //chatLog.appendChild(messageElement);
       //chatLog.scrollTop = chatLog.scrollHeight;
 
-      guidingQuestions.value = data.completion.content;
+      guidingQuestions.value =
+        data.completion.content + `\n**Written with ChatGPT`;
       spinner.classList.add("invisible");
+      btnSaveQuestions.classList.remove("disabled");
     });
 };
 
@@ -1606,6 +1685,7 @@ saveQuestions = async () => {
 
   let body = {
     bookID: bookId,
+    bookISBN: document.getElementById("selection-isbn").value,
     clubID: clubId,
     questions: questions,
   };
@@ -1770,10 +1850,14 @@ loadBook = async () => {
   author.innerText = "by " + book.items[0].volumeInfo.authors[0];
   let isbnTen = document.createElement("p");
   isbnTen.innerText =
-    "ISBN 10: " + book.items[0].volumeInfo.industryIdentifiers[1].identifier;
+    book.items[0].volumeInfo.industryIdentifiers[1].type.replaceAll("_", " ") +
+    ": " +
+    book.items[0].volumeInfo.industryIdentifiers[1].identifier;
   let isbnThirteen = document.createElement("p");
   isbnThirteen.innerText =
-    "ISBN 13: " + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
+    book.items[0].volumeInfo.industryIdentifiers[0].type.replaceAll("_", " ") +
+    ": " +
+    book.items[0].volumeInfo.industryIdentifiers[0].identifier;
 
   // configure star icons for rating, if available
   if (book.items[0].volumeInfo.averageRating != undefined) {
@@ -1884,7 +1968,7 @@ loadBook = async () => {
   loadReviews(bookId);
 };
 
-loadComments = async (discussionId) => {
+loadComments = async (discussionId, leaderId) => {
   let commentSection = document.getElementById("comment-section");
   // clear previously rendered reviews and display all current reviews
   commentSection.innerHTML = "";
@@ -1941,10 +2025,11 @@ loadComments = async (discussionId) => {
     row.appendChild(col2);
     row.appendChild(col3);
 
-    // if the author for this comment is the current logged in user
+    // if the current logged in user is the author for this comment OR the leader of the club
     if (
       comments[i].properties["🧑‍🏫 Employees"].relation[0].id ==
-      localStorage.getItem("userId")
+        localStorage.getItem("userId") ||
+      leaderId == localStorage.getItem("userId").replaceAll("-", "")
     ) {
       // display a button to delete this comment
       let btnDeleteComment = document.createElement("a");
@@ -2003,6 +2088,27 @@ loadDiscussion = async () => {
 
   console.log(discussion);
 
+  const club = await fetch("/api/club?id=" + clubId).then((response) =>
+    response.json()
+  );
+
+  console.log(club);
+
+  let leaderId = club[0].properties["Club Leader"].relation[0].id.replaceAll(
+    "-",
+    ""
+  );
+
+  const leader = await fetch("/api/teacher?id=" + leaderId).then((response) =>
+    response.json()
+  );
+
+  console.log(leader);
+
+  let discussionLeader = document.getElementById("discussion-leader");
+  discussionLeader.innerText = leader[0].properties["Full Name"].formula.string;
+
+  // code breaks here when a new book has been added
   let discussionId = discussion[0].properties["discussion ID"].formula.string;
 
   // update the DOM with discussion information
@@ -2018,7 +2124,7 @@ loadDiscussion = async () => {
   console.log(book);
 
   let bookThumbnail = document.createElement("img");
-  bookThumbnail.src = book.items[0].volumeInfo.imageLinks.smallThumbnail;
+  bookThumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
 
   let bookDetails = document.getElementById("book-details");
   let title = document.createElement("h5");
@@ -2027,10 +2133,14 @@ loadDiscussion = async () => {
   author.innerText = "by " + book.items[0].volumeInfo.authors[0];
   let isbnTen = document.createElement("p");
   isbnTen.innerText =
-    "ISBN 10: " + book.items[0].volumeInfo.industryIdentifiers[1].identifier;
+    book.items[0].volumeInfo.industryIdentifiers[1].type.replaceAll("_", " ") +
+    ": " +
+    book.items[0].volumeInfo.industryIdentifiers[1].identifier;
   let isbnThirteen = document.createElement("p");
   isbnThirteen.innerText =
-    "ISBN 13: " + book.items[0].volumeInfo.industryIdentifiers[0].identifier;
+    book.items[0].volumeInfo.industryIdentifiers[0].type.replaceAll("_", " ") +
+    ": " +
+    book.items[0].volumeInfo.industryIdentifiers[0].identifier;
 
   bookDetails.appendChild(bookThumbnail);
   bookDetails.appendChild(title);
@@ -2117,11 +2227,11 @@ loadDiscussion = async () => {
 
       commentSubmitted.classList.remove("d-none");
 
-      loadComments(discussionId);
+      loadComments(discussionId, leaderId);
     }
   });
 
-  loadComments(discussionId);
+  loadComments(discussionId, leaderId);
 };
 
 loadTeacher = async () => {
@@ -2151,13 +2261,23 @@ loadTeacher = async () => {
   avatar.innerText = "";
   let thumbnail = document.createElement("img");
   thumbnail.classList.add("avatar-large");
-  thumbnail.src = teacher[0].properties["Avatar image"].files[0].external.url;
+
+  if (teacher[0].properties["Avatar image"].files.length == 0) {
+    thumbnail.src = "images/default_avatar.png";
+  } else {
+    thumbnail.src = teacher[0].properties["Avatar image"].files[0].external.url;
+  }
+
   avatar.appendChild(thumbnail);
 
   let shortBio = document.getElementById("short-bio");
-  shortBio.innerText = "";
-  shortBio.innerText =
-    teacher[0].properties["Short bio"].rich_text[0].plain_text;
+
+  if (teacher[0].properties["Short bio"].rich_text.length == 0) {
+    shortBio.innerText = "Once upon a time...";
+  } else {
+    shortBio.innerText =
+      teacher[0].properties["Short bio"].rich_text[0].plain_text;
+  }
 
   let messageSent = document.getElementById("message-sent");
   let closeMsgBtn = document.getElementById("close-button");
@@ -2387,7 +2507,7 @@ async function loadClubShelf(clubId) {
 
   shelf.appendChild(spinnerDiv);
 
-  // make another call to Notion to get the Wishlist
+  // make another call to Notion to get the club booklist
   const booklist = await fetch("/api/club/booklist?id=" + clubId).then(
     (response) => response.json()
   );
@@ -2431,6 +2551,78 @@ async function loadClubShelf(clubId) {
       detailsDiv.appendChild(bookInfo);
 
       shelf.appendChild(thumbnailDiv);
+      shelf.appendChild(detailsDiv);
+    }
+  } else {
+    const messageDiv = document.createElement("div");
+
+    messageDiv.innerText = "There are no books on this shelf yet.";
+
+    shelf.classList.remove("shelf");
+    shelf.classList.add("shelf-empty");
+
+    shelf.appendChild(messageDiv);
+  }
+}
+
+async function loadMembersShelf(clubId) {
+  let shelf = document.getElementById("club-members");
+
+  shelf.innerHTML = "";
+
+  const spinnerDiv = document.createElement("div");
+  spinnerDiv.setAttribute("id", "spinner");
+  spinnerDiv.classList.add("spinner-border");
+  spinnerDiv.setAttribute("role", "status");
+
+  shelf.appendChild(spinnerDiv);
+
+  // make another call to Notion to get the club members
+  const members = await fetch("/api/club/members?clubId=" + clubId).then(
+    (response) => response.json()
+  );
+
+  spinnerDiv.remove();
+
+  console.log(shelf, members);
+
+  // IF there are books in the booklist
+  if (members.length > 0) {
+    for (i = 0; i < members.length; i++) {
+      const avatarDiv = document.createElement("div");
+      const anchorAvatar = document.createElement("a");
+      const avatarImg = document.createElement("img");
+      const detailsDiv = document.createElement("div");
+      const memberInfo = document.createElement("div");
+      const anchorFullName = document.createElement("a");
+
+      avatarDiv.classList.add("m-3");
+      avatarImg.classList.add("avatar-thumbnail");
+      detailsDiv.classList.add("my-3", "mx-2");
+      memberInfo.classList.add("details-small");
+
+      if (members[i].properties["Avatar image"].files.length == 0) {
+        avatarImg.src = "images/default_avatar.png";
+      } else {
+        avatarImg.src =
+          members[i].properties["Avatar image"].files[0].external.url;
+      }
+
+      anchorAvatar.href =
+        "teacher.html?id=" + members[i].properties["Teacher ID"].formula.string;
+      anchorAvatar.appendChild(avatarImg);
+      avatarDiv.appendChild(anchorAvatar);
+
+      anchorFullName.innerText =
+        members[i].properties["Full Name"].formula.string;
+      anchorFullName.href =
+        "teacher.html?id=" + members[i].properties["Teacher ID"].formula.string;
+
+      memberInfo.appendChild(anchorFullName);
+
+      detailsDiv.appendChild(memberInfo);
+
+      shelf.appendChild(avatarDiv);
       shelf.appendChild(detailsDiv);
     }
   } else {

@@ -87,7 +87,7 @@
     </nav>
 
     <main class="container text-center">
-        On this page, users will be able to view upcoming meeting info and the current book.
+        On this page, club leaders will be able to add new books, compose discussion guides, and select meeting dates.
 
         <!-- https://getbootstrap.com/docs/5.3/layout/columns/ -->
         <section class="section1">
@@ -151,7 +151,7 @@
                         <!-- missing src, alt attributes -->
                         <img id="thumbnail">
                         <br>
-                        <button id="btn-confirm" type="button" class="btn btn-success">Confirm selection</button>
+                        <button id="btn-confirm" type="button" class="btn btn-success">Add this book</button>
                     </div>
 
                     <div id="generate-questions" class="d-none">
@@ -167,7 +167,7 @@
                             </div>
 
                             <button id="btnChatGPT" type="button" class="btn btn-primary"
-                                onclick="generateGPTQuestions()">Ask AI to generate questions
+                                onclick="generateGPTQuestions()">Ask ChatGPT to write questions
                             </button>
 
                             <button id="btnSaveQuestions" type="button" class="btn btn-success"
@@ -184,7 +184,7 @@
 
         </section>
 
-        <section class="section1">
+        <section class="section2">
             <div class="row">
                 <div class="col"></div>
                 <div class="col">
@@ -250,26 +250,6 @@
 
             </div>
 
-        </section>
-
-        <section class="section2">
-            <h1>Members</h1>
-            <div class="row">
-                <div class="col-sm-2">
-                    <div class="avatar-thumbnail">Avatar image</div>
-                </div>
-                <div class="col-sm-10">
-                    <div class="review-details">Lorem ipsum...</div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-2">
-                    <div class="avatar-thumbnail">Avatar image</div>
-                </div>
-                <div class="col-sm-10">
-                    <div class="review-details">Lorem ipsum...</div>
-                </div>
-            </div>
         </section>
 
     </main>
