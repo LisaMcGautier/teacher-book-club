@@ -185,8 +185,6 @@ async function registerUser() {
     body: JSON.stringify(body), // body data type must match "Content-Type" header
   });
 
-  // TODO: update the UI based on the result (success) or (error)
-  //return response.json(); // parses JSON response into native JavaScript objects
   console.log(response.json());
 }
 
@@ -301,17 +299,6 @@ function loadKudosCount(teacher) {
 }
 
 loadAvatarBio = async () => {
-  // let reviewSection = document.getElementById("review-section");
-  // // clear previously rendered reviews and display all current reviews
-  // reviewSection.innerHTML = "";
-
-  // const spinnerDiv = document.createElement("div");
-  // spinnerDiv.setAttribute("id", "spinner");
-  // spinnerDiv.classList.add("spinner-border", "m-3");
-  // spinnerDiv.setAttribute("role", "status");
-
-  // reviewSection.appendChild(spinnerDiv);
-
   const teacherId = localStorage.getItem("userId").replaceAll("-", "");
 
   const teacher = await fetch("/api/teacher?id=" + teacherId).then((response) =>
@@ -684,7 +671,6 @@ async function booksSearch(q) {
         console.log(ISBNid);
 
         wishlistButton.addEventListener("click", async function () {
-          // alert(ISBNid);
           // call node, passing userID, title & ISBN
           let body = {
             bookTitle: anchorTitle.innerText,
@@ -707,7 +693,6 @@ async function booksSearch(q) {
         });
 
         historyButton.addEventListener("click", async function () {
-          // alert(ISBNid);
           // call node, passing userID, title & ISBN
           let body = {
             bookTitle: anchorTitle.innerText,
@@ -1131,43 +1116,6 @@ loadClub = async () => {
   loadMembersShelf(clubId);
 };
 
-// async function listClubBooks() {
-//   const urlParams = new URL(window.location.toLocaleString()).searchParams;
-//   const clubId = urlParams.get("id");
-
-//   const response = await fetch("/api/club/booklist?id=" + clubId);
-//   const booklist = await response.json();
-//   console.log(booklist);
-
-//   let clubBooklist = document.getElementById("club-booklist");
-
-//   for (i = 0; i < booklist.length; i++) {
-//     const row = document.createElement("div");
-//     const col1 = document.createElement("div");
-//     const col2 = document.createElement("div");
-
-//     const anchorTitle = document.createElement("a");
-
-//     row.classList.add("row");
-//     col1.classList.add("col");
-//     // col2.classList.add("col");
-
-//     anchorTitle.innerText =
-//       // booklist[i].properties["Club Name"].title[0].plain_text;
-//       booklist[i].properties.Title.title[0].plain_text;
-//     anchorTitle.href = "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
-
-//     // <table class="table table-striped table-hover"> ... </table>
-
-//     col1.appendChild(anchorTitle);
-
-//     row.appendChild(col1);
-//     // row.appendChild(col2);
-
-//     clubBooklist.appendChild(row);
-//   }
-// }
-
 async function listClubBooks(clubLeader) {
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const clubId = urlParams.get("id");
@@ -1202,20 +1150,14 @@ async function listClubBooks(clubLeader) {
 
       row.classList.add("row");
       col1.classList.add("col");
-      // col2.classList.add("col");
 
-      anchorTitle.innerText =
-        // booklist[i].properties["Club Name"].title[0].plain_text;
-        booklist[i].properties.Title.title[0].plain_text;
+      anchorTitle.innerText = booklist[i].properties.Title.title[0].plain_text;
       anchorTitle.href =
         "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
-
-      // <table class="table table-striped table-hover"> ... </table>
 
       col1.appendChild(anchorTitle);
 
       row.appendChild(col1);
-      // row.appendChild(col2);
 
       clubBooklist.appendChild(row);
     }
@@ -1253,16 +1195,11 @@ async function createClub() {
       body: JSON.stringify(body),
     });
 
-    // TODO: update the UI based on the result (success) or (error)
-    //return response.json(); // parses JSON response into native JavaScript objects
-    // console.log(response.json());
-
     const clubInfo = await response.json();
 
     console.log(clubInfo);
 
     if (clubInfo != null && clubInfo.id != undefined) {
-      // alert("HOORAY!");
       location.replace(
         "/club.html?id=" + clubInfo.id.replaceAll("-", "") + "&created=true"
       );
@@ -1371,8 +1308,6 @@ loadAddBook = async () => {
       keyboard: false,
     }
   );
-
-  console.log("just want to see if it works...");
 
   closeMeetingBtn.addEventListener("click", async function () {
     if (messageWarning.classList.contains("d-none") == false) {
@@ -1583,7 +1518,6 @@ async function adminSearchBooks() {
 
     spinnerDiv.remove();
 
-    // console.log(response.id);
     console.log(response.id.replaceAll("-", ""));
 
     let bookId = document.createElement("input");
@@ -1591,13 +1525,7 @@ async function adminSearchBooks() {
     bookId.type = "hidden";
     bookId.value = response.id;
 
-    // let bookISBN = document.createElement("input");
-    // bookISBN.id = "book-isbn";
-    // bookISBN.type = "hidden";
-    // bookISBN.value = document.getElementById("selection-isbn").value;
-
     searchResults.appendChild(bookId);
-    // searchResults.appendChild(bookISBN);
 
     document.getElementById("add-book-search").className = "d-none";
     document.getElementById("confirm-book").className = "d-none";
@@ -1623,9 +1551,6 @@ generateGPTQuestions = async () => {
   let messages = [];
   const guidingQuestions = document.getElementById("guiding-questions");
 
-  //const chatLog = document.getElementById("chat-log");
-  //const messageText = "What are the names of the planets in our solar system?";
-
   const messageText =
     "Please generate 5 discussion questions for the book " +
     document.getElementById("selected-title").innerText;
@@ -1639,9 +1564,6 @@ generateGPTQuestions = async () => {
   messageElement.innerHTML = `
         <div class="message__text">${messageText}</div>
     `;
-
-  //chatLog.appendChild(messageElement);
-  //chatLog.scrollTop = chatLog.scrollHeight;
 
   fetch("http://localhost:3000", {
     method: "POST",
@@ -1665,9 +1587,6 @@ generateGPTQuestions = async () => {
       messageElement.innerHTML = `
             <div class="message__text">${data.completion.content}</div>            
         `;
-
-      //chatLog.appendChild(messageElement);
-      //chatLog.scrollTop = chatLog.scrollHeight;
 
       guidingQuestions.value =
         data.completion.content + `\n**Written with ChatGPT`;

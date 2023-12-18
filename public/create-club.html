@@ -4,10 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>TBC - Create Club</title>
-    <meta name="description" content="View upcoming meeting info and the current book.">
-
+    <meta name="description" content="Create a new club name and description.">
     <!-- Bootstrap 5 CSS CDN link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
@@ -28,7 +26,7 @@
                         <option value="members">Members</option>
                     </select>
                 </div>
-                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input" />
+                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input">
                 <div class="input-group-text">
                     <button id="mob-search-btn" type="button" class="btn btn-light btn-sm" onclick="search('mob')">
                         Search
@@ -42,7 +40,6 @@
             <a id="mob-register" class="d-none" href="register.html">Register</a>
             <button id="mob-logout" type="button" class="btn btn-danger d-none" onclick="logout()">Logout</button>
         </div>
-
         <a class="menu-icon" onclick="hamburger()">
             <div>&#9776;</div>
         </a>
@@ -63,7 +60,7 @@
                             <option value="members">Members</option>
                         </select>
                     </div>
-                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input" />
+                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input">
                     <div class="input-group-text">
                         <button id="search-btn" type="button" class="btn btn-light btn-sm" onclick="search()">
                             Search
@@ -84,19 +81,16 @@
 
     <main class="container text-center">
         On this page, users will be able to create a new club.
-
         <!-- https://getbootstrap.com/docs/5.3/layout/columns/ -->
         <section class="section1">
             <h1 id="club-heading">Create a new club</h1>
-
             <!-- https://getbootstrap.com/docs/5.0/components/alerts/ -->
             <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
+                <symbol id="exclamation-triangle-fill" fill="currentColor" viewbox="0 0 16 16">
                     <path
                         d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
                 </symbol>
             </svg>
-
             <div id="empty-fields" class="alert alert-danger align-items-center d-none" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
                     <use xlink:href="#exclamation-triangle-fill" />
@@ -105,38 +99,24 @@
                     Please enter a club name and description.
                 </div>
             </div>
-
             <div class="row">
-
                 <div class="col">
-                    <!-- <img
-                        src="http://books.google.com/books/content?id=OYtkbGl2j0sC&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api">
-                    <h2>Fahrenheit 451</h2> -->
                     <br>
-
                     <label for="clubname">Club name:</label>
                     <input type="text" id="clubname" name="clubname" required>
-
                     <br><br>
-
                     <label for="clubname">Club description:</label>
                     <input type="text" id="clubdescription" name="clubdescription" required>
-
                     <br><br>
-
-                    <button id="btn-create-club" onclick="createClub()" type="button" class="btn btn-success">Create club</button>
+                    <button id="btn-create-club" onclick="createClub()" type="button" class="btn btn-success">Create
+                        club</button>
                 </div>
-
             </div>
-
         </section>
-
     </main>
 
     <footer>Copyright 2023</footer>
-
     <script src="script.js"></script>
-
 </body>
 
 </html>
