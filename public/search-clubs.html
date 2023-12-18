@@ -4,17 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Teacher Book Club - Search</title>
-    <meta name="description"
-        content="Teacher Book Club is a website to help teachers connect via shared reading experiences.">
-
+    <meta name="description" content="Search for clubs by name or keyword.">
     <!-- Bootstrap 5 CSS CDN link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <!-- My Style Sheet -->
     <link rel="stylesheet" href="styles.css">
-
 </head>
 
 <body class="text-center" onload="searchClubs()">
@@ -30,7 +26,7 @@
                         <option value="members">Members</option>
                     </select>
                 </div>
-                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input" />
+                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input">
                 <div class="input-group-text">
                     <button id="mob-search-btn" type="button" class="btn btn-light btn-sm" onclick="search('mob')">
                         Search
@@ -44,7 +40,6 @@
             <a id="mob-register" class="d-none" href="register.html">Register</a>
             <button id="mob-logout" type="button" class="btn btn-danger d-none" onclick="logout()">Logout</button>
         </div>
-
         <a class="menu-icon" onclick="hamburger()">
             <div>&#9776;</div>
         </a>
@@ -65,7 +60,7 @@
                             <option value="members">Members</option>
                         </select>
                     </div>
-                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input" />
+                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input">
                     <div class="input-group-text">
                         <button id="search-btn" type="button" class="btn btn-light btn-sm" onclick="search()">
                             Search
@@ -86,33 +81,22 @@
 
     <main class="container text-center">
         On this page, users will be able to search for available clubs.
-
         <section class="section1">
             <h1>Search for clubs</h1>
-
             <form>
                 <label for="searchterm">Enter seach term:</label><br>
                 <input type="text" id="searchterm" name="searchterm"><br>
-
                 <input type="button" id="search-clubs-btn" value="Search" onclick="return clubsSearch(null)">
-
             </form>
-
         </section>
-
         <section class="section2">
             <h1>Search Results</h1>
-
             <div id="search-results"></div>
-
         </section>
-
     </main>
 
     <footer>Copyright 2023</footer>
-
     <script src="script.js"></script>
-
 </body>
 
 </html>

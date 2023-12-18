@@ -28,10 +28,7 @@ async function queryDatabase(myQuery) {
   }
 }
 
-// Create User Database
-// ============================
 // https://www.dschapman.com/articles/using-notion-to-create-a-user-database-i
-
 async function CreateUser(body) {
   let foundUser = await CheckUsername(body.username);
 
@@ -84,10 +81,6 @@ async function CreateUser(body) {
 
   console.log(`SUCCESS: User successfully added with pageId ${response.id}`);
   return response;
-
-  // async () => {
-  //   CreateUser(username, email, password);
-  // };
 }
 
 // https://developers.notion.com/reference/post-database-query-filter
@@ -559,7 +552,6 @@ app.get("/api/club/booklist", (req, res) => {
             result.items[0].volumeInfo.imageLinks.thumbnail;
         });
     }
-    // console.log(data);
     res.send(data);
   });
 });
@@ -1002,8 +994,6 @@ app.post("/api/send-message", (req, res) => {
 });
 
 app.get("/api/messages", (req, res) => {
-  // console.log("MESSAGES " + req.query.id);
-
   let myQuery = {
     database_id: process.env.NOTION_DATABASE_MESSAGES_ID,
     filter: {
@@ -1021,14 +1011,11 @@ app.get("/api/messages", (req, res) => {
   };
 
   queryDatabase(myQuery).then(async (data) => {
-    // console.log(data);
     res.send(data);
   });
 });
 
 app.get("/api/wishlist", (req, res) => {
-  // console.log("WISHLIST " + req.query.id);
-
   let myQuery = {
     database_id: process.env.NOTION_DATABASE_WISHLIST_ID,
     filter: {
@@ -1057,14 +1044,12 @@ app.get("/api/wishlist", (req, res) => {
             result.items[0].volumeInfo.imageLinks.thumbnail;
         });
     }
-    // console.log(data);
+
     res.send(data);
   });
 });
 
 app.get("/api/history", (req, res) => {
-  // console.log("HISTORY " + req.query.id);
-
   let myQuery = {
     database_id: process.env.NOTION_DATABASE_HISTORY_ID,
     filter: {
@@ -1093,25 +1078,10 @@ app.get("/api/history", (req, res) => {
             result.items[0].volumeInfo.imageLinks.thumbnail;
         });
     }
-    // console.log(data);
+
     res.send(data);
   });
 });
-
-// app.get("/api/book", (req, res) => {
-//   // grab the bookID from the page URL
-//   fetch(
-//     "https://www.googleapis.com/books/v1/volumes/" +
-//       req.query.id +
-//       "?key=" +
-//       process.env.GOOGLE_BOOKS_API_KEY
-//   )
-//     .then((response) => response.json())
-//     .then((result) => {
-//       // returns a single book
-//       res.send(result);
-//     });
-// });
 
 app.get("/api/book", (req, res) => {
   // grab the bookID from the page URL

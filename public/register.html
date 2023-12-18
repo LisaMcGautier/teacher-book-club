@@ -4,11 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>TBC - Register</title>
-    <meta name="description"
-        content="Teacher Book Club is a website to help teachers connect via shared reading experiences.">
-
+    <meta name="description" content="Sign up for a new account.">
     <!-- Bootstrap 5 CSS CDN link -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
@@ -22,13 +19,14 @@
         <div id="menu-links">
             <div class="input-group">
                 <div class="input-group-text">
-                    <select id="mob-search-category" class="form-select form-select-sm" aria-label="Small select example">
+                    <select id="mob-search-category" class="form-select form-select-sm"
+                        aria-label="Small select example">
                         <option selected value="books">Books</option>
                         <option value="clubs">Clubs</option>
                         <option value="members">Members</option>
                     </select>
                 </div>
-                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input" />
+                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input">
                 <div class="input-group-text">
                     <button id="mob-search-btn" type="button" class="btn btn-light btn-sm" onclick="search('mob')">
                         Search
@@ -42,7 +40,6 @@
             <a id="mob-register" class="d-none" href="register.html">Register</a>
             <button id="mob-logout" type="button" class="btn btn-danger d-none" onclick="logout()">Logout</button>
         </div>
-
         <a class="menu-icon" onclick="hamburger()">
             <div>&#9776;</div>
         </a>
@@ -63,7 +60,7 @@
                             <option value="members">Members</option>
                         </select>
                     </div>
-                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input" />
+                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input">
                     <div class="input-group-text">
                         <button id="search-btn" type="button" class="btn btn-light btn-sm" onclick="search()">
                             Search
@@ -83,54 +80,35 @@
     </nav>
 
     <main class="container text-center">
-        On this page, users will be able to register a new account. <br>
+        On this page, users will be able to sign up for a new account. <br>
         Already have an account? You can log in <a href="login.html">here.</a>
-
         <section class="section1">
             <h1>Register</h1>
-
             <br>
-
             <label for="firstname">first name:</label>
             <input type="text" id="firstname" name="firstname" required>
-
             <br><br>
-
             <label for="lastname">last name:</label>
             <input type="text" id="lastname" name="lastname" required>
-
             <br><br>
-
             <label for="username">username:</label>
             <input type="text" id="username" name="username" required>
-
             <br><br>
-
             <label for="email">email:</label>
             <input type="email" id="email" name="email" required>
-
             <br><br>
-
             <label for="password">password:</label>
             <input type="password" id="password" name="password" required>
-
             <br><br>
-
             <label for="confirm">confirm password:</label>
             <input type="password" id="confirm" name="confirm" required>
-
             <br>
-
             <button onclick="registerUser()" type="button" class="btn btn-success">Click to Register</button>
-
         </section>
-
     </main>
 
     <footer>Copyright 2023</footer>
-
     <script src="script.js"></script>
-
 </body>
 
 </html>
