@@ -91,7 +91,7 @@ main {
 }
 
 #guiding-questions {
-    width: 200px;
+    width: 300px;
     height: 300px;
     color: #555;
 }
@@ -100,7 +100,8 @@ main {
     border: #40047b solid .5px;
     height: 100%;
     margin: 20px 36px;
-    background-color: #DDDDDD;
+    /* background-color: #DDDDDD; */
+    background: linear-gradient(45deg, rgba(223,209,237,1) 10%, rgb(181 117 243) 49%, rgba(223,209,237,1) 90%);
 }
 
 .section2 h1 {
@@ -223,22 +224,6 @@ main {
     margin-right: auto;
 }
 
-.questions ul {
-    margin: 0;
-    padding: 0;
-}
-
-.questions ul li {
-    list-style-type: none;
-    border-bottom: 0.5px dashed #808080;
-    margin: 5px;
-    text-align: left;
-}
-
-.questions ul li:last-child {
-    border: 0;
-}
-
 /* Styles relevant to the TEACHER page */
 .avatar-large {
     width: 200px;
@@ -253,7 +238,7 @@ main {
 .short-bio {
     background-color: #FFFFFF;
     font-size: 1.25em;
-    height: 100px;
+    height: fit-content;
     border: 1px solid #aaaaaa;
     margin-top: 10px;
     margin-right: 10px;
@@ -338,6 +323,40 @@ footer {
     color: #FFFFFF;
     height: 75px;
     background-color: #000000;
+}
+
+/* Media Query for Mobile Viewports */
+/* ==================================================================== */
+@media screen and (max-width: 849px) {
+
+    .section1 {
+        border: #0D498C solid .5px;
+        height: 100%;
+        margin: 0;
+        /* based on background-color: #0D498C; */
+        /* #d0e4fb on the outside edges #5ca1f0 at the center */
+        background: linear-gradient(90deg, rgba(208, 228, 251, 1) 0%, rgba(92, 161, 240, 1) 50%, rgba(208, 228, 251, 1) 100%);
+    }
+
+    .section2 {
+        border: #40047b solid .5px;
+        height: 100%;
+        margin: 10px 0;
+        background: linear-gradient(45deg, rgba(223,209,237,1) 10%, rgb(181 117 243) 49%, rgba(223,209,237,1) 90%);
+    }
+
+    .container {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .calendar {
+        width: 300px;
+    }
+
+    .cld-main {
+        width: 100%;
+    }
 }
 
 /* Media Query for Tablet Viewport */
