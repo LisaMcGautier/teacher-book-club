@@ -1258,13 +1258,13 @@ loadMeetings = async () => {
     const tableRow = document.createElement("tr");
     const tdDate = document.createElement("td");
     const tdBtns = document.createElement("td");
-    const editBtn = document.createElement("button");
+    // const editBtn = document.createElement("button");
     const deleteBtn = document.createElement("button");
 
-    editBtn.classList.add("btn", "btn-primary", "btn-sm");
+    // editBtn.classList.add("btn", "btn-primary", "btn-sm");
     deleteBtn.classList.add("btn", "btn-danger", "btn-sm");
 
-    editBtn.innerText = "EDIT";
+    // editBtn.innerText = "EDIT";
     deleteBtn.innerText = "DELETE";
 
     tdDate.innerText = meetings[i].properties.Date.date.start;
@@ -1272,7 +1272,7 @@ loadMeetings = async () => {
     tbody.appendChild(tableRow);
     tableRow.appendChild(tdDate);
     tableRow.appendChild(tdBtns);
-    tdBtns.appendChild(editBtn);
+    // tdBtns.appendChild(editBtn);
     tdBtns.appendChild(deleteBtn);
   }
 };
@@ -1373,7 +1373,7 @@ loadAddBook = async () => {
 };
 
 async function adminSearchBooks() {
-  let searchterm = document.getElementById("searchterm");
+  let searchterm = document.getElementById("searchterm");  
   const response = await fetch("/api/books/search?q=" + searchterm.value);
   const books = await response.json();
   console.log(books);
@@ -1408,8 +1408,8 @@ async function adminSearchBooks() {
         // append the button child
 
         row.classList.add("row");
-        col1.classList.add("col");
-        col2.classList.add("col", "col-md-2");
+        col1.classList.add("col-8");
+        col2.classList.add("col-4");
         selectButton.classList.add("btn", "btn-info");
 
         anchorTitle.innerText = books.items[i].volumeInfo.title;
@@ -1624,6 +1624,7 @@ saveQuestions = async () => {
 
   // remove the save button to prevent user from adding multiple records to Notion
   document.getElementById("btnSaveQuestions").remove();
+  document.getElementById("section-meetings-list").classList.remove("d-none");  
 };
 
 loadReviews = async (bookId) => {
@@ -2547,7 +2548,7 @@ async function loadMembersShelf(clubId) {
   } else {
     const messageDiv = document.createElement("div");
 
-    messageDiv.innerText = "There are no books on this shelf yet.";
+    messageDiv.innerText = "There are no members in this club yet.";
 
     shelf.classList.remove("shelf");
     shelf.classList.add("shelf-empty");
