@@ -5,7 +5,10 @@ async function index() {
 
 async function addBook() {
   configureMenu();
-  loadAddBook();
+
+  if (checkLoginUser()) {
+    loadAddBook();
+  }
 }
 
 async function book() {
@@ -16,6 +19,13 @@ async function book() {
 async function club() {
   configureMenu();
   loadClub();
+}
+
+async function createClubPage() {
+  configureMenu();
+  if (checkLoginUser()) {
+    loadCreateClub();
+  }
 }
 
 async function discussion() {
@@ -29,11 +39,23 @@ async function login() {
   // allow user to login by pressing enter key
   handleEnter("username", "btn-login");
   handleEnter("password", "btn-login");
+
+  // if user tried to access a protected page, show the appropriate alert
+  const urlParams = new URL(window.location.toLocaleString()).searchParams;
+  const error = urlParams.get("error");
+
+  if (error == "login-required") {
+    let loginRequired = document.getElementById("login-required");
+    loginRequired.classList.remove("d-none");
+  }
 }
 
 async function myProfile() {
   configureMenu();
-  loadProfile();
+
+  if (checkLoginUser()) {
+    loadProfile();
+  }
 }
 
 async function searchBooks() {
@@ -53,7 +75,10 @@ async function searchMembers() {
 
 async function teacher() {
   configureMenu();
-  loadTeacher();
+
+  if (checkLoginUser()) {
+    loadTeacher();
+  }
 }
 
 async function configureMenu() {
@@ -244,6 +269,15 @@ async function loginUser() {
   }
 }
 
+function checkLoginUser() {
+  if (localStorage.getItem("userId") == undefined) {
+    location.replace("/login.html?error=login-required");
+    return false;
+  }
+
+  return true;
+}
+
 function logout() {
   localStorage.removeItem("userId");
   localStorage.removeItem("userFirst");
@@ -410,6 +444,9 @@ loadMessages = async () => {
 };
 
 loadProfile = async () => {
+  let myProfileMain = document.getElementById("my-profile-main");
+  myProfileMain.style.visibility = "visible";
+
   const teacherId = localStorage.getItem("userId").replaceAll("-", "");
 
   loadAvatarBio();
@@ -721,8 +758,11 @@ async function booksSearch(q) {
 
         col1.appendChild(anchorThumbnail);
         col2.appendChild(anchorTitle);
-        col2.appendChild(wishlistButton);
-        col2.appendChild(historyButton);
+
+        if (localStorage.getItem("userId") != undefined) {
+          col2.appendChild(wishlistButton);
+          col2.appendChild(historyButton);
+        }
 
         row.appendChild(col1);
         row.appendChild(col2);
@@ -1116,6 +1156,11 @@ loadClub = async () => {
   loadMembersShelf(clubId);
 };
 
+loadCreateClub = async () => {
+  let createClubMain = document.getElementById("create-club-main");
+  createClubMain.style.visibility = "visible";
+};
+
 async function listClubBooks(clubLeader) {
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const clubId = urlParams.get("id");
@@ -1278,6 +1323,9 @@ loadMeetings = async () => {
 };
 
 loadAddBook = async () => {
+  let addBookMain = document.getElementById("add-book-main");
+  addBookMain.style.visibility = "visible";
+
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const clubId = urlParams.get("id");
@@ -1373,7 +1421,7 @@ loadAddBook = async () => {
 };
 
 async function adminSearchBooks() {
-  let searchterm = document.getElementById("searchterm");  
+  let searchterm = document.getElementById("searchterm");
   const response = await fetch("/api/books/search?q=" + searchterm.value);
   const books = await response.json();
   console.log(books);
@@ -1624,7 +1672,7 @@ saveQuestions = async () => {
 
   // remove the save button to prevent user from adding multiple records to Notion
   document.getElementById("btnSaveQuestions").remove();
-  document.getElementById("section-meetings-list").classList.remove("d-none");  
+  document.getElementById("section-meetings-list").classList.remove("d-none");
 };
 
 loadReviews = async (bookId) => {
@@ -1808,6 +1856,12 @@ loadBook = async () => {
   bookDetails.appendChild(author);
   bookDetails.appendChild(isbnTen);
   bookDetails.appendChild(isbnThirteen);
+
+  let btnAddReview = document.getElementById("btn-add-review");
+
+  if (localStorage.getItem("userId") == undefined) {
+    btnAddReview.classList.add("d-none");
+  }
 
   let reviewSubmitted = document.getElementById("review-submitted");
   let closeReviewBtn = document.getElementById("close-button");
@@ -2075,6 +2129,12 @@ loadDiscussion = async () => {
   let goBackBtn = document.getElementById("go-back-button");
   goBackBtn.href = "club.html?id=" + clubId;
 
+  let btnAddComment = document.getElementById("btn-add-comment");
+
+  if (localStorage.getItem("userId") == undefined) {
+    btnAddComment.classList.add("d-none");
+  }
+
   let commentSubmitted = document.getElementById("comment-submitted");
   let closeCommentBtn = document.getElementById("close-button");
   let cancelCommentBtn = document.getElementById("cancel-button");
@@ -2155,6 +2215,9 @@ loadDiscussion = async () => {
 };
 
 loadTeacher = async () => {
+  let teacherMain = document.getElementById("teacher-main");
+  teacherMain.style.visibility = "visible";
+
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const teacherId = urlParams.get("id");

@@ -82,136 +82,142 @@
     </nav>
 
     <main class="container text-center">
-        On this page, club leaders will be able to add new books, compose discussion guides, and select meeting dates.
-        <!-- https://getbootstrap.com/docs/5.3/layout/columns/ -->
-        <section class="section1">
-            <h1 id="club-heading">Section 1</h1>
-            <!-- https://getbootstrap.com/docs/5.0/components/alerts/ -->
-            <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                <symbol id="check-circle-fill" fill="currentColor" viewbox="0 0 16 16">
-                    <path
-                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                </symbol>
-                <symbol id="exclamation-triangle-fill" fill="currentColor" viewbox="0 0 16 16">
-                    <path
-                        d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
-                </symbol>
-            </svg>
-            <div id="meeting-created" class="alert alert-success align-items-center d-none fs-5" role="alert">
-                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:">
-                    <use xlink:href="#check-circle-fill" />
+        <div id="add-book-main" style="visibility: hidden;">
+            On this page, club leaders will be able to add new books, compose discussion guides, and select meeting
+            dates.
+            <!-- https://getbootstrap.com/docs/5.3/layout/columns/ -->
+            <section class="section1">
+                <h1 id="club-heading">Section 1</h1>
+                <!-- https://getbootstrap.com/docs/5.0/components/alerts/ -->
+                <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                    <symbol id="check-circle-fill" fill="currentColor" viewbox="0 0 16 16">
+                        <path
+                            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                    </symbol>
+                    <symbol id="exclamation-triangle-fill" fill="currentColor" viewbox="0 0 16 16">
+                        <path
+                            d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                    </symbol>
                 </svg>
-                <div>
-                    Meeting created!
-                </div>
-            </div>
-            <div class="row">
-                <div id="search" class="col-left col-12 col-md-6">
-                    <div id="add-book-search">
-                        <div>
-                            <form>
-                                <label for="searchterm">Enter seach term:</label><br>
-                                <input type="text" id="searchterm" name="searchterm">
-                                <input type="button" id="admin-search-books-btn" class="btn btn-light btn-sm"
-                                    value="Search" onclick="return adminSearchBooks()"><br>
-                                <img src="/images/google_books_logo.png" alt="Powered by Google Books">
-                            </form>
-                        </div>
-                        <div id="search-results"></div>
-                    </div>
-                    <div id="selected-book" class="d-none">
-                        <h3 id="selected-title">Book Title</h3>
-                        <img id="selected-thumbnail" src="/images/default_book_small.png" alt="selected book thumbnail">
-                        <br>
-                        <button id="btn-change" type="button" class="btn btn-danger">Select a different book</button>
+                <div id="meeting-created" class="alert alert-success align-items-center d-none fs-5" role="alert">
+                    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:">
+                        <use xlink:href="#check-circle-fill" />
+                    </svg>
+                    <div>
+                        Meeting created!
                     </div>
                 </div>
-                <div id="questions" class="col-right col-12 col-md-6">
-                    <div id="confirm-book" class="d-none">
-                        <h3 id="selection">Book Title</h3>
-                        <input type="hidden" id="selection-isbn">
-                        <img id="thumbnail" src="/images/default_book_small.png" alt="selected book thumbnail">
-                        <br>
-                        <button id="btn-confirm" type="button" class="btn btn-success">Add this book</button>
-                    </div>
-                    <div id="generate-questions" class="d-none">
-                        <div>
-                            <h3>Guiding Questions</h3>
-                            <textarea id="guiding-questions">Type your own questions here...</textarea>
-                            <div class="row">
-                                <div id="spinner" class="spinner-border invisible" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
+                <div class="row">
+                    <div id="search" class="col-left col-12 col-md-6">
+                        <div id="add-book-search">
+                            <div>
+                                <form>
+                                    <label for="searchterm">Enter seach term:</label><br>
+                                    <input type="text" id="searchterm" name="searchterm">
+                                    <input type="button" id="admin-search-books-btn" class="btn btn-light btn-sm"
+                                        value="Search" onclick="return adminSearchBooks()"><br>
+                                    <img src="/images/google_books_logo.png" alt="Powered by Google Books">
+                                </form>
                             </div>
-                            <button id="btnChatGPT" type="button" class="btn btn-primary"
-                                onclick="generateGPTQuestions()">Ask ChatGPT to write questions
-                            </button>
-                            <button id="btnSaveQuestions" type="button" class="btn btn-success"
-                                onclick="saveQuestions()">Save questions
-                            </button>
+                            <div id="search-results"></div>
+                        </div>
+                        <div id="selected-book" class="d-none">
+                            <h3 id="selected-title">Book Title</h3>
+                            <img id="selected-thumbnail" src="/images/default_book_small.png"
+                                alt="selected book thumbnail">
+                            <br>
+                            <button id="btn-change" type="button" class="btn btn-danger">Select a different
+                                book</button>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-        <section id="section-meetings-list" class="section2 d-none">
-            <div class="row">
-                <div class="col"></div>
-                <div class="col">
-                    <h1 class="cbl-h1">Meetings List</h1>
-                </div>
-                <div class="col">
-                    <!-- https://getbootstrap.com/docs/5.3/components/modal/#how-it-works -->
-                    <!-- Button trigger modal -->
-                    <button id="create-meeting-btn" type="button" class="btn btn-primary d-none" data-bs-toggle="modal"
-                        data-bs-target="#createMeetingModal">
-                        Click to create meeting
-                    </button>
-                    <!-- Modal -->
-                    <div class="modal fade" id="createMeetingModal" tabindex="-1"
-                        aria-labelledby="createMeetingModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h2 class="modal-title fs-5" id="createMeetingModalLabel">Create meeting</h2>
-                                    <button id="close-button" type="button" class="btn-close"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div id="message-warning" class="alert alert-warning align-items-center d-none"
-                                    role="alert">
-                                    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img"
-                                        aria-label="Warning:">
-                                        <use xlink:href="#exclamation-triangle-fill" />
-                                    </svg>
-                                    <div>
-                                        Please select a date
+                    <div id="questions" class="col-right col-12 col-md-6">
+                        <div id="confirm-book" class="d-none">
+                            <h3 id="selection">Book Title</h3>
+                            <input type="hidden" id="selection-isbn">
+                            <img id="thumbnail" src="/images/default_book_small.png" alt="selected book thumbnail">
+                            <br>
+                            <button id="btn-confirm" type="button" class="btn btn-success">Add this book</button>
+                        </div>
+                        <div id="generate-questions" class="d-none">
+                            <div>
+                                <h3>Guiding Questions</h3>
+                                <textarea id="guiding-questions">Type your own questions here...</textarea>
+                                <div class="row">
+                                    <div id="spinner" class="spinner-border invisible" role="status">
+                                        <span class="visually-hidden">Loading...</span>
                                     </div>
                                 </div>
-                                <div class="modal-body">
-                                    <!-- https://www.geeksforgeeks.org/how-to-setting-up-datepicker-in-bootstrap/ -->
-                                    <label>Select Date: </label>
-                                    <div id="datepicker" class="input-group date" data-date-format="yyyy-mm-dd">
-                                        <input id="datepicker-result" class="form-control" type="text" readonly>
-                                        <span class="input-group-addon">
-                                            <i class="glyphicon glyphicon-calendar"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button id="cancel-button" type="button" class="btn btn-secondary">Cancel</button>
-                                    <button id="create-button" type="button" class="btn btn-success">Create</button>
-                                </div>
+                                <button id="btnChatGPT" type="button" class="btn btn-primary"
+                                    onclick="generateGPTQuestions()">Ask ChatGPT to write questions
+                                </button>
+                                <button id="btnSaveQuestions" type="button" class="btn btn-success"
+                                    onclick="saveQuestions()">Save questions
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-12">
-                    <div id="meetings-list"></div>
+            </section>
+            <section id="section-meetings-list" class="section2 d-none">
+                <div class="row">
+                    <div class="col"></div>
+                    <div class="col">
+                        <h1 class="cbl-h1">Meetings List</h1>
+                    </div>
+                    <div class="col">
+                        <!-- https://getbootstrap.com/docs/5.3/components/modal/#how-it-works -->
+                        <!-- Button trigger modal -->
+                        <button id="create-meeting-btn" type="button" class="btn btn-primary d-none"
+                            data-bs-toggle="modal" data-bs-target="#createMeetingModal">
+                            Click to create meeting
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal fade" id="createMeetingModal" tabindex="-1"
+                            aria-labelledby="createMeetingModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h2 class="modal-title fs-5" id="createMeetingModalLabel">Create meeting</h2>
+                                        <button id="close-button" type="button" class="btn-close"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div id="message-warning" class="alert alert-warning align-items-center d-none"
+                                        role="alert">
+                                        <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img"
+                                            aria-label="Warning:">
+                                            <use xlink:href="#exclamation-triangle-fill" />
+                                        </svg>
+                                        <div>
+                                            Please select a date
+                                        </div>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!-- https://www.geeksforgeeks.org/how-to-setting-up-datepicker-in-bootstrap/ -->
+                                        <label>Select Date: </label>
+                                        <div id="datepicker" class="input-group date" data-date-format="yyyy-mm-dd">
+                                            <input id="datepicker-result" class="form-control" type="text" readonly>
+                                            <span class="input-group-addon">
+                                                <i class="glyphicon glyphicon-calendar"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button id="cancel-button" type="button"
+                                            class="btn btn-secondary">Cancel</button>
+                                        <button id="create-button" type="button" class="btn btn-success">Create</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </section>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div id="meetings-list"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
 
     <footer>Copyright 2023</footer>
