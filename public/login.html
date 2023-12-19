@@ -108,11 +108,21 @@
                     Invalid username or password.
                 </div>
             </div>
-            <label for="username">username:</label>
-            <input type="text" id="username" name="username" required>
-            <br><br>
-            <label for="password">password:</label>
-            <input type="password" id="password" name="password" required>
+            <div id="login-required" class="alert alert-danger align-items-center d-none" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                    <use xlink:href="#exclamation-triangle-fill" />
+                </svg>
+                <div>
+                    Please log in to access the full content.
+                </div>
+            </div>
+            <form>
+                <label for="username">username:</label>
+                <input type="text" id="username" name="username" required>
+                <br><br>
+                <label for="password">password:</label>
+                <input type="password" id="password" name="password" required>
+            </form>
             <br>
             <button id="btn-login" onclick="loginUser()" type="button" class="btn btn-success">Click to Log In</button>
         </section>

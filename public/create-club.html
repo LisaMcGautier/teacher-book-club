@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 
-<body class="text-center" onload="configureMenu()">
+<body class="text-center" onload="createClubPage()">
     <!-- Mobile Nav -->
     <nav class="mobile-nav">
         <div id="menu-links">
@@ -80,39 +80,41 @@
     </nav>
 
     <main class="container text-center">
-        On this page, users will be able to create a new club.
-        <!-- https://getbootstrap.com/docs/5.3/layout/columns/ -->
-        <section class="section1">
-            <h1 id="club-heading">Create a new club</h1>
-            <!-- https://getbootstrap.com/docs/5.0/components/alerts/ -->
-            <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-                <symbol id="exclamation-triangle-fill" fill="currentColor" viewbox="0 0 16 16">
-                    <path
-                        d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
-                </symbol>
-            </svg>
-            <div id="empty-fields" class="alert alert-danger align-items-center d-none" role="alert">
-                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
-                    <use xlink:href="#exclamation-triangle-fill" />
+        <div id="create-club-main" style="visibility: hidden;">
+            On this page, users will be able to create a new club.
+            <!-- https://getbootstrap.com/docs/5.3/layout/columns/ -->
+            <section class="section1">
+                <h1 id="club-heading">Create a new club</h1>
+                <!-- https://getbootstrap.com/docs/5.0/components/alerts/ -->
+                <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                    <symbol id="exclamation-triangle-fill" fill="currentColor" viewbox="0 0 16 16">
+                        <path
+                            d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                    </symbol>
                 </svg>
-                <div>
-                    Please enter a club name and description.
+                <div id="empty-fields" class="alert alert-danger align-items-center d-none" role="alert">
+                    <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                        <use xlink:href="#exclamation-triangle-fill" />
+                    </svg>
+                    <div>
+                        Please enter a club name and description.
+                    </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <br>
-                    <label for="clubname">Club name:</label>
-                    <input type="text" id="clubname" name="clubname" required>
-                    <br><br>
-                    <label for="clubname">Club description:</label>
-                    <input type="text" id="clubdescription" name="clubdescription" required>
-                    <br><br>
-                    <button id="btn-create-club" onclick="createClub()" type="button" class="btn btn-success">Create
-                        club</button>
+                <div class="row">
+                    <div class="col">
+                        <br>
+                        <label for="clubname">Club name:</label>
+                        <input type="text" id="clubname" name="clubname" required>
+                        <br><br>
+                        <label for="clubname">Club description:</label>
+                        <input type="text" id="clubdescription" name="clubdescription" required>
+                        <br><br>
+                        <button id="btn-create-club" onclick="createClub()" type="button" class="btn btn-success">Create
+                            club</button>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
     </main>
 
     <footer>Copyright 2023</footer>
