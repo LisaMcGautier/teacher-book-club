@@ -1059,6 +1059,10 @@ loadClub = async () => {
     btnDeleteClub.classList.add("btn", "btn-danger");
     btnDeleteClub.innerText = "Delete club";
 
+    btnDeleteClub.addEventListener("click", async function () {
+      alert("This functionality is coming soon...");
+    });
+
     divDeleteClub.appendChild(btnDeleteClub);
 
     // display a button to add a new book
@@ -2594,7 +2598,7 @@ async function loadClubShelf(clubId, leaderId) {
 
       // if the leader for this club is the current logged in user
       if (leaderId == localStorage.getItem("userId")) {
-        // display a button to delete the club
+        // display a button to delete the book
         bookInfo.appendChild(deleteBtn);
       }
 
