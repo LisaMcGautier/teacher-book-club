@@ -2594,8 +2594,12 @@ async function loadClubShelf(clubId, leaderId) {
         "<br>";
 
       const pageId = booklist[i].id;
-      const discussionGuideId =
-        booklist[i].properties["📣 Discussion Guides"].relation[0].id;
+
+      //  make sure discussionGuideId is not undefined
+      if (booklist[i].properties["📣 Discussion Guides"].has_more) {
+        const discussionGuideId =
+          booklist[i].properties["📣 Discussion Guides"].relation[0].id;
+      }
 
       deleteBtn.addEventListener("click", async function () {
         if (confirm("Are you sure you want to delete this book?")) {
