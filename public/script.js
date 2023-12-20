@@ -2000,50 +2000,52 @@ loadComments = async (discussionId, leaderId) => {
     row.appendChild(col3);
 
     // if the current logged in user is the author for this comment OR the leader of the club
-    if (
-      comments[i].properties["🧑‍🏫 Employees"].relation[0].id ==
-        localStorage.getItem("userId") ||
-      leaderId == localStorage.getItem("userId").replaceAll("-", "")
-    ) {
-      // display a button to delete this comment
-      let btnDeleteComment = document.createElement("a");
-      btnDeleteComment.classList.add("btn", "btn-sm", "btn-danger");
-      btnDeleteComment.innerText = "Delete comment";
+    if (localStorage.getItem("userId") != null) {
+      if (
+        comments[i].properties["🧑‍🏫 Employees"].relation[0].id ==
+          localStorage.getItem("userId") ||
+        leaderId == localStorage.getItem("userId").replaceAll("-", "")
+      ) {
+        // display a button to delete this comment
+        let btnDeleteComment = document.createElement("a");
+        btnDeleteComment.classList.add("btn", "btn-sm", "btn-danger");
+        btnDeleteComment.innerText = "Delete comment";
 
-      const pageId = comments[i].id;
+        const pageId = comments[i].id;
 
-      btnDeleteComment.addEventListener("click", async function () {
-        let body = {
-          pageId: pageId,
-        };
+        btnDeleteComment.addEventListener("click", async function () {
+          let body = {
+            pageId: pageId,
+          };
 
-        // call nodeJS remove comments endpoint -- POST
-        const response = await fetch("/api/comments/remove", {
-          method: "POST",
-          mode: "cors",
-          cache: "no-cache",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          redirect: "follow",
-          referrerPolicy: "no-referrer",
-          body: JSON.stringify(body),
+          // call nodeJS remove comments endpoint -- POST
+          const response = await fetch("/api/comments/remove", {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(body),
+          });
+
+          const confirmation = await response.json();
+
+          console.log(confirmation);
+
+          loadComments(discussionId);
         });
 
-        const confirmation = await response.json();
+        col3.appendChild(btnDeleteComment);
 
-        console.log(confirmation);
-
-        loadComments(discussionId);
-      });
-
-      col3.appendChild(btnDeleteComment);
-
-      col2.classList.add("col-sm-9");
-      col3.classList.add("col-sm-1");
-    } else {
-      col2.classList.add("col-sm-10");
+        col2.classList.add("col-sm-9");
+        col3.classList.add("col-sm-1");
+      } else {
+        col2.classList.add("col-sm-10");
+      }
     }
 
     commentSection.appendChild(row);
