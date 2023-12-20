@@ -184,33 +184,63 @@ async function registerUser() {
   let password = document.getElementById("password");
   let confirm = document.getElementById("confirm");
 
-  // construct a body JSON object using those values
-  let body = {
-    firstname: firstname.value,
-    lastname: lastname.value,
-    username: username.value,
-    email: email.value,
-    password: password.value,
-    confirm: confirm.value,
-  };
+  if (
+    firstname.value.trim() == "" ||
+    lastname.value.trim() == "" ||
+    username.value.trim() == "" ||
+    email.value.trim() == "" ||
+    password.value.trim() == "" ||
+    confirm.value.trim() == ""
+  ) {
+    // empty field(s) detected, alert user
+    let emptyFields = document.getElementById("empty-fields");
+    emptyFields.classList.remove("d-none");
+  } else if (password.value.trim() != confirm.value.trim()) {
+    // empty field(s) detected, alert user
+    let passwordMismatch = document.getElementById("password-mismatch");
+    passwordMismatch.classList.remove("d-none");
+  }
+  else {
+    // construct a body JSON object using those values
+    let body = {
+      firstname: firstname.value,
+      lastname: lastname.value,
+      username: username.value,
+      email: email.value,
+      password: password.value,
+      confirm: confirm.value,
+    };
 
-  // call nodeJS create-user endpoint -- POST
-  // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
-  const response = await fetch("/api/create-user", {
-    method: "POST", // *GET, POST, PUT, DELETE, etc.
-    mode: "cors", // no-cors, *cors, same-origin
-    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: "same-origin", // include, *same-origin, omit
-    headers: {
-      "Content-Type": "application/json",
-      // 'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    redirect: "follow", // manual, *follow, error
-    referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-    body: JSON.stringify(body), // body data type must match "Content-Type" header
-  });
+    // call nodeJS create-user endpoint -- POST
+    // https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+    const response = await fetch("/api/create-user", {
+      method: "POST", // *GET, POST, PUT, DELETE, etc.
+      mode: "cors", // no-cors, *cors, same-origin
+      cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+      credentials: "same-origin", // include, *same-origin, omit
+      headers: {
+        "Content-Type": "application/json",
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      redirect: "follow", // manual, *follow, error
+      referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify(body), // body data type must match "Content-Type" header
+    });
 
-  console.log(response.json());
+    const registerInfo = await response.json();
+
+    console.log(registerInfo);
+
+    if (registerInfo != null && registerInfo.id != undefined) {
+      // log in the new user
+      localStorage.setItem("userId", registerInfo.id.replaceAll("-", ""));
+
+      // redirect the logged in user to profile page
+      location.replace("/my-profile.html");
+    } else {
+      alert("Oops! Someone else is already using " + body.username);
+    }
+  }
 }
 
 // Allow user to log in
