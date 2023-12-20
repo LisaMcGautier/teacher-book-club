@@ -30,61 +30,70 @@ async function queryDatabase(myQuery) {
 
 // https://www.dschapman.com/articles/using-notion-to-create-a-user-database-i
 async function CreateUser(body) {
-  let foundUser = await CheckUsername(body.username);
+  let foundUser = await DoesUsernameExist(body.username);
 
-  // https://www.youtube.com/watch?v=Pzz36k2rt10&t=220s
-  const response = await notion.pages.create({
-    parent: { database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID },
-    properties: {
-      "Last Name": {
-        title: [
-          {
-            type: "text",
-            text: {
-              content: body.lastname,
+  if (foundUser == false) {
+    // https://www.youtube.com/watch?v=Pzz36k2rt10&t=220s
+    const response = await notion.pages.create({
+      parent: { database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID },
+      properties: {
+        "Last Name": {
+          title: [
+            {
+              type: "text",
+              text: {
+                content: body.lastname,
+              },
             },
-          },
-        ],
-      },
-      "First Name": {
-        rich_text: [
-          {
-            text: {
-              content: body.firstname,
+          ],
+        },
+        "First Name": {
+          rich_text: [
+            {
+              text: {
+                content: body.firstname,
+              },
             },
-          },
-        ],
-      },
-      username: {
-        rich_text: [
-          {
-            text: {
-              content: body.username,
+          ],
+        },
+        username: {
+          rich_text: [
+            {
+              text: {
+                content: body.username,
+              },
             },
-          },
-        ],
-      },
-      Email: {
-        email: body.email,
-      },
-      password: {
-        rich_text: [
-          {
-            text: {
-              content: body.password,
+          ],
+        },
+        Email: {
+          email: body.email,
+        },
+        password: {
+          rich_text: [
+            {
+              text: {
+                content: body.password,
+              },
             },
-          },
-        ],
+          ],
+        },
       },
-    },
-  });
+    });
 
-  console.log(`SUCCESS: User successfully added with pageId ${response.id}`);
-  return response;
+    console.log(`SUCCESS: User successfully added with pageId ${response.id}`);
+    return response;
+  } else {
+    const response = {
+      duplicate: true,
+    };
+
+    console.log(`CONFLICT: Username already exists`);
+    return response;
+  }
 }
 
 // https://developers.notion.com/reference/post-database-query-filter
-async function CheckUsername(username) {
+async function DoesUsernameExist(username) {
   let myQuery = {
     database_id: process.env.NOTION_DATABASE_EMPLOYEES_ID,
     filter: {
@@ -100,7 +109,7 @@ async function CheckUsername(username) {
   const response = await queryDatabase(myQuery);
 
   if (response.length > 0) {
-    return response[0].id;
+    return true;
   } else {
     return false;
   }
