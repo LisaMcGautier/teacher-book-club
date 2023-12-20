@@ -1728,6 +1728,10 @@ saveQuestions = async () => {
 
   // remove the save button to prevent user from adding multiple records to Notion
   document.getElementById("btnSaveQuestions").remove();
+  // remove buttons to change book or ask ChatGPT for questions
+  document.getElementById("btn-change").remove();
+  document.getElementById("btnChatGPT").remove();
+
   document.getElementById("section-meetings-list").classList.remove("d-none");
 };
 
