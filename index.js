@@ -503,6 +503,24 @@ app.post("/api/meeting/create", (req, res) => {
   });
 });
 
+async function RemoveMeeting(body) {
+  const response = await notion.pages.update({
+    parent: { database_id: process.env.NOTION_DATABASE_MEETINGS_ID },
+    page_id: body.pageId,
+    archived: true,
+  });
+
+  console.log(`SUCCESS: Meeting archived with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/meetings/remove", (req, res) => {
+  console.log(req.body);
+  RemoveMeeting(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
 app.get("/api/club", (req, res) => {
   console.log("CLUB " + req.query.id);
 

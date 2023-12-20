@@ -1303,21 +1303,44 @@ loadMeetings = async () => {
     const tableRow = document.createElement("tr");
     const tdDate = document.createElement("td");
     const tdBtns = document.createElement("td");
-    // const editBtn = document.createElement("button");
     const deleteBtn = document.createElement("button");
 
-    // editBtn.classList.add("btn", "btn-primary", "btn-sm");
     deleteBtn.classList.add("btn", "btn-danger", "btn-sm");
-
-    // editBtn.innerText = "EDIT";
     deleteBtn.innerText = "DELETE";
+
+    const pageId = meetings[i].id;
+
+    deleteBtn.addEventListener("click", async function () {
+      let body = {
+        pageId: pageId,
+      };
+
+      // call nodeJS remove reviews endpoint -- POST
+      const response = await fetch("/api/meetings/remove", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+      });
+
+      const confirmation = await response.json();
+
+      console.log(confirmation);
+
+      loadMeetings();
+    });
 
     tdDate.innerText = meetings[i].properties.Date.date.start;
 
     tbody.appendChild(tableRow);
     tableRow.appendChild(tdDate);
     tableRow.appendChild(tdBtns);
-    // tdBtns.appendChild(editBtn);
     tdBtns.appendChild(deleteBtn);
   }
 };
