@@ -28,7 +28,7 @@
                         <option value="members">Members</option>
                     </select>
                 </div>
-                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input">
+                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input" maxlength="50">
                 <div class="input-group-text">
                     <button id="mob-search-btn" type="button" class="btn btn-light btn-sm" onclick="search('mob')">
                         Search
@@ -62,7 +62,7 @@
                             <option value="members">Members</option>
                         </select>
                     </div>
-                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input">
+                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input" maxlength="50">
                     <div class="input-group-text">
                         <button id="search-btn" type="button" class="btn btn-light btn-sm" onclick="search()">
                             Search
@@ -113,7 +113,7 @@
                             <div>
                                 <form>
                                     <label for="searchterm">Enter seach term:</label><br>
-                                    <input type="text" id="searchterm" name="searchterm">
+                                    <input type="text" id="searchterm" name="searchterm" maxlength="50">
                                     <input type="button" id="admin-search-books-btn" class="btn btn-light btn-sm"
                                         value="Search" onclick="return adminSearchBooks()"><br>
                                     <img src="/images/google_books_logo.png" alt="Powered by Google Books">
@@ -159,15 +159,12 @@
                 </div>
             </section>
             <section id="section-meetings-list" class="section2 d-none">
+                <h1 class="cbl-h1">Meetings List</h1>
                 <div class="row">
-                    <div class="col"></div>
-                    <div class="col">
-                        <h1 class="cbl-h1">Meetings List</h1>
-                    </div>
                     <div class="col">
                         <!-- https://getbootstrap.com/docs/5.3/components/modal/#how-it-works -->
                         <!-- Button trigger modal -->
-                        <button id="create-meeting-btn" type="button" class="btn btn-primary d-none"
+                        <button id="create-meeting-btn" type="button" class="btn btn-warning d-none"
                             data-bs-toggle="modal" data-bs-target="#createMeetingModal">
                             Click to create meeting
                         </button>

@@ -317,6 +317,10 @@ label {
     cursor: pointer;
 }
 
+#clubdescription {
+    vertical-align: middle;
+}
+
 footer {
     margin-top: 10px;
     padding-top: 25px;

@@ -28,7 +28,7 @@
                         <option value="members">Members</option>
                     </select>
                 </div>
-                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input">
+                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input" maxlength="50">
                 <div class="input-group-text">
                     <button id="mob-search-btn" type="button" class="btn btn-light btn-sm" onclick="search('mob')">
                         Search
@@ -62,7 +62,7 @@
                             <option value="members">Members</option>
                         </select>
                     </div>
-                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input">
+                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input" maxlength="50">
                     <div class="input-group-text">
                         <button id="search-btn" type="button" class="btn btn-light btn-sm" onclick="search()">
                             Search
@@ -85,11 +85,8 @@
         On this page, users will be able to view upcoming meeting info and the current book.
         <!-- https://getbootstrap.com/docs/5.3/layout/columns/ -->
         <section class="section1">
+            <h1 id="club-heading">Section 1</h1>
             <div class="row">
-                <div class="col"></div>
-                <div class="col">
-                    <h1 id="club-heading">Section 1</h1>
-                </div>
                 <div id="div-delete-club" class="col"></div>
             </div>
             <div class="row">
@@ -103,10 +100,7 @@
         </section>
         <section class="section2">
             <div class="row">
-                <div class="col"></div>
-                <div class="col">
-                    <h1 class="cbl-h1">Club Book List</h1>
-                </div>
+                <h1 class="cbl-h1">Club Book List</h1>
                 <div id="div-add-book" class="col"></div>
             </div>
             <div class="row">
