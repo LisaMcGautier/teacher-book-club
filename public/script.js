@@ -1049,11 +1049,10 @@ loadClub = async () => {
 
   console.log(events);
 
+  let leaderId = club[0].properties["Club Leader"].relation[0].id;
+
   // if the leader for this club is the current logged in user
-  if (
-    club[0].properties["Club Leader"].relation[0].id ==
-    localStorage.getItem("userId")
-  ) {
+  if (leaderId == localStorage.getItem("userId")) {
     // display a button to delete the club
     let divDeleteClub = document.getElementById("div-delete-club");
     let btnDeleteClub = document.createElement("a");
@@ -1152,7 +1151,7 @@ loadClub = async () => {
     clubDetails.appendChild(title);
   }
 
-  loadClubShelf(clubId);
+  loadClubShelf(clubId, leaderId);
   loadMembersShelf(clubId);
 };
 
@@ -2503,7 +2502,7 @@ async function loadShelf(shelfName, teacherId) {
   }
 }
 
-async function loadClubShelf(clubId) {
+async function loadClubShelf(clubId, leaderId) {
   let shelf = document.getElementById("club-booklist");
 
   shelf.innerHTML = "";
@@ -2533,10 +2532,13 @@ async function loadClubShelf(clubId) {
       const detailsDiv = document.createElement("div");
       const bookInfo = document.createElement("div");
       const anchorTitle = document.createElement("a");
+      const deleteBtn = document.createElement("button");
 
       thumbnailDiv.classList.add("m-3");
       detailsDiv.classList.add("my-3", "mx-2");
       bookInfo.classList.add("details-small");
+      deleteBtn.classList.add("btn", "btn-danger", "btn-sm");
+      deleteBtn.innerText = "DELETE";
 
       thumbnailImg.src = booklist[i].properties.thumbnail;
       anchorThumbnail.href =
@@ -2554,7 +2556,47 @@ async function loadClubShelf(clubId) {
         ">" +
         anchorTitle.innerText +
         "</a><br>by<br>" +
-        booklist[i].properties.authors;
+        booklist[i].properties.authors +
+        "<br>";
+
+      const pageId = booklist[i].id;
+      const discussionGuideId =
+        booklist[i].properties["📣 Discussion Guides"].relation[0].id;
+
+      deleteBtn.addEventListener("click", async function () {
+        if (confirm("Are you sure you want to delete this book?")) {
+          let body = {
+            pageId: pageId,
+            discussionGuideId: discussionGuideId,
+          };
+
+          // call nodeJS remove books endpoint -- POST
+          const response = await fetch("/api/books/remove", {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(body),
+          });
+
+          const confirmation = await response.json();
+
+          console.log(confirmation);
+
+          loadClub();
+        }
+      });
+
+      // if the leader for this club is the current logged in user
+      if (leaderId == localStorage.getItem("userId")) {
+        // display a button to delete the club
+        bookInfo.appendChild(deleteBtn);
+      }
 
       detailsDiv.appendChild(bookInfo);
 

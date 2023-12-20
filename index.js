@@ -593,6 +593,40 @@ app.get("/api/club/members", (req, res) => {
 });
 
 async function RemoveBook(body) {
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_MEETINGS_ID,
+    filter: {
+      property: "📚 Books",
+      relation: {
+        contains: body.pageId,
+      },
+    },
+  };
+
+  queryDatabase(myQuery).then(async (data) => {
+    for (let i = 0; i < data.length; i++) {
+      const responseMeetings = await notion.pages.update({
+        parent: { database_id: process.env.NOTION_DATABASE_MEETINGS_ID },
+        page_id: data[i].id,
+        archived: true,
+      });
+
+      console.log(
+        `SUCCESS: Meeting archived with pageId ${responseMeetings.id}`
+      );
+    }
+  });
+
+  const responseDiscussionGuide = await notion.pages.update({
+    parent: { database_id: process.env.NOTION_DATABASE_DISCUSSION_GUIDES_ID },
+    page_id: body.discussionGuideId,
+    archived: true,
+  });
+
+  console.log(
+    `SUCCESS: Discussion Guide archived with pageId ${responseDiscussionGuide.id}`
+  );
+
   const responseBook = await notion.pages.update({
     parent: { database_id: process.env.NOTION_DATABASE_BOOKS_ID },
     page_id: body.pageId,
@@ -601,14 +635,7 @@ async function RemoveBook(body) {
 
   console.log(`SUCCESS: Book archived with pageId ${responseBook.id}`);
 
-  const responseMeeting = await notion.pages.update({
-    parent: { database_id: process.env.NOTION_DATABASE_MEETINGS_ID },
-    page_id: body.pageId,
-    archived: true,
-  });
-
-  console.log(`SUCCESS: Book archived with pageId ${responseMeeting.id}`);
-  return response;
+  return responseBook;
 }
 
 app.post("/api/books/remove", (req, res) => {
