@@ -135,7 +135,7 @@ main {
 
 /* https://www.w3schools.com/cssref/css_selectors.php */
 /* Selects all badge class elements where the parent has an id beginning with kudos*/
-[id^=kudos-]>.badge {
+[id^=kudos-]>.badge, #member-requests>.badge {
     margin: 0;
 }
 
