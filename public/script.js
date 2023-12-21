@@ -1210,13 +1210,9 @@ loadClub = async () => {
   let clubHeading = document.getElementById("club-heading");
   clubHeading.innerText = club[0].properties["Club Name"].title[0].plain_text;
 
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  let bioSaved = document.getElementById("bio-saved"); // not used
   let closeBtn = document.getElementById("close-button");
   let btnClose = document.getElementById("btn-close");
-  let saveBioBtn = document.getElementById("save-button"); // not used
   let decisionSuccess = document.getElementById("decision-success");
-  let bioContent = document.getElementById("bio-content"); // not used
 
   let handleRequestsModal = new bootstrap.Modal(
     document.getElementById("handleRequestsModal"),
@@ -1230,7 +1226,6 @@ loadClub = async () => {
       decisionSuccess.classList.add("d-none");
     }
 
-    // bioContent.innerText = "";
     handleRequestsModal.hide();
   });
 
@@ -1239,10 +1234,8 @@ loadClub = async () => {
       decisionSuccess.classList.add("d-none");
     }
 
-    // bioContent.innerText = "";
     handleRequestsModal.hide();
   });
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   // use the club id to query notion for that club's meetings
   const meetings = await fetch("/api/club/meetings?id=" + clubId).then(
@@ -1461,52 +1454,6 @@ loadCreateClub = async () => {
   let createClubMain = document.getElementById("create-club-main");
   createClubMain.style.visibility = "visible";
 };
-
-async function listClubBooks(clubLeader) {
-  const urlParams = new URL(window.location.toLocaleString()).searchParams;
-  const clubId = urlParams.get("id");
-
-  let shelf = document.getElementById("club-booklist");
-  shelf.innerHTML = "";
-
-  const spinnerDiv = document.createElement("div");
-  spinnerDiv.setAttribute("id", "spinner");
-  spinnerDiv.classList.add("spinner-border");
-  spinnerDiv.setAttribute("role", "status");
-
-  shelf.appendChild(spinnerDiv);
-
-  // make another call to Notion to get the club bookklist
-  const response = await fetch("/api/club/booklist?id=" + clubId);
-  const booklist = await response.json();
-
-  spinnerDiv.remove();
-
-  // IF there are books in the booklist
-  if (booklist.length > 0) {
-    for (i = 0; i < booklist.length; i++) {
-      const thumbnailDiv = document.createElement("div");
-      const anchorThumbnail = document.createElement("a");
-      const thumbnailImg = document.createElement("img");
-      const detailsDiv = document.createElement("div");
-      const bookInfo = document.createElement("div");
-      const anchorTitle = document.createElement("a");
-
-      row.classList.add("row");
-      col1.classList.add("col");
-
-      anchorTitle.innerText = booklist[i].properties.Title.title[0].plain_text;
-      anchorTitle.href =
-        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
-
-      col1.appendChild(anchorTitle);
-
-      row.appendChild(col1);
-
-      clubBooklist.appendChild(row);
-    }
-  }
-}
 
 // allow a logged in user to create a new club
 async function createClub() {
@@ -1909,7 +1856,7 @@ generateGPTQuestions = async () => {
   spinner.classList.remove("invisible");
 
   // connect with ChatGPT to generate questions based on the book title
-  // (ISBN did not always yield reliable responses
+  // (ISBN did not always yield reliable responses)
   // https://www.youtube.com/watch?v=LX_DXLlaymg
   let messages = [];
   const guidingQuestions = document.getElementById("guiding-questions");
@@ -2658,7 +2605,6 @@ loadTeacher = async () => {
 
   // if the teacherId matches the logged in user
   // do NOT allow the buttons to send kudos
-
   if (teacherId == localStorage.getItem("userId").replaceAll("-", "")) {
     let kudosEmpathetic = document.getElementById("kudos-empathetic");
     let kudosHelpful = document.getElementById("kudos-helpful");
