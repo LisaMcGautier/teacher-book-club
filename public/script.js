@@ -2631,6 +2631,7 @@ async function loadClubShelf(clubId, leaderId) {
       const bookInfo = document.createElement("div");
       const anchorTitle = document.createElement("a");
       const deleteBtn = document.createElement("button");
+      const meetingDate = document.createElement("div");
 
       thumbnailDiv.classList.add("m-3");
       detailsDiv.classList.add("my-3", "mx-2");
@@ -2656,6 +2657,11 @@ async function loadClubShelf(clubId, leaderId) {
         "</a><br>by<br>" +
         booklist[i].properties.authors +
         "<br>";
+
+      if (booklist[i].properties["Meeting Date"].rollup.array.length > 0) {
+        meetingDate.innerText =
+          booklist[i].properties["Meeting Date"].rollup.array[0].date.start;
+      }
 
       const pageId = booklist[i].id;
 
@@ -2699,6 +2705,8 @@ async function loadClubShelf(clubId, leaderId) {
         // display a button to delete the book
         bookInfo.appendChild(deleteBtn);
       }
+
+      bookInfo.appendChild(meetingDate);
 
       detailsDiv.appendChild(bookInfo);
 
