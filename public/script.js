@@ -1085,14 +1085,28 @@ loadClub = async () => {
     // display a button to delete the club
     let divDeleteClub = document.getElementById("div-delete-club");
     let btnDeleteClub = document.createElement("a");
+    let btnNewRequests = document.createElement("a");
+
     btnDeleteClub.classList.add("btn", "btn-danger");
     btnDeleteClub.innerText = "Delete club";
 
+    btnNewRequests.classList.add("btn", "btn-primary");
+    btnNewRequests.innerText = "New Requests";
+
     btnDeleteClub.addEventListener("click", async function () {
-      alert("This functionality is coming soon...");
+      alert(
+        "This functionality is coming soon... The leader will have privileges to delete a club."
+      );
+    });
+
+    btnNewRequests.addEventListener("click", async function () {
+      alert(
+        "This functionality is coming soon... The leader will have privileges to approve new requests."
+      );
     });
 
     divDeleteClub.appendChild(btnDeleteClub);
+    divDeleteClub.appendChild(btnNewRequests);
 
     // display a button to add a new book
     let divAddBook = document.getElementById("div-add-book");
@@ -1203,7 +1217,9 @@ loadClub = async () => {
         if (confirmation != null && confirmation.id != undefined) {
           alert("Your request has been sent!");
         } else {
-          alert("Oops! A request has already been sent. Please allow some time for us to respond.");
+          alert(
+            "Oops! A request has already been sent. Please allow some time for us to respond."
+          );
           btnJoinClub.classList.add("disabled");
           btnJoinClub.innerText = "Request already sent";
         }
