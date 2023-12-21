@@ -257,7 +257,9 @@ async function CreateRequest(body) {
   if (foundRequest == false) {
     // https://www.youtube.com/watch?v=Pzz36k2rt10&t=220s
     const response = await notion.pages.create({
-      parent: { database_id: process.env.NOTION_DATABASE_JOIN_CLUB_REQUESTS_ID },
+      parent: {
+        database_id: process.env.NOTION_DATABASE_JOIN_CLUB_REQUESTS_ID,
+      },
       properties: {
         "🧑‍🏫 Employees": {
           relation: [
@@ -276,7 +278,9 @@ async function CreateRequest(body) {
       },
     });
 
-    console.log(`SUCCESS: Request successfully added with pageId ${response.id}`);
+    console.log(
+      `SUCCESS: Request successfully added with pageId ${response.id}`
+    );
     return response;
   } else {
     const response = {
@@ -305,7 +309,7 @@ async function DoesRequestExist(body) {
             contains: body.clubId,
           },
         },
-      ],      
+      ],
     },
   };
 
@@ -319,6 +323,94 @@ async function DoesRequestExist(body) {
     return false;
   }
 }
+
+app.get("/api/requests/list", (req, res) => {
+  console.log("REQUESTS for CLUB " + req.query.id);
+
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_JOIN_CLUB_REQUESTS_ID,
+    filter: {
+      property: "👥 Clubs",
+      relation: {
+        contains: req.query.id,
+      },
+    },
+  };
+
+  queryDatabase(myQuery).then((data) => {
+    res.send(data);
+  });
+});
+
+async function RemoveRequest(body) {
+  const response = await notion.pages.update({
+    parent: { database_id: process.env.NOTION_DATABASE_JOIN_CLUB_REQUESTS_ID },
+    page_id: body.pageId,
+    archived: true,
+  });
+
+  console.log(`SUCCESS: Request archived with pageId ${response.id}`);
+  return response;
+}
+
+app.post("/api/requests/remove", (req, res) => {
+  console.log(req.body);
+  RemoveRequest(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
+async function ApproveRequest(body) {
+  const response = await notion.pages.update({
+    parent: { database_id: process.env.NOTION_DATABASE_JOIN_CLUB_REQUESTS_ID },
+    page_id: body.pageId,
+    archived: true,
+  });
+
+  // obtain the current club members array
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_CLUBS_ID,
+    filter: {
+      property: "club ID",
+      formula: {
+        string: { equals: body.clubId },
+      },
+    },
+  };
+
+  queryDatabase(myQuery).then(async (data) => {
+    // extract members array from the club
+    let clubMembers = data[0].properties["🧑‍🏫 Employees"].relation;
+
+    // then add requesting member to the array
+    clubMembers.push({ id: body.memberId });
+
+    // update the club with the new members list
+    const response = await notion.pages
+      .update({
+        parent: { database_id: process.env.NOTION_DATABASE_CLUBS_ID },
+        page_id: body.clubId,
+        properties: {
+          "🧑‍🏫 Employees": {
+            type: "relation",
+            relation: clubMembers,
+          },
+        },
+      })
+      .then((data) => {
+        console.log(`SUCCESS: Request approved with pageId ${data.id}`);
+
+        return data;
+      });
+  });
+}
+
+app.post("/api/requests/approve", (req, res) => {
+  console.log(req.body);
+  ApproveRequest(req.body).then((data) => {
+    res.send(data);
+  });
+});
 
 app.post("/api/create-user", (req, res) => {
   console.log(req.body);
