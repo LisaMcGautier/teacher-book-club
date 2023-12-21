@@ -1106,6 +1106,121 @@ async function membersSearch(q) {
   }
 }
 
+loadMemberRequests = async (clubId) => {
+  let newRequestsList = document.getElementById("new-requests-list");
+  newRequestsList.innerHTML = "";
+
+  const requests = await fetch("/api/requests/list?id=" + clubId).then(
+    (response) => response.json()
+  );
+
+  console.log(requests);
+
+  let requestCount = document.getElementById("member-requests-count");
+  requestCount.innerText = requests.length;
+
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const tr = document.createElement("tr");
+  const thMemberName = document.createElement("th");
+  const thActions = document.createElement("th");
+  const tbody = document.createElement("tbody");
+
+  // display the results in a table
+  // https://getbootstrap.com/docs/5.3/content/tables/
+  table.classList.add("table", "table-striped", "table-hover", "table-sm");
+  thMemberName.setAttribute("scope", "col");
+  thActions.setAttribute("scope", "col");
+
+  newRequestsList.appendChild(table);
+  table.appendChild(thead);
+  thead.appendChild(tr);
+  tr.appendChild(thMemberName);
+  tr.appendChild(thActions);
+  table.appendChild(tbody);
+
+  for (i = 0; i < requests.length; i++) {
+    const tableRow = document.createElement("tr");
+    const tdMemberName = document.createElement("td");
+    const tdBtns = document.createElement("td");
+    const denyBtn = document.createElement("button");
+    const approveBtn = document.createElement("button");
+
+    denyBtn.classList.add("btn", "btn-danger", "btn-sm");
+    denyBtn.innerText = "DENY";
+
+    const pageId = requests[i].id;
+
+    denyBtn.addEventListener("click", async function () {
+      let body = {
+        pageId: pageId,
+      };
+
+      // call nodeJS remove requests endpoint -- POST
+      const response = await fetch("/api/requests/remove", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+      });
+
+      // const confirmation = await response.json();
+      // console.log(confirmation);
+
+      // reload the member join request list
+      loadMemberRequests(clubId);
+    });
+
+    approveBtn.classList.add("btn", "btn-success", "btn-sm");
+    approveBtn.innerText = "APPROVE";
+
+    let memberId = requests[i].properties["🧑‍🏫 Employees"].relation[0].id;
+
+    approveBtn.addEventListener("click", async function () {
+      let body = {
+        pageId: pageId,
+        memberId: memberId,
+        clubId: clubId,
+      };
+
+      // call nodeJS approve requests endpoint -- POST
+      const response = await fetch("/api/requests/approve", {
+        method: "POST",
+        mode: "cors",
+        cache: "no-cache",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        redirect: "follow",
+        referrerPolicy: "no-referrer",
+        body: JSON.stringify(body),
+      });
+
+      // const confirmation = await response.json();
+      // console.log(confirmation);
+
+      // reload the member join request list
+      loadMemberRequests(clubId);
+    });
+
+    tdMemberName.innerText =
+      requests[i].properties["Member Name"].rollup.array[0].formula.string;
+
+    tbody.appendChild(tableRow);
+    tableRow.appendChild(tdMemberName);
+    tableRow.appendChild(tdBtns);
+    tdBtns.appendChild(denyBtn);
+    tdBtns.appendChild(approveBtn);
+  }
+};
+
 // load club page based on dynamic value (club id)
 // https://www.pluralsight.com/guides/handling-nested-promises-using-asyncawait-in-react
 loadClub = async () => {
@@ -1122,6 +1237,41 @@ loadClub = async () => {
   // update the DOM with club information
   let clubHeading = document.getElementById("club-heading");
   clubHeading.innerText = club[0].properties["Club Name"].title[0].plain_text;
+
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  let bioSaved = document.getElementById("bio-saved");// not used
+  let closeBtn = document.getElementById("close-button");
+  let btnClose = document.getElementById("btn-close");
+  let saveBioBtn = document.getElementById("save-button"); // not used
+  let decisionSuccess = document.getElementById("decision-success");
+  let bioContent = document.getElementById("bio-content"); // not used
+
+  let handleRequestsModal = new bootstrap.Modal(
+    document.getElementById("handleRequestsModal"),
+    {
+      keyboard: false,
+    }
+  );
+
+  closeBtn.addEventListener("click", async function () {
+    if (decisionSuccess.classList.contains("d-none") == false) {
+      decisionSuccess.classList.add("d-none");
+    }
+
+    // bioContent.innerText = "";
+    handleRequestsModal.hide();
+  });
+
+  btnClose.addEventListener("click", async function () {
+    if (decisionSuccess.classList.contains("d-none") == false) {
+      decisionSuccess.classList.add("d-none");
+    }
+
+    // bioContent.innerText = "";
+    handleRequestsModal.hide();
+  });
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 
   // use the club id to query notion for that club's meetings
   const meetings = await fetch("/api/club/meetings?id=" + clubId).then(
@@ -1163,12 +1313,10 @@ loadClub = async () => {
     let divDeleteClub = document.getElementById("div-delete-club");
     let btnDeleteClub = document.createElement("a");
     let btnNewRequests = document.createElement("a");
+    let requestCount = document.createElement("span");
 
     btnDeleteClub.classList.add("btn", "btn-danger");
     btnDeleteClub.innerText = "Delete club";
-
-    btnNewRequests.classList.add("btn", "btn-primary");
-    btnNewRequests.innerText = "New Requests";
 
     // ONLY the leader should be able to delete a club or approve/deny new members
     btnDeleteClub.addEventListener("click", async function () {
@@ -1177,11 +1325,21 @@ loadClub = async () => {
       );
     });
 
-    btnNewRequests.addEventListener("click", async function () {
-      alert(
-        "This functionality is coming soon... The leader will have privileges to approve new requests."
-      );
-    });
+    loadMemberRequests(clubId);
+
+    btnNewRequests.setAttribute("id", "member-requests");
+
+    btnNewRequests.setAttribute("data-bs-toggle", "modal");
+    btnNewRequests.setAttribute("data-bs-target", "#handleRequestsModal");
+
+    btnNewRequests.classList.add("btn", "btn-primary");
+
+    btnNewRequests.innerText = "New Requests";
+
+    requestCount.setAttribute("id", "member-requests-count");
+    requestCount.classList.add("badge", "bg-dark");
+
+    btnNewRequests.appendChild(requestCount);
 
     divDeleteClub.appendChild(btnDeleteClub);
     divDeleteClub.appendChild(btnNewRequests);
