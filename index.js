@@ -162,6 +162,13 @@ app.post("/api/login-user", (req, res) => {
   });
 });
 
+app.post("/api/create-club", (req, res) => {
+  console.log(req.body);
+  CreateClub(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
 async function CreateClub(body) {
   let foundClub = await DoesClubnameExist(body.clubname);
   console.log("found club equals " + foundClub);
@@ -222,6 +229,83 @@ async function DoesClubnameExist(clubname) {
           equals: clubname,
         },
       },
+    },
+  };
+
+  const response = await queryDatabase(myQuery);
+
+  console.log(response);
+
+  if (response.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+app.post("/api/requests/add", (req, res) => {
+  console.log(req.body);
+  CreateRequest(req.body).then((data) => {
+    res.send(data);
+  });
+});
+
+async function CreateRequest(body) {
+  let foundRequest = await DoesRequestExist(body);
+  console.log("found request equals " + foundRequest);
+
+  if (foundRequest == false) {
+    // https://www.youtube.com/watch?v=Pzz36k2rt10&t=220s
+    const response = await notion.pages.create({
+      parent: { database_id: process.env.NOTION_DATABASE_JOIN_CLUB_REQUESTS_ID },
+      properties: {
+        "🧑‍🏫 Employees": {
+          relation: [
+            {
+              id: body.teacherId,
+            },
+          ],
+        },
+        "👥 Clubs": {
+          relation: [
+            {
+              id: body.clubId,
+            },
+          ],
+        },
+      },
+    });
+
+    console.log(`SUCCESS: Request successfully added with pageId ${response.id}`);
+    return response;
+  } else {
+    const response = {
+      duplicate: true,
+    };
+
+    console.log(`CONFLICT: Request already exists`);
+    return response;
+  }
+}
+
+async function DoesRequestExist(body) {
+  let myQuery = {
+    database_id: process.env.NOTION_DATABASE_JOIN_CLUB_REQUESTS_ID,
+    filter: {
+      and: [
+        {
+          property: "🧑‍🏫 Employees",
+          relation: {
+            contains: body.teacherId,
+          },
+        },
+        {
+          property: "👥 Clubs",
+          relation: {
+            contains: body.clubId,
+          },
+        },
+      ],      
     },
   };
 
@@ -323,13 +407,6 @@ app.get("/api/clubs", (req, res) => {
   };
 
   queryDatabase(myQuery).then((data) => {
-    res.send(data);
-  });
-});
-
-app.post("/api/create-club", (req, res) => {
-  console.log(req.body);
-  CreateClub(req.body).then((data) => {
     res.send(data);
   });
 });

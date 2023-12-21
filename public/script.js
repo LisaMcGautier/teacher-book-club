@@ -199,8 +199,7 @@ async function registerUser() {
     // empty field(s) detected, alert user
     let passwordMismatch = document.getElementById("password-mismatch");
     passwordMismatch.classList.remove("d-none");
-  }
-  else {
+  } else {
     // construct a body JSON object using those values
     let body = {
       firstname: firstname.value,
@@ -1170,6 +1169,47 @@ loadClub = async () => {
     btnDiscussion.classList.add("btn", "btn-success");
     btnDiscussion.innerText = "Click to join discussion";
 
+    let btnJoinClub = document.createElement("button");
+    btnJoinClub.classList.add("btn", "btn-info");
+    btnJoinClub.innerText = "Request to join club";
+
+    if (localStorage.getItem("userId") != undefined) {
+      const teacherId = localStorage.getItem("userId").replaceAll("-", "");
+
+      btnJoinClub.addEventListener("click", async function () {
+        let body = {
+          teacherId: teacherId,
+          clubId: clubId,
+        };
+
+        // call nodeJS reuqest to join club endpoint -- POST
+        const response = await fetch("/api/requests/add", {
+          method: "POST",
+          mode: "cors",
+          cache: "no-cache",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          redirect: "follow",
+          referrerPolicy: "no-referrer",
+          body: JSON.stringify(body),
+        });
+
+        const confirmation = await response.json();
+
+        console.log(confirmation);
+
+        if (confirmation != null && confirmation.id != undefined) {
+          alert("Your request has been sent!");
+        } else {
+          alert("Oops! A request has already been sent. Please allow some time for us to respond.");
+          btnJoinClub.classList.add("disabled");
+          btnJoinClub.innerText = "Request already sent";
+        }
+      });
+    }
+
     anchorThumbnail.appendChild(clubThumbnail);
     clubDetails.appendChild(anchorThumbnail);
     clubDetails.appendChild(title);
@@ -1177,6 +1217,10 @@ loadClub = async () => {
     clubDetails.appendChild(isbnTen);
     clubDetails.appendChild(isbnThirteen);
     clubDetails.appendChild(btnDiscussion);
+
+    if (localStorage.getItem("userId") != undefined) {
+      clubDetails.appendChild(btnJoinClub);
+    }
   } else {
     let clubDetails = document.getElementById("club-details");
     let title = document.createElement("h5");
