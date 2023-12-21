@@ -1,36 +1,73 @@
 async function index() {
   configureMenu();
-  listClubs();
+
+  // display a visual progress bar while page is loading
+  // https://codepen.io/tmac/pen/QgVRKb
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await listClubs();
+
+  // hide the progress bar
+  pageProgress.classList.add("d-none");
 }
 
 async function addBook() {
   configureMenu();
 
   if (checkLoginUser()) {
-    loadAddBook();
+    let pageProgress = document.getElementById("page-progress");
+    pageProgress.classList.remove("d-none");
+
+    await loadAddBook();
+
+    pageProgress.classList.add("d-none");
   }
 }
 
 async function book() {
   configureMenu();
-  loadBook();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await loadBook();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function club() {
   configureMenu();
-  loadClub();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await loadClub();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function createClubPage() {
   configureMenu();
   if (checkLoginUser()) {
-    loadCreateClub();
+    let pageProgress = document.getElementById("page-progress");
+    pageProgress.classList.remove("d-none");
+
+    await loadCreateClub();
+
+    pageProgress.classList.add("d-none");
   }
 }
 
 async function discussion() {
   configureMenu();
-  loadDiscussion();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await loadDiscussion();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function login() {
@@ -54,30 +91,69 @@ async function myProfile() {
   configureMenu();
 
   if (checkLoginUser()) {
-    loadProfile();
+    let pageProgress = document.getElementById("page-progress");
+    pageProgress.classList.remove("d-none");
+
+    await loadProfile();
+
+    pageProgress.classList.add("d-none");
   }
 }
 
 async function searchBooks() {
   configureMenu();
-  loadSearchBooks();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await loadSearchBooks();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function searchClubs() {
   configureMenu();
-  loadSearchClubs();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await loadSearchClubs();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function searchMembers() {
   configureMenu();
-  loadSearchMembers();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await loadSearchMembers();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function teacher() {
   configureMenu();
 
   if (checkLoginUser()) {
-    loadTeacher();
+    let pageProgress = document.getElementById("page-progress");
+    pageProgress.classList.remove("d-none");
+
+    await loadTeacher();
+
+    pageProgress.classList.add("d-none");
+  }
+}
+
+// Hamburger menu function
+function hamburger() {
+  let menu = document.getElementById("menu-links");
+
+  if (menu.style.display === "block") {
+    menu.style.display = "none";
+  } else {
+    menu.style.display = "block";
   }
 }
 
@@ -273,7 +349,6 @@ async function loginUser() {
       body: JSON.stringify(body),
     });
 
-    // TODO: update the UI based on the result (success) or (error)
     const userInfo = await response.json();
     console.log(userInfo);
 
@@ -298,6 +373,7 @@ async function loginUser() {
   }
 }
 
+// check whether user is logged in
 function checkLoginUser() {
   if (localStorage.getItem("userId") == undefined) {
     location.replace("/login.html?error=login-required");
@@ -307,6 +383,7 @@ function checkLoginUser() {
   return true;
 }
 
+// allow user to log out
 function logout() {
   localStorage.removeItem("userId");
   localStorage.removeItem("userFirst");
@@ -314,6 +391,7 @@ function logout() {
   location.replace("/index.html");
 }
 
+// display number of kudos received in each category
 function loadKudosCount(teacher) {
   let kudosEmpatheticCount = document.getElementById("kudos-empathetic-count");
   let kudosHelpfulCount = document.getElementById("kudos-helpful-count");
@@ -361,6 +439,7 @@ function loadKudosCount(teacher) {
   }
 }
 
+// get avatar, bio, and kudos for user's (my) profile page
 loadAvatarBio = async () => {
   const teacherId = localStorage.getItem("userId").replaceAll("-", "");
 
@@ -400,6 +479,7 @@ loadAvatarBio = async () => {
   loadKudosCount(teacher);
 };
 
+// show messages for user's (my) profile page
 loadMessages = async () => {
   let recipientUserId = localStorage.getItem("userId").replaceAll("-", "");
 
@@ -472,6 +552,7 @@ loadMessages = async () => {
   }
 };
 
+// when user logs in, redirect to display user's (my) profile page
 loadProfile = async () => {
   let myProfileMain = document.getElementById("my-profile-main");
   myProfileMain.style.visibility = "visible";
@@ -559,10 +640,9 @@ loadProfile = async () => {
 
   loadShelf("wishlist", teacherId);
   loadShelf("history", teacherId);
-
-  // loop over the results to make one call to GB API per ISBN to render thumbnails on the page
 };
 
+// display the list of available clubs on the home page
 async function listClubs() {
   const response = await fetch("/api/clubs");
   const clubs = await response.json();
@@ -628,6 +708,7 @@ async function listClubs() {
   }
 }
 
+// load search-books page
 loadSearchBooks = async () => {
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const q = urlParams.get("q");
@@ -744,6 +825,7 @@ async function booksSearch(q) {
             userID: localStorage.getItem("userId").replaceAll("-", ""),
           };
 
+          // call nodeJS create wishlist endpoint -- POST
           const response = await fetch("/api/wishlist/create", {
             method: "POST",
             mode: "cors",
@@ -766,6 +848,7 @@ async function booksSearch(q) {
             userID: localStorage.getItem("userId").replaceAll("-", ""),
           };
 
+          // call nodeJS create wishlist endpoint -- POST
           const response = await fetch("/api/history/create", {
             method: "POST",
             mode: "cors",
@@ -788,6 +871,7 @@ async function booksSearch(q) {
         col1.appendChild(anchorThumbnail);
         col2.appendChild(anchorTitle);
 
+        // only show the wishlist and history buttons if user is logged in
         if (localStorage.getItem("userId") != undefined) {
           col2.appendChild(wishlistButton);
           col2.appendChild(historyButton);
@@ -805,6 +889,7 @@ async function booksSearch(q) {
   }
 }
 
+// load search-clubs page
 loadSearchClubs = async () => {
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const q = urlParams.get("q");
@@ -863,6 +948,7 @@ async function clubsSearch(q) {
     const thClubDescription = document.createElement("th");
     const tbody = document.createElement("tbody");
 
+    // display results in a table
     // https://getbootstrap.com/docs/5.3/content/tables/
     table.classList.add("table", "table-striped", "table-hover", "table-sm");
     thClubName.setAttribute("scope", "col");
@@ -911,6 +997,7 @@ async function clubsSearch(q) {
   }
 }
 
+// load search-members page
 loadSearchMembers = async () => {
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const q = urlParams.get("q");
@@ -1019,17 +1106,7 @@ async function membersSearch(q) {
   }
 }
 
-// Hamburger menu function
-function hamburger() {
-  let menu = document.getElementById("menu-links");
-
-  if (menu.style.display === "block") {
-    menu.style.display = "none";
-  } else {
-    menu.style.display = "block";
-  }
-}
-
+// load club page based on dynamic value (club id)
 // https://www.pluralsight.com/guides/handling-nested-promises-using-asyncawait-in-react
 loadClub = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
@@ -1093,6 +1170,7 @@ loadClub = async () => {
     btnNewRequests.classList.add("btn", "btn-primary");
     btnNewRequests.innerText = "New Requests";
 
+    // ONLY the leader should be able to delete a club or approve/deny new members
     btnDeleteClub.addEventListener("click", async function () {
       alert(
         "This functionality is coming soon... The leader will have privileges to delete a club."
@@ -1121,10 +1199,12 @@ loadClub = async () => {
   // https://github.com/jackducasse/caleandar
   var element = caleandar(document.getElementById("club-calendar"), events);
 
+  // get the ISBN of the current book
   if (meetings.length > 0) {
     let bookId =
       meetings[0].properties.ISBN.rollup.array[0].rich_text[0].plain_text;
 
+    // use the ISBN to query google books
     const book = await fetch("/api/book?id=" + bookId).then((response) =>
       response.json()
     );
@@ -1133,7 +1213,13 @@ loadClub = async () => {
     console.log(book);
 
     let clubThumbnail = document.createElement("img");
-    clubThumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
+
+    // if there are no thumbnails, display a generic image
+    if (book.items[0].volumeInfo.imageLinks != undefined) {
+      clubThumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
+    } else {
+      clubThumbnail.src = "images/default_book_small.png";
+    }
     let anchorThumbnail = document.createElement("a");
 
     let ISBNid;
@@ -1187,6 +1273,7 @@ loadClub = async () => {
     btnJoinClub.classList.add("btn", "btn-info");
     btnJoinClub.innerText = "Request to join club";
 
+    // only allow the user to request to join club if they are logged in
     if (localStorage.getItem("userId") != undefined) {
       const teacherId = localStorage.getItem("userId").replaceAll("-", "");
 
@@ -1196,7 +1283,7 @@ loadClub = async () => {
           clubId: clubId,
         };
 
-        // call nodeJS reuqest to join club endpoint -- POST
+        // call nodeJS request to join club endpoint -- POST
         const response = await fetch("/api/requests/add", {
           method: "POST",
           mode: "cors",
@@ -1234,6 +1321,7 @@ loadClub = async () => {
     clubDetails.appendChild(isbnThirteen);
     clubDetails.appendChild(btnDiscussion);
 
+    // only show button to join for logged in users
     if (localStorage.getItem("userId") != undefined) {
       clubDetails.appendChild(btnJoinClub);
     }
@@ -1245,6 +1333,7 @@ loadClub = async () => {
     clubDetails.appendChild(title);
   }
 
+  // show club booklist and members
   loadClubShelf(clubId, leaderId);
   loadMembersShelf(clubId);
 };
@@ -1302,6 +1391,7 @@ async function listClubBooks(clubLeader) {
   }
 }
 
+// allow a logged in user to create a new club
 async function createClub() {
   let clubname = document.getElementById("clubname");
   let clubdescription = document.getElementById("clubdescription");
@@ -1351,6 +1441,8 @@ async function createClub() {
   }
 }
 
+// show the list of meetings
+// after club leader adds a new book and saves discussion questions
 loadMeetings = async () => {
   let meetingsList = document.getElementById("meetings-list");
   // clear previously rendered reviews and display all current reviews
@@ -1380,6 +1472,7 @@ loadMeetings = async () => {
   const thActions = document.createElement("th");
   const tbody = document.createElement("tbody");
 
+  // display the results in a table
   // https://getbootstrap.com/docs/5.3/content/tables/
   table.classList.add("table", "table-striped", "table-hover", "table-sm");
   thMeetingDate.setAttribute("scope", "col");
@@ -1408,7 +1501,7 @@ loadMeetings = async () => {
         pageId: pageId,
       };
 
-      // call nodeJS remove reviews endpoint -- POST
+      // call nodeJS remove meetings endpoint -- POST
       const response = await fetch("/api/meetings/remove", {
         method: "POST",
         mode: "cors",
@@ -1426,6 +1519,7 @@ loadMeetings = async () => {
 
       console.log(confirmation);
 
+      // reload the meetings list
       loadMeetings();
     });
 
@@ -1438,6 +1532,7 @@ loadMeetings = async () => {
   }
 };
 
+// only club leader has access to the add-book button via the club page
 loadAddBook = async () => {
   let addBookMain = document.getElementById("add-book-main");
   addBookMain.style.visibility = "visible";
@@ -1466,6 +1561,7 @@ loadAddBook = async () => {
   let messageWarning = document.getElementById("message-warning");
   let datepickerResult = document.getElementById("datepicker-result");
 
+  // use bootstrap modal to collect meeting date
   let createMeetingModal = new bootstrap.Modal(
     document.getElementById("createMeetingModal"),
     {
@@ -1531,11 +1627,13 @@ loadAddBook = async () => {
 
       meetingCreated.classList.remove("d-none");
 
+      // load the meetings list
       loadMeetings();
     }
   });
 };
 
+// allow club leader to search for books
 async function adminSearchBooks() {
   let searchterm = document.getElementById("searchterm");
   const response = await fetch("/api/books/search?q=" + searchterm.value);
@@ -1563,13 +1661,10 @@ async function adminSearchBooks() {
         const col1 = document.createElement("div");
         const authorName = document.createElement("div");
         const col2 = document.createElement("div");
-        const selectButton = document.createElement("button");
-        const anchorTitle = document.createElement("a");
 
         // create an addtional element (button) for selecting this book
-        // attach an on click event (add event listener targeting the onClick property)
-        // on click, call another function that will pass the ISBN of this book
-        // append the button child
+        const selectButton = document.createElement("button");
+        const anchorTitle = document.createElement("a");
 
         row.classList.add("row");
         col1.classList.add("col-8");
@@ -1611,6 +1706,7 @@ async function adminSearchBooks() {
 
         anchorTitle.href = "book.html?id=" + bookISBN;
 
+        // attach an on click event to pass the ISBN of this book
         // https://www.w3schools.com/jsref/met_element_addeventlistener.asp
         selectButton.addEventListener("click", function () {
           document.getElementById("selection").innerText = selectedTitle;
@@ -1637,6 +1733,7 @@ async function adminSearchBooks() {
     searchResults.classList.add("m-3");
   }
 
+  // allow club leader to select a different book
   let buttonChange = document.getElementById("btn-change");
   buttonChange.addEventListener("click", function () {
     document.getElementById("add-book-search").className = "d-block";
@@ -1645,6 +1742,7 @@ async function adminSearchBooks() {
     document.getElementById("generate-questions").className = "d-none";
   });
 
+  // allow club leader to confirm this book selection
   let buttonConfirm = document.getElementById("btn-confirm");
   buttonConfirm.addEventListener("click", async function () {
     console.log(
@@ -1667,6 +1765,7 @@ async function adminSearchBooks() {
 
     document.getElementById("confirm-book").appendChild(spinnerDiv);
 
+    // call nodeJS create (add) book endpoint -- POST
     const response = await fetch("/api/book/create", {
       method: "POST",
       mode: "cors",
@@ -1684,6 +1783,8 @@ async function adminSearchBooks() {
 
     console.log(response.id.replaceAll("-", ""));
 
+    // hold on to the book id so that we can use it later
+    // to save discussion questions and meeting date(s)
     let bookId = document.createElement("input");
     bookId.id = "book-id";
     bookId.type = "hidden";
@@ -1700,6 +1801,7 @@ async function adminSearchBooks() {
   });
 }
 
+// allow a user to use AI to generate quesions
 generateGPTQuestions = async () => {
   let buttonChatGPT = document.getElementById("btnChatGPT");
   buttonChatGPT.classList.add("disabled");
@@ -1710,8 +1812,10 @@ generateGPTQuestions = async () => {
 
   let spinner = document.getElementById("spinner");
   spinner.classList.remove("invisible");
-  // https://www.youtube.com/watch?v=LX_DXLlaymg
 
+  // connect with ChatGPT to generate questions based on the book title
+  // (ISBN did not always yield reliable responses
+  // https://www.youtube.com/watch?v=LX_DXLlaymg
   let messages = [];
   const guidingQuestions = document.getElementById("guiding-questions");
 
@@ -1759,6 +1863,7 @@ generateGPTQuestions = async () => {
     });
 };
 
+// save the user's input as the discussion guide
 saveQuestions = async () => {
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
   const clubId = urlParams.get("id");
@@ -1773,6 +1878,7 @@ saveQuestions = async () => {
     questions: questions,
   };
 
+  // call nodeJS create questions endpoint -- POST
   const response = await fetch("/api/questions/create", {
     method: "POST",
     mode: "cors",
@@ -1788,6 +1894,7 @@ saveQuestions = async () => {
 
   // remove the save button to prevent user from adding multiple records to Notion
   document.getElementById("btnSaveQuestions").remove();
+
   // remove buttons to change book or ask ChatGPT for questions
   document.getElementById("btn-change").remove();
   document.getElementById("btnChatGPT").remove();
@@ -1795,8 +1902,10 @@ saveQuestions = async () => {
   document.getElementById("section-meetings-list").classList.remove("d-none");
 };
 
+// load reviews on the book page
 loadReviews = async (bookId) => {
   let reviewSection = document.getElementById("review-section");
+
   // clear previously rendered reviews and display all current reviews
   reviewSection.innerHTML = "";
 
@@ -1807,100 +1916,110 @@ loadReviews = async (bookId) => {
 
   reviewSection.appendChild(spinnerDiv);
 
-  const reviews = await fetch("/api/reviews-notion?isbn=" + bookId).then(
-    (response) => response.json()
+  const reviews = await fetch("/api/reviews?isbn=" + bookId).then((response) =>
+    response.json()
   );
 
   console.log(reviews[0]);
 
   spinnerDiv.remove();
 
-  for (i = 0; i < reviews.length; i++) {
-    const row = document.createElement("div");
-    const col1 = document.createElement("div");
-    const col2 = document.createElement("div");
-    const col3 = document.createElement("div");
-    const avatar = document.createElement("img");
-    const anchorAvatar = document.createElement("a");
-    const reviewContent = document.createElement("div");
+  if (reviews.length > 0) {
+    for (i = 0; i < reviews.length; i++) {
+      const row = document.createElement("div");
+      const col1 = document.createElement("div");
+      const col2 = document.createElement("div");
+      const col3 = document.createElement("div");
+      const avatar = document.createElement("img");
+      const anchorAvatar = document.createElement("a");
+      const reviewContent = document.createElement("div");
 
-    row.classList.add("row");
-    col1.classList.add("col-sm-2");
+      row.classList.add("row");
+      col1.classList.add("col-sm-2");
 
-    let teacherId = reviews[i].properties["🧑‍🏫 Employees"].relation[0].id;
-    teacherId = teacherId.replaceAll("-", "");
+      let teacherId = reviews[i].properties["🧑‍🏫 Employees"].relation[0].id;
+      teacherId = teacherId.replaceAll("-", "");
 
-    if (reviews[i].properties.avatarURL == null) {
-      avatar.src = "images/default_avatar.png";
-    } else {
-      avatar.src = reviews[i].properties.avatarURL;
-    }
+      if (reviews[i].properties.avatarURL == null) {
+        avatar.src = "images/default_avatar.png";
+      } else {
+        avatar.src = reviews[i].properties.avatarURL;
+      }
 
-    anchorAvatar.href = "teacher.html?id=" + teacherId;
+      anchorAvatar.href = "teacher.html?id=" + teacherId;
 
-    avatar.classList.add("avatar-thumbnail");
-    anchorAvatar.appendChild(avatar);
+      avatar.classList.add("avatar-thumbnail");
+      anchorAvatar.appendChild(avatar);
 
-    reviewContent.innerText =
-      reviews[i].properties.Review.rich_text[0].plain_text;
-    reviewContent.classList.add("review-details");
+      reviewContent.innerText =
+        reviews[i].properties.Review.rich_text[0].plain_text;
+      reviewContent.classList.add("review-details");
 
-    col1.appendChild(anchorAvatar);
-    col2.appendChild(reviewContent);
+      col1.appendChild(anchorAvatar);
+      col2.appendChild(reviewContent);
 
-    row.appendChild(col1);
-    row.appendChild(col2);
-    row.appendChild(col3);
+      row.appendChild(col1);
+      row.appendChild(col2);
+      row.appendChild(col3);
 
-    // if the author for this review is the current logged in user
-    if (
-      reviews[i].properties["🧑‍🏫 Employees"].relation[0].id ==
-      localStorage.getItem("userId")
-    ) {
-      // display a button to delete this review
-      let btnDeleteReview = document.createElement("a");
-      btnDeleteReview.classList.add("btn", "btn-sm", "btn-danger");
-      btnDeleteReview.innerText = "Delete review";
+      // if the author for this review is the current logged in user
+      if (
+        reviews[i].properties["🧑‍🏫 Employees"].relation[0].id ==
+        localStorage.getItem("userId")
+      ) {
+        // display a button to delete this review
+        let btnDeleteReview = document.createElement("a");
+        btnDeleteReview.classList.add("btn", "btn-sm", "btn-danger");
+        btnDeleteReview.innerText = "Delete review";
 
-      const pageId = reviews[i].id;
+        const pageId = reviews[i].id;
 
-      btnDeleteReview.addEventListener("click", async function () {
-        let body = {
-          pageId: pageId,
-        };
+        btnDeleteReview.addEventListener("click", async function () {
+          let body = {
+            pageId: pageId,
+          };
 
-        // call nodeJS remove reviews endpoint -- POST
-        const response = await fetch("/api/reviews/remove", {
-          method: "POST",
-          mode: "cors",
-          cache: "no-cache",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          redirect: "follow",
-          referrerPolicy: "no-referrer",
-          body: JSON.stringify(body),
+          // call nodeJS remove reviews endpoint -- POST
+          const response = await fetch("/api/reviews/remove", {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(body),
+          });
+
+          const confirmation = await response.json();
+
+          console.log(confirmation);
+
+          loadReviews(bookId);
         });
 
-        const confirmation = await response.json();
+        col3.appendChild(btnDeleteReview);
+        col2.classList.add("col-sm-9");
+        col3.classList.add("col-sm-1");
+      } else {
+        col2.classList.add("col-sm-10");
+      }
 
-        console.log(confirmation);
-
-        loadReviews(bookId);
-      });
-
-      col3.appendChild(btnDeleteReview);
-      col2.classList.add("col-sm-9");
-      col3.classList.add("col-sm-1");
-    } else {
-      col2.classList.add("col-sm-10");
+      reviewSection.appendChild(row);
     }
+  } else {
+    const emptyContent = document.createElement("div");
+    emptyContent.classList.add("review-details");
 
-    reviewSection.appendChild(row);
+    emptyContent.innerText = "There are no reviews for this book yet.";
+
+    reviewSection.appendChild(emptyContent);
   }
 };
 
+// load book page based on dynamic value (book id)
 loadBook = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
@@ -1919,8 +2038,13 @@ loadBook = async () => {
   let bookThumbnail = document.getElementById("book-thumbnail");
   let thumbnail = document.createElement("img");
 
-  // what if there is no thumbnail for this book?
-  thumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
+  // if there are no thumbnails, display a generic image
+  if (book.items[0].volumeInfo.imageLinks != undefined) {
+    thumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
+  } else {
+    thumbnail.src = "images/default_book_small.png";
+  }
+
   thumbnail.alt = book.items[0].volumeInfo.title + " book cover";
 
   bookThumbnail.appendChild(thumbnail);
@@ -1979,6 +2103,7 @@ loadBook = async () => {
 
   let btnAddReview = document.getElementById("btn-add-review");
 
+  // only logged in users can add reviews
   if (localStorage.getItem("userId") == undefined) {
     btnAddReview.classList.add("d-none");
   }
@@ -2062,8 +2187,10 @@ loadBook = async () => {
   loadReviews(bookId);
 };
 
+// load comments on the discussion page
 loadComments = async (discussionId, leaderId) => {
   let commentSection = document.getElementById("comment-section");
+
   // clear previously rendered reviews and display all current reviews
   commentSection.innerHTML = "";
 
@@ -2082,96 +2209,108 @@ loadComments = async (discussionId, leaderId) => {
 
   spinnerDiv.remove();
 
-  for (i = 0; i < comments.length; i++) {
-    const row = document.createElement("div");
-    const col1 = document.createElement("div");
-    const col2 = document.createElement("div");
-    const col3 = document.createElement("div");
-    const avatar = document.createElement("img");
-    const anchorAvatar = document.createElement("a");
-    const commentContent = document.createElement("div");
+  if (comments.length > 0) {
+    for (i = 0; i < comments.length; i++) {
+      const row = document.createElement("div");
+      const col1 = document.createElement("div");
+      const col2 = document.createElement("div");
+      const col3 = document.createElement("div");
+      const avatar = document.createElement("img");
+      const anchorAvatar = document.createElement("a");
+      const commentContent = document.createElement("div");
 
-    row.classList.add("row");
-    col1.classList.add("col-sm-2");
+      row.classList.add("row");
+      col1.classList.add("col-sm-2");
+      col2.classList.add("col-sm-10");
 
-    let teacherId = comments[i].properties["🧑‍🏫 Employees"].relation[0].id;
-    teacherId = teacherId.replaceAll("-", "");
+      let teacherId = comments[i].properties["🧑‍🏫 Employees"].relation[0].id;
+      teacherId = teacherId.replaceAll("-", "");
 
-    if (comments[i].properties.avatarURL == null) {
-      avatar.src = "images/default_avatar.png";
-    } else {
-      avatar.src = comments[i].properties.avatarURL;
-    }
+      if (comments[i].properties.avatarURL == null) {
+        avatar.src = "images/default_avatar.png";
+      } else {
+        avatar.src = comments[i].properties.avatarURL;
+      }
 
-    anchorAvatar.href = "teacher.html?id=" + teacherId;
+      anchorAvatar.href = "teacher.html?id=" + teacherId;
 
-    avatar.classList.add("avatar-thumbnail");
-    anchorAvatar.appendChild(avatar);
+      avatar.classList.add("avatar-thumbnail");
+      anchorAvatar.appendChild(avatar);
 
-    commentContent.innerText =
-      comments[i].properties.Comment.rich_text[0].plain_text;
-    commentContent.classList.add("review-details");
+      commentContent.innerText =
+        comments[i].properties.Comment.rich_text[0].plain_text;
+      commentContent.classList.add("review-details");
 
-    col1.appendChild(anchorAvatar);
-    col2.appendChild(commentContent);
+      col1.appendChild(anchorAvatar);
+      col2.appendChild(commentContent);
 
-    row.appendChild(col1);
-    row.appendChild(col2);
-    row.appendChild(col3);
+      row.appendChild(col1);
+      row.appendChild(col2);
+      row.appendChild(col3);
 
-    // if the current logged in user is the author for this comment OR the leader of the club
-    if (localStorage.getItem("userId") != null) {
-      if (
-        comments[i].properties["🧑‍🏫 Employees"].relation[0].id ==
-          localStorage.getItem("userId") ||
-        leaderId == localStorage.getItem("userId").replaceAll("-", "")
-      ) {
-        // display a button to delete this comment
-        let btnDeleteComment = document.createElement("a");
-        btnDeleteComment.classList.add("btn", "btn-sm", "btn-danger");
-        btnDeleteComment.innerText = "Delete comment";
+      // if the current logged in user is the author for this comment OR the leader of the club
+      if (localStorage.getItem("userId") != null) {
+        if (
+          comments[i].properties["🧑‍🏫 Employees"].relation[0].id ==
+            localStorage.getItem("userId") ||
+          leaderId == localStorage.getItem("userId").replaceAll("-", "")
+        ) {
+          // display a button to delete this comment
+          let btnDeleteComment = document.createElement("a");
+          btnDeleteComment.classList.add("btn", "btn-sm", "btn-danger");
+          btnDeleteComment.innerText = "Delete comment";
 
-        const pageId = comments[i].id;
+          const pageId = comments[i].id;
 
-        btnDeleteComment.addEventListener("click", async function () {
-          let body = {
-            pageId: pageId,
-          };
+          btnDeleteComment.addEventListener("click", async function () {
+            let body = {
+              pageId: pageId,
+            };
 
-          // call nodeJS remove comments endpoint -- POST
-          const response = await fetch("/api/comments/remove", {
-            method: "POST",
-            mode: "cors",
-            cache: "no-cache",
-            credentials: "same-origin",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            redirect: "follow",
-            referrerPolicy: "no-referrer",
-            body: JSON.stringify(body),
+            // call nodeJS remove comments endpoint -- POST
+            const response = await fetch("/api/comments/remove", {
+              method: "POST",
+              mode: "cors",
+              cache: "no-cache",
+              credentials: "same-origin",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              redirect: "follow",
+              referrerPolicy: "no-referrer",
+              body: JSON.stringify(body),
+            });
+
+            const confirmation = await response.json();
+
+            console.log(confirmation);
+
+            loadComments(discussionId);
           });
 
-          const confirmation = await response.json();
+          col3.appendChild(btnDeleteComment);
 
-          console.log(confirmation);
-
-          loadComments(discussionId);
-        });
-
-        col3.appendChild(btnDeleteComment);
-
-        col2.classList.add("col-sm-9");
-        col3.classList.add("col-sm-1");
-      } else {
-        col2.classList.add("col-sm-10");
+          col2.classList.remove("col-sm-10");
+          col2.classList.add("col-sm-9");
+          col3.classList.add("col-sm-1");
+        } else {
+          col2.classList.add("col-sm-10");
+        }
       }
-    }
 
-    commentSection.appendChild(row);
+      commentSection.appendChild(row);
+    }
+  } else {
+    const emptyContent = document.createElement("div");
+    emptyContent.classList.add("review-details");
+
+    emptyContent.innerText = "There are no comments in this discussion yet.";
+
+    commentSection.appendChild(emptyContent);
   }
 };
 
+// load discussion page based on dynamic values (club id + ISBN)
 loadDiscussion = async () => {
   // https://www.w3docs.com/snippets/javascript/how-to-get-url-parameters.html#:~:text=When%20you%20want%20to%20access,get(%24PARAM_NAME)%20
   const urlParams = new URL(window.location.toLocaleString()).searchParams;
@@ -2204,7 +2343,6 @@ loadDiscussion = async () => {
   let discussionLeader = document.getElementById("discussion-leader");
   discussionLeader.innerText = leader[0].properties["Full Name"].formula.string;
 
-  // code breaks here when a new book has been added
   let discussionId = discussion[0].properties["discussion ID"].formula.string;
 
   // update the DOM with discussion information
@@ -2220,7 +2358,13 @@ loadDiscussion = async () => {
   console.log(book);
 
   let bookThumbnail = document.createElement("img");
-  bookThumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
+
+  // if there are no thumbnails, display a generic image
+  if (book.items[0].volumeInfo.imageLinks != undefined) {
+    bookThumbnail.src = book.items[0].volumeInfo.imageLinks.thumbnail;
+  } else {
+    bookThumbnail.src = "images/default_book_small.png";
+  }
 
   let bookDetails = document.getElementById("book-details");
   let title = document.createElement("h5");
@@ -2336,6 +2480,7 @@ loadDiscussion = async () => {
   loadComments(discussionId, leaderId);
 };
 
+// load club page based on dynamic value (teacher id)
 loadTeacher = async () => {
   let teacherMain = document.getElementById("teacher-main");
   teacherMain.style.visibility = "visible";
@@ -2485,8 +2630,6 @@ loadTeacher = async () => {
 
   loadShelf("wishlist", teacherId);
   loadShelf("history", teacherId);
-
-  // loop over the results to make one call to GB API per ISBN to render thumbnails on the page
 };
 
 async function giveKudos(sender) {
@@ -2530,6 +2673,7 @@ async function giveKudos(sender) {
   loadTeacher();
 }
 
+// re-use the function for wishlist and history
 async function loadShelf(shelfName, teacherId) {
   let shelf = document.getElementById(shelfName + "-shelf");
 
@@ -2542,7 +2686,7 @@ async function loadShelf(shelfName, teacherId) {
 
   shelf.appendChild(spinnerDiv);
 
-  // make another call to Notion to get the Wishlist
+  // call Notion to get the booklist
   const booklist = await fetch("/api/" + shelfName + "?id=" + teacherId).then(
     (response) => response.json()
   );
@@ -2612,7 +2756,7 @@ async function loadClubShelf(clubId, leaderId) {
 
   shelf.appendChild(spinnerDiv);
 
-  // make another call to Notion to get the club booklist
+  // call Notion to get the club booklist
   const booklist = await fetch("/api/club/booklist?id=" + clubId).then(
     (response) => response.json()
   );
@@ -2671,6 +2815,7 @@ async function loadClubShelf(clubId, leaderId) {
           booklist[i].properties["📣 Discussion Guides"].relation[0].id;
       }
 
+      // allow ONLY club leader to delete book(s)
       deleteBtn.addEventListener("click", async function () {
         if (confirm("Are you sure you want to delete this book?")) {
           let body = {
@@ -2737,7 +2882,7 @@ async function loadMembersShelf(clubId) {
 
   shelf.appendChild(spinnerDiv);
 
-  // make another call to Notion to get the club members
+  // call Notion to get the club members
   const members = await fetch("/api/club/members?clubId=" + clubId).then(
     (response) => response.json()
   );
@@ -2746,7 +2891,7 @@ async function loadMembersShelf(clubId) {
 
   console.log(shelf, members);
 
-  // IF there are books in the booklist
+  // IF there are members in the clublist
   if (members.length > 0) {
     for (i = 0; i < members.length; i++) {
       const avatarDiv = document.createElement("div");
