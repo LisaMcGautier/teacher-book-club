@@ -1,36 +1,72 @@
 async function index() {
   configureMenu();
-  listClubs();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await listClubs();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function addBook() {
   configureMenu();
 
   if (checkLoginUser()) {
-    loadAddBook();
+
+    let pageProgress = document.getElementById("page-progress");
+    pageProgress.classList.remove("d-none");
+
+    await loadAddBook();
+
+    pageProgress.classList.add("d-none");
   }
 }
 
 async function book() {
   configureMenu();
-  loadBook();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await loadBook();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function club() {
   configureMenu();
-  loadClub();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+  
+  await loadClub();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function createClubPage() {
   configureMenu();
   if (checkLoginUser()) {
-    loadCreateClub();
+
+    let pageProgress = document.getElementById("page-progress");
+    pageProgress.classList.remove("d-none");
+
+    await loadCreateClub();
+
+    pageProgress.classList.add("d-none");
   }
 }
 
 async function discussion() {
   configureMenu();
-  loadDiscussion();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await loadDiscussion();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function login() {
@@ -54,30 +90,60 @@ async function myProfile() {
   configureMenu();
 
   if (checkLoginUser()) {
-    loadProfile();
+
+    let pageProgress = document.getElementById("page-progress");
+    pageProgress.classList.remove("d-none");
+
+    await loadProfile();
+
+    pageProgress.classList.add("d-none");
   }
 }
 
 async function searchBooks() {
   configureMenu();
-  loadSearchBooks();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await loadSearchBooks();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function searchClubs() {
   configureMenu();
-  loadSearchClubs();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await loadSearchClubs();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function searchMembers() {
   configureMenu();
-  loadSearchMembers();
+
+  let pageProgress = document.getElementById("page-progress");
+  pageProgress.classList.remove("d-none");
+
+  await loadSearchMembers();
+
+  pageProgress.classList.add("d-none");
 }
 
 async function teacher() {
   configureMenu();
 
   if (checkLoginUser()) {
-    loadTeacher();
+
+    let pageProgress = document.getElementById("page-progress");
+    pageProgress.classList.remove("d-none");
+
+    await loadTeacher();
+
+    pageProgress.classList.add("d-none");
   }
 }
 
@@ -1815,89 +1881,98 @@ loadReviews = async (bookId) => {
 
   spinnerDiv.remove();
 
-  for (i = 0; i < reviews.length; i++) {
-    const row = document.createElement("div");
-    const col1 = document.createElement("div");
-    const col2 = document.createElement("div");
-    const col3 = document.createElement("div");
-    const avatar = document.createElement("img");
-    const anchorAvatar = document.createElement("a");
-    const reviewContent = document.createElement("div");
+  if (reviews.length > 0) {
+    for (i = 0; i < reviews.length; i++) {
+      const row = document.createElement("div");
+      const col1 = document.createElement("div");
+      const col2 = document.createElement("div");
+      const col3 = document.createElement("div");
+      const avatar = document.createElement("img");
+      const anchorAvatar = document.createElement("a");
+      const reviewContent = document.createElement("div");
 
-    row.classList.add("row");
-    col1.classList.add("col-sm-2");
+      row.classList.add("row");
+      col1.classList.add("col-sm-2");
 
-    let teacherId = reviews[i].properties["🧑‍🏫 Employees"].relation[0].id;
-    teacherId = teacherId.replaceAll("-", "");
+      let teacherId = reviews[i].properties["🧑‍🏫 Employees"].relation[0].id;
+      teacherId = teacherId.replaceAll("-", "");
 
-    if (reviews[i].properties.avatarURL == null) {
-      avatar.src = "images/default_avatar.png";
-    } else {
-      avatar.src = reviews[i].properties.avatarURL;
-    }
+      if (reviews[i].properties.avatarURL == null) {
+        avatar.src = "images/default_avatar.png";
+      } else {
+        avatar.src = reviews[i].properties.avatarURL;
+      }
 
-    anchorAvatar.href = "teacher.html?id=" + teacherId;
+      anchorAvatar.href = "teacher.html?id=" + teacherId;
 
-    avatar.classList.add("avatar-thumbnail");
-    anchorAvatar.appendChild(avatar);
+      avatar.classList.add("avatar-thumbnail");
+      anchorAvatar.appendChild(avatar);
 
-    reviewContent.innerText =
-      reviews[i].properties.Review.rich_text[0].plain_text;
-    reviewContent.classList.add("review-details");
+      reviewContent.innerText =
+        reviews[i].properties.Review.rich_text[0].plain_text;
+      reviewContent.classList.add("review-details");
 
-    col1.appendChild(anchorAvatar);
-    col2.appendChild(reviewContent);
+      col1.appendChild(anchorAvatar);
+      col2.appendChild(reviewContent);
 
-    row.appendChild(col1);
-    row.appendChild(col2);
-    row.appendChild(col3);
+      row.appendChild(col1);
+      row.appendChild(col2);
+      row.appendChild(col3);
 
-    // if the author for this review is the current logged in user
-    if (
-      reviews[i].properties["🧑‍🏫 Employees"].relation[0].id ==
-      localStorage.getItem("userId")
-    ) {
-      // display a button to delete this review
-      let btnDeleteReview = document.createElement("a");
-      btnDeleteReview.classList.add("btn", "btn-sm", "btn-danger");
-      btnDeleteReview.innerText = "Delete review";
+      // if the author for this review is the current logged in user
+      if (
+        reviews[i].properties["🧑‍🏫 Employees"].relation[0].id ==
+        localStorage.getItem("userId")
+      ) {
+        // display a button to delete this review
+        let btnDeleteReview = document.createElement("a");
+        btnDeleteReview.classList.add("btn", "btn-sm", "btn-danger");
+        btnDeleteReview.innerText = "Delete review";
 
-      const pageId = reviews[i].id;
+        const pageId = reviews[i].id;
 
-      btnDeleteReview.addEventListener("click", async function () {
-        let body = {
-          pageId: pageId,
-        };
+        btnDeleteReview.addEventListener("click", async function () {
+          let body = {
+            pageId: pageId,
+          };
 
-        // call nodeJS remove reviews endpoint -- POST
-        const response = await fetch("/api/reviews/remove", {
-          method: "POST",
-          mode: "cors",
-          cache: "no-cache",
-          credentials: "same-origin",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          redirect: "follow",
-          referrerPolicy: "no-referrer",
-          body: JSON.stringify(body),
+          // call nodeJS remove reviews endpoint -- POST
+          const response = await fetch("/api/reviews/remove", {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify(body),
+          });
+
+          const confirmation = await response.json();
+
+          console.log(confirmation);
+
+          loadReviews(bookId);
         });
 
-        const confirmation = await response.json();
+        col3.appendChild(btnDeleteReview);
+        col2.classList.add("col-sm-9");
+        col3.classList.add("col-sm-1");
+      } else {
+        col2.classList.add("col-sm-10");
+      }
 
-        console.log(confirmation);
-
-        loadReviews(bookId);
-      });
-
-      col3.appendChild(btnDeleteReview);
-      col2.classList.add("col-sm-9");
-      col3.classList.add("col-sm-1");
-    } else {
-      col2.classList.add("col-sm-10");
+      reviewSection.appendChild(row);
     }
+  } else {
+    const emptyContent = document.createElement("div");
+    emptyContent.classList.add("review-details");
 
-    reviewSection.appendChild(row);
+    emptyContent.innerText = "There are no reviews for this book yet.";
+
+    reviewSection.appendChild(emptyContent);
   }
 };
 
@@ -2082,93 +2157,104 @@ loadComments = async (discussionId, leaderId) => {
 
   spinnerDiv.remove();
 
-  for (i = 0; i < comments.length; i++) {
-    const row = document.createElement("div");
-    const col1 = document.createElement("div");
-    const col2 = document.createElement("div");
-    const col3 = document.createElement("div");
-    const avatar = document.createElement("img");
-    const anchorAvatar = document.createElement("a");
-    const commentContent = document.createElement("div");
+  if (comments.length > 0) {
+    for (i = 0; i < comments.length; i++) {
+      const row = document.createElement("div");
+      const col1 = document.createElement("div");
+      const col2 = document.createElement("div");
+      const col3 = document.createElement("div");
+      const avatar = document.createElement("img");
+      const anchorAvatar = document.createElement("a");
+      const commentContent = document.createElement("div");
 
-    row.classList.add("row");
-    col1.classList.add("col-sm-2");
+      row.classList.add("row");
+      col1.classList.add("col-sm-2");
+      col2.classList.add("col-sm-10");
 
-    let teacherId = comments[i].properties["🧑‍🏫 Employees"].relation[0].id;
-    teacherId = teacherId.replaceAll("-", "");
+      let teacherId = comments[i].properties["🧑‍🏫 Employees"].relation[0].id;
+      teacherId = teacherId.replaceAll("-", "");
 
-    if (comments[i].properties.avatarURL == null) {
-      avatar.src = "images/default_avatar.png";
-    } else {
-      avatar.src = comments[i].properties.avatarURL;
-    }
+      if (comments[i].properties.avatarURL == null) {
+        avatar.src = "images/default_avatar.png";
+      } else {
+        avatar.src = comments[i].properties.avatarURL;
+      }
 
-    anchorAvatar.href = "teacher.html?id=" + teacherId;
+      anchorAvatar.href = "teacher.html?id=" + teacherId;
 
-    avatar.classList.add("avatar-thumbnail");
-    anchorAvatar.appendChild(avatar);
+      avatar.classList.add("avatar-thumbnail");
+      anchorAvatar.appendChild(avatar);
 
-    commentContent.innerText =
-      comments[i].properties.Comment.rich_text[0].plain_text;
-    commentContent.classList.add("review-details");
+      commentContent.innerText =
+        comments[i].properties.Comment.rich_text[0].plain_text;
+      commentContent.classList.add("review-details");
 
-    col1.appendChild(anchorAvatar);
-    col2.appendChild(commentContent);
+      col1.appendChild(anchorAvatar);
+      col2.appendChild(commentContent);
 
-    row.appendChild(col1);
-    row.appendChild(col2);
-    row.appendChild(col3);
+      row.appendChild(col1);
+      row.appendChild(col2);
+      row.appendChild(col3);
 
-    // if the current logged in user is the author for this comment OR the leader of the club
-    if (localStorage.getItem("userId") != null) {
-      if (
-        comments[i].properties["🧑‍🏫 Employees"].relation[0].id ==
-          localStorage.getItem("userId") ||
-        leaderId == localStorage.getItem("userId").replaceAll("-", "")
-      ) {
-        // display a button to delete this comment
-        let btnDeleteComment = document.createElement("a");
-        btnDeleteComment.classList.add("btn", "btn-sm", "btn-danger");
-        btnDeleteComment.innerText = "Delete comment";
+      // if the current logged in user is the author for this comment OR the leader of the club
+      if (localStorage.getItem("userId") != null) {
+        if (
+          comments[i].properties["🧑‍🏫 Employees"].relation[0].id ==
+            localStorage.getItem("userId") ||
+          leaderId == localStorage.getItem("userId").replaceAll("-", "")
+        ) {
+          // display a button to delete this comment
+          let btnDeleteComment = document.createElement("a");
+          btnDeleteComment.classList.add("btn", "btn-sm", "btn-danger");
+          btnDeleteComment.innerText = "Delete comment";
 
-        const pageId = comments[i].id;
+          const pageId = comments[i].id;
 
-        btnDeleteComment.addEventListener("click", async function () {
-          let body = {
-            pageId: pageId,
-          };
+          btnDeleteComment.addEventListener("click", async function () {
+            let body = {
+              pageId: pageId,
+            };
 
-          // call nodeJS remove comments endpoint -- POST
-          const response = await fetch("/api/comments/remove", {
-            method: "POST",
-            mode: "cors",
-            cache: "no-cache",
-            credentials: "same-origin",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            redirect: "follow",
-            referrerPolicy: "no-referrer",
-            body: JSON.stringify(body),
+            // call nodeJS remove comments endpoint -- POST
+            const response = await fetch("/api/comments/remove", {
+              method: "POST",
+              mode: "cors",
+              cache: "no-cache",
+              credentials: "same-origin",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              redirect: "follow",
+              referrerPolicy: "no-referrer",
+              body: JSON.stringify(body),
+            });
+
+            const confirmation = await response.json();
+
+            console.log(confirmation);
+
+            loadComments(discussionId);
           });
 
-          const confirmation = await response.json();
+          col3.appendChild(btnDeleteComment);
 
-          console.log(confirmation);
-
-          loadComments(discussionId);
-        });
-
-        col3.appendChild(btnDeleteComment);
-
-        col2.classList.add("col-sm-9");
-        col3.classList.add("col-sm-1");
-      } else {
-        col2.classList.add("col-sm-10");
+          col2.classList.remove("col-sm-10");
+          col2.classList.add("col-sm-9");
+          col3.classList.add("col-sm-1");
+        } else {
+          col2.classList.add("col-sm-10");
+        }
       }
-    }
 
-    commentSection.appendChild(row);
+      commentSection.appendChild(row);
+    }
+  } else {
+    const emptyContent = document.createElement("div");
+    emptyContent.classList.add("review-details");
+
+    emptyContent.innerText = "There are no comments in this discussion yet.";
+
+    commentSection.appendChild(emptyContent);
   }
 };
 

@@ -28,7 +28,8 @@
                         <option value="members">Members</option>
                     </select>
                 </div>
-                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input" maxlength="50">
+                <input id="mob-search-text" type="text" class="form-control search-text" aria-label="Text input"
+                    maxlength="50">
                 <div class="input-group-text">
                     <button id="mob-search-btn" type="button" class="btn btn-light btn-sm" onclick="search('mob')">
                         Search
@@ -62,7 +63,8 @@
                             <option value="members">Members</option>
                         </select>
                     </div>
-                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input" maxlength="50">
+                    <input id="search-text" type="text" class="form-control search-text" aria-label="Text input"
+                        maxlength="50">
                     <div class="input-group-text">
                         <button id="search-btn" type="button" class="btn btn-light btn-sm" onclick="search()">
                             Search
@@ -83,6 +85,11 @@
 
     <main class="container text-center">
         On this page, users will be able to view upcoming meeting info and the current book.
+        <div id="page-progress" class="progress-bar-container d-none">
+            <div class="progress-bar">
+                <div class="progress-bar-value"></div>
+            </div>
+        </div>
         <!-- https://getbootstrap.com/docs/5.3/layout/columns/ -->
         <section class="section1">
             <h1 id="club-heading">Section 1</h1>
