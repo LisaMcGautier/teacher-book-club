@@ -1,3 +1,4 @@
+// handle index (home page) body on load
 async function index() {
   configureMenu();
 
@@ -12,6 +13,7 @@ async function index() {
   pageProgress.classList.add("d-none");
 }
 
+// handle add-book body on load
 async function addBook() {
   configureMenu();
 
@@ -25,6 +27,7 @@ async function addBook() {
   }
 }
 
+// handle book page body on load
 async function book() {
   configureMenu();
 
@@ -36,6 +39,7 @@ async function book() {
   pageProgress.classList.add("d-none");
 }
 
+// handle club page body on load
 async function club() {
   configureMenu();
 
@@ -47,6 +51,7 @@ async function club() {
   pageProgress.classList.add("d-none");
 }
 
+// handle create-club page body on load
 async function createClubPage() {
   configureMenu();
   if (checkLoginUser()) {
@@ -59,6 +64,7 @@ async function createClubPage() {
   }
 }
 
+// handle discussion page body on load
 async function discussion() {
   configureMenu();
 
@@ -70,6 +76,7 @@ async function discussion() {
   pageProgress.classList.add("d-none");
 }
 
+// handle login body on load
 async function login() {
   configureMenu();
 
@@ -87,6 +94,7 @@ async function login() {
   }
 }
 
+// handle my-profile page body on load
 async function myProfile() {
   configureMenu();
 
@@ -100,6 +108,7 @@ async function myProfile() {
   }
 }
 
+// handle search-books page body on load
 async function searchBooks() {
   configureMenu();
 
@@ -111,6 +120,7 @@ async function searchBooks() {
   pageProgress.classList.add("d-none");
 }
 
+// handle search-clubs page body on load
 async function searchClubs() {
   configureMenu();
 
@@ -122,6 +132,7 @@ async function searchClubs() {
   pageProgress.classList.add("d-none");
 }
 
+// handle search-members page body on load
 async function searchMembers() {
   configureMenu();
 
@@ -133,6 +144,7 @@ async function searchMembers() {
   pageProgress.classList.add("d-none");
 }
 
+// handle teacher page body on load
 async function teacher() {
   configureMenu();
 
@@ -157,6 +169,7 @@ function hamburger() {
   }
 }
 
+// display the menu based on user logged in status
 async function configureMenu() {
   let mProfile = document.getElementById("mob-my-profile");
   let tdProfile = document.getElementById("td-my-profile");
@@ -204,6 +217,7 @@ async function configureMenu() {
   handleEnter("search-text", "search-btn");
 }
 
+// enable user to use enter to submit inputs
 function handleEnter(inputId, btnId) {
   // https://www.w3schools.com/howto/howto_js_trigger_button_enter.asp
 
@@ -222,6 +236,7 @@ function handleEnter(inputId, btnId) {
   });
 }
 
+// allow user to search books, clubs, or members
 function search(src) {
   let searchCategory;
   let searchText;
