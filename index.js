@@ -886,7 +886,7 @@ async function getEmployeeByID(teacherID) {
   return employee;
 }
 
-app.get("/api/reviews-notion", (req, res) => {
+app.get("/api/reviews", (req, res) => {
   console.log("REVIEW " + req.query.isbn);
 
   let myQuery = {
