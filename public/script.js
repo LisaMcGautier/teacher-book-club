@@ -837,6 +837,8 @@ async function booksSearch(q) {
             referrerPolicy: "no-referrer",
             body: JSON.stringify(body),
           });
+
+          alert(anchorTitle.innerText + " was added to your Want to Read shelf.");
         });
 
         historyButton.addEventListener("click", async function () {
@@ -847,7 +849,7 @@ async function booksSearch(q) {
             userID: localStorage.getItem("userId").replaceAll("-", ""),
           };
 
-          // call nodeJS create wishlist endpoint -- POST
+          // call nodeJS create history endpoint -- POST
           const response = await fetch("/api/history/create", {
             method: "POST",
             mode: "cors",
@@ -860,6 +862,8 @@ async function booksSearch(q) {
             referrerPolicy: "no-referrer",
             body: JSON.stringify(body),
           });
+
+          alert(anchorTitle.innerText + " was added to your Have Read shelf.");
         });
 
         anchorThumbnail.href = "book.html?id=" + ISBNid;
