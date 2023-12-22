@@ -1,3 +1,4 @@
+// handle index (home page) body on load
 async function index() {
   configureMenu();
 
@@ -12,6 +13,7 @@ async function index() {
   pageProgress.classList.add("d-none");
 }
 
+// handle add-book body on load
 async function addBook() {
   configureMenu();
 
@@ -25,6 +27,7 @@ async function addBook() {
   }
 }
 
+// handle book page body on load
 async function book() {
   configureMenu();
 
@@ -36,6 +39,7 @@ async function book() {
   pageProgress.classList.add("d-none");
 }
 
+// handle club page body on load
 async function club() {
   configureMenu();
 
@@ -47,6 +51,7 @@ async function club() {
   pageProgress.classList.add("d-none");
 }
 
+// handle create-club page body on load
 async function createClubPage() {
   configureMenu();
   if (checkLoginUser()) {
@@ -59,6 +64,7 @@ async function createClubPage() {
   }
 }
 
+// handle discussion page body on load
 async function discussion() {
   configureMenu();
 
@@ -70,6 +76,7 @@ async function discussion() {
   pageProgress.classList.add("d-none");
 }
 
+// handle login body on load
 async function login() {
   configureMenu();
 
@@ -87,6 +94,7 @@ async function login() {
   }
 }
 
+// handle my-profile page body on load
 async function myProfile() {
   configureMenu();
 
@@ -100,6 +108,7 @@ async function myProfile() {
   }
 }
 
+// handle search-books page body on load
 async function searchBooks() {
   configureMenu();
 
@@ -111,6 +120,7 @@ async function searchBooks() {
   pageProgress.classList.add("d-none");
 }
 
+// handle search-clubs page body on load
 async function searchClubs() {
   configureMenu();
 
@@ -122,6 +132,7 @@ async function searchClubs() {
   pageProgress.classList.add("d-none");
 }
 
+// handle search-members page body on load
 async function searchMembers() {
   configureMenu();
 
@@ -133,6 +144,7 @@ async function searchMembers() {
   pageProgress.classList.add("d-none");
 }
 
+// handle teacher page body on load
 async function teacher() {
   configureMenu();
 
@@ -157,6 +169,7 @@ function hamburger() {
   }
 }
 
+// display the menu based on user logged in status
 async function configureMenu() {
   let mProfile = document.getElementById("mob-my-profile");
   let tdProfile = document.getElementById("td-my-profile");
@@ -204,6 +217,7 @@ async function configureMenu() {
   handleEnter("search-text", "search-btn");
 }
 
+// enable user to use enter to submit inputs
 function handleEnter(inputId, btnId) {
   // https://www.w3schools.com/howto/howto_js_trigger_button_enter.asp
 
@@ -222,6 +236,7 @@ function handleEnter(inputId, btnId) {
   });
 }
 
+// allow user to search books, clubs, or members
 function search(src) {
   let searchCategory;
   let searchText;
@@ -304,8 +319,6 @@ async function registerUser() {
 
     const registerInfo = await response.json();
 
-    console.log(registerInfo);
-
     if (registerInfo != null && registerInfo.id != undefined) {
       // log in the new user
       localStorage.setItem("userId", registerInfo.id.replaceAll("-", ""));
@@ -350,7 +363,6 @@ async function loginUser() {
     });
 
     const userInfo = await response.json();
-    console.log(userInfo);
 
     // Check if user login was successful
     if (userInfo != null && userInfo != false) {
@@ -447,8 +459,6 @@ loadAvatarBio = async () => {
     response.json()
   );
 
-  console.log(teacher);
-
   let avatar = document.getElementById("avatar");
   avatar.innerText = "";
   let thumbnail = document.createElement("img");
@@ -497,8 +507,6 @@ loadMessages = async () => {
   const messages = await fetch("/api/messages?id=" + recipientUserId).then(
     (response) => response.json()
   );
-
-  console.log(messages[0]);
 
   spinnerDiv.remove();
 
@@ -597,8 +605,6 @@ loadProfile = async () => {
     if (bioContent.innerText.trim() == "") {
       messageWarning.classList.remove("d-none");
     } else {
-      console.log("Message: ", bioContent.innerText);
-
       if (messageWarning.classList.contains("d-none") == false) {
         messageWarning.classList.add("d-none");
       }
@@ -624,10 +630,6 @@ loadProfile = async () => {
         body: JSON.stringify(body),
       });
 
-      const confirmation = await response.json();
-
-      console.log(confirmation);
-
       bioContent.innerText = "";
 
       bioSaved.classList.remove("d-none");
@@ -646,7 +648,6 @@ loadProfile = async () => {
 async function listClubs() {
   const response = await fetch("/api/clubs");
   const clubs = await response.json();
-  console.log(clubs);
 
   let clubsList = document.getElementById("clubs-list");
 
@@ -750,7 +751,6 @@ async function booksSearch(q) {
 
   const response = await fetch("/api/books/search?q=" + searchterm);
   const books = await response.json();
-  console.log(books);
 
   spinnerDiv.remove();
 
@@ -815,7 +815,6 @@ async function booksSearch(q) {
 
         // get the ISBN found in the previous step
         ISBNid = isbnAvailable[0].identifier;
-        console.log(ISBNid);
 
         wishlistButton.addEventListener("click", async function () {
           // call node, passing userID, title & ISBN
@@ -838,6 +837,8 @@ async function booksSearch(q) {
             referrerPolicy: "no-referrer",
             body: JSON.stringify(body),
           });
+
+          alert(anchorTitle.innerText + " was added to your Want to Read shelf.");
         });
 
         historyButton.addEventListener("click", async function () {
@@ -848,7 +849,7 @@ async function booksSearch(q) {
             userID: localStorage.getItem("userId").replaceAll("-", ""),
           };
 
-          // call nodeJS create wishlist endpoint -- POST
+          // call nodeJS create history endpoint -- POST
           const response = await fetch("/api/history/create", {
             method: "POST",
             mode: "cors",
@@ -861,6 +862,8 @@ async function booksSearch(q) {
             referrerPolicy: "no-referrer",
             body: JSON.stringify(body),
           });
+
+          alert(anchorTitle.innerText + " was added to your Have Read shelf.");
         });
 
         anchorThumbnail.href = "book.html?id=" + ISBNid;
@@ -931,7 +934,6 @@ async function clubsSearch(q) {
 
   const response = await fetch("/api/clubs/search?q=" + searchterm);
   const clubs = await response.json();
-  console.log(clubs);
 
   spinnerDiv.remove();
 
@@ -1039,7 +1041,6 @@ async function membersSearch(q) {
 
   const response = await fetch("/api/members/search?q=" + searchterm);
   const members = await response.json();
-  console.log(members);
 
   spinnerDiv.remove();
 
@@ -1114,8 +1115,6 @@ loadMemberRequests = async (clubId) => {
     (response) => response.json()
   );
 
-  console.log(requests);
-
   let requestCount = document.getElementById("member-requests-count");
   requestCount.innerText = requests.length;
 
@@ -1170,9 +1169,6 @@ loadMemberRequests = async (clubId) => {
         body: JSON.stringify(body),
       });
 
-      // const confirmation = await response.json();
-      // console.log(confirmation);
-
       // reload the member join request list
       loadMemberRequests(clubId);
     });
@@ -1203,9 +1199,6 @@ loadMemberRequests = async (clubId) => {
         body: JSON.stringify(body),
       });
 
-      // const confirmation = await response.json();
-      // console.log(confirmation);
-
       // reload the member join request list
       loadMemberRequests(clubId);
     });
@@ -1232,19 +1225,13 @@ loadClub = async () => {
     response.json()
   );
 
-  console.log(club);
-
   // update the DOM with club information
   let clubHeading = document.getElementById("club-heading");
   clubHeading.innerText = club[0].properties["Club Name"].title[0].plain_text;
 
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-  let bioSaved = document.getElementById("bio-saved");// not used
   let closeBtn = document.getElementById("close-button");
   let btnClose = document.getElementById("btn-close");
-  let saveBioBtn = document.getElementById("save-button"); // not used
   let decisionSuccess = document.getElementById("decision-success");
-  let bioContent = document.getElementById("bio-content"); // not used
 
   let handleRequestsModal = new bootstrap.Modal(
     document.getElementById("handleRequestsModal"),
@@ -1258,7 +1245,6 @@ loadClub = async () => {
       decisionSuccess.classList.add("d-none");
     }
 
-    // bioContent.innerText = "";
     handleRequestsModal.hide();
   });
 
@@ -1267,24 +1253,17 @@ loadClub = async () => {
       decisionSuccess.classList.add("d-none");
     }
 
-    // bioContent.innerText = "";
     handleRequestsModal.hide();
   });
-  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
 
   // use the club id to query notion for that club's meetings
   const meetings = await fetch("/api/club/meetings?id=" + clubId).then(
     (response) => response.json()
   );
 
-  console.log(meetings);
-
   let events = [];
 
   for (i = 0; i < meetings.length; i++) {
-    console.log(meetings[i].properties.Date.date.start);
-
     const meetingDate = new Date(meetings[i].properties.Date.date.start);
 
     // https://www.w3schools.com/js/js_date_methods.asp
@@ -1302,8 +1281,6 @@ loadClub = async () => {
         meetings[i].properties.ISBN.rollup.array[0].rich_text[0].plain_text,
     });
   }
-
-  console.log(events);
 
   let leaderId = club[0].properties["Club Leader"].relation[0].id;
 
@@ -1368,8 +1345,6 @@ loadClub = async () => {
     );
 
     // update the DOM with book information
-    console.log(book);
-
     let clubThumbnail = document.createElement("img");
 
     // if there are no thumbnails, display a generic image
@@ -1457,8 +1432,6 @@ loadClub = async () => {
 
         const confirmation = await response.json();
 
-        console.log(confirmation);
-
         if (confirmation != null && confirmation.id != undefined) {
           alert("Your request has been sent!");
         } else {
@@ -1501,54 +1474,6 @@ loadCreateClub = async () => {
   createClubMain.style.visibility = "visible";
 };
 
-async function listClubBooks(clubLeader) {
-  const urlParams = new URL(window.location.toLocaleString()).searchParams;
-  const clubId = urlParams.get("id");
-
-  let shelf = document.getElementById("club-booklist");
-  shelf.innerHTML = "";
-
-  const spinnerDiv = document.createElement("div");
-  spinnerDiv.setAttribute("id", "spinner");
-  spinnerDiv.classList.add("spinner-border");
-  spinnerDiv.setAttribute("role", "status");
-
-  shelf.appendChild(spinnerDiv);
-
-  // make another call to Notion to get the club bookklist
-  const response = await fetch("/api/club/booklist?id=" + clubId);
-  const booklist = await response.json();
-
-  spinnerDiv.remove();
-
-  console.log(booklist);
-
-  // IF there are books in the booklist
-  if (booklist.length > 0) {
-    for (i = 0; i < booklist.length; i++) {
-      const thumbnailDiv = document.createElement("div");
-      const anchorThumbnail = document.createElement("a");
-      const thumbnailImg = document.createElement("img");
-      const detailsDiv = document.createElement("div");
-      const bookInfo = document.createElement("div");
-      const anchorTitle = document.createElement("a");
-
-      row.classList.add("row");
-      col1.classList.add("col");
-
-      anchorTitle.innerText = booklist[i].properties.Title.title[0].plain_text;
-      anchorTitle.href =
-        "book.html?id=" + booklist[i].properties.ISBN.rich_text[0].plain_text;
-
-      col1.appendChild(anchorTitle);
-
-      row.appendChild(col1);
-
-      clubBooklist.appendChild(row);
-    }
-  }
-}
-
 // allow a logged in user to create a new club
 async function createClub() {
   let clubname = document.getElementById("clubname");
@@ -1583,8 +1508,6 @@ async function createClub() {
 
     const clubInfo = await response.json();
 
-    console.log(clubInfo);
-
     if (clubInfo != null && clubInfo.id != undefined) {
       location.replace(
         "/club.html?id=" + clubInfo.id.replaceAll("-", "") + "&created=true"
@@ -1618,8 +1541,6 @@ loadMeetings = async () => {
   const meetings = await fetch("/api/book/meetings?bookId=" + bookId).then(
     (response) => response.json()
   );
-
-  console.log(meetings[0]);
 
   spinnerDiv.remove();
 
@@ -1673,10 +1594,6 @@ loadMeetings = async () => {
         body: JSON.stringify(body),
       });
 
-      const confirmation = await response.json();
-
-      console.log(confirmation);
-
       // reload the meetings list
       loadMeetings();
     });
@@ -1705,8 +1622,6 @@ loadAddBook = async () => {
   const club = await fetch("/api/club?id=" + clubId).then((response) =>
     response.json()
   );
-
-  console.log(club);
 
   // update the DOM with club information
   let clubHeading = document.getElementById("club-heading");
@@ -1749,8 +1664,6 @@ loadAddBook = async () => {
     if (datepickerResult.value.trim() == "") {
       messageWarning.classList.remove("d-none");
     } else {
-      console.log("Message: ", datepickerResult.value);
-
       if (messageWarning.classList.contains("d-none") == false) {
         messageWarning.classList.add("d-none");
       }
@@ -1777,10 +1690,6 @@ loadAddBook = async () => {
         body: JSON.stringify(body),
       });
 
-      const confirmation = await response.json();
-
-      console.log(confirmation);
-
       datepickerResult.value = "";
 
       meetingCreated.classList.remove("d-none");
@@ -1796,7 +1705,6 @@ async function adminSearchBooks() {
   let searchterm = document.getElementById("searchterm");
   const response = await fetch("/api/books/search?q=" + searchterm.value);
   const books = await response.json();
-  console.log(books);
 
   let searchResults = document.getElementById("search-results");
 
@@ -1903,9 +1811,6 @@ async function adminSearchBooks() {
   // allow club leader to confirm this book selection
   let buttonConfirm = document.getElementById("btn-confirm");
   buttonConfirm.addEventListener("click", async function () {
-    console.log(
-      "confirm book " + document.getElementById("selection").innerText
-    );
     const urlParams = new URL(window.location.toLocaleString()).searchParams;
     const clubId = urlParams.get("id");
 
@@ -1939,8 +1844,6 @@ async function adminSearchBooks() {
 
     spinnerDiv.remove();
 
-    console.log(response.id.replaceAll("-", ""));
-
     // hold on to the book id so that we can use it later
     // to save discussion questions and meeting date(s)
     let bookId = document.createElement("input");
@@ -1972,7 +1875,7 @@ generateGPTQuestions = async () => {
   spinner.classList.remove("invisible");
 
   // connect with ChatGPT to generate questions based on the book title
-  // (ISBN did not always yield reliable responses
+  // (ISBN did not always yield reliable responses)
   // https://www.youtube.com/watch?v=LX_DXLlaymg
   let messages = [];
   const guidingQuestions = document.getElementById("guiding-questions");
@@ -2078,8 +1981,6 @@ loadReviews = async (bookId) => {
     response.json()
   );
 
-  console.log(reviews[0]);
-
   spinnerDiv.remove();
 
   if (reviews.length > 0) {
@@ -2151,10 +2052,6 @@ loadReviews = async (bookId) => {
             body: JSON.stringify(body),
           });
 
-          const confirmation = await response.json();
-
-          console.log(confirmation);
-
           loadReviews(bookId);
         });
 
@@ -2186,8 +2083,6 @@ loadBook = async () => {
   const book = await fetch("/api/book?id=" + bookId).then((response) =>
     response.json()
   );
-
-  console.log(book);
 
   // update the DOM with book information
   let bookHeading = document.getElementById("book-heading");
@@ -2302,8 +2197,6 @@ loadBook = async () => {
     if (reviewContent.innerText.trim() == "") {
       messageWarning.classList.remove("d-none");
     } else {
-      console.log("Message: ", reviewContent.innerText);
-
       if (messageWarning.classList.contains("d-none") == false) {
         messageWarning.classList.add("d-none");
       }
@@ -2329,10 +2222,6 @@ loadBook = async () => {
         referrerPolicy: "no-referrer",
         body: JSON.stringify(body),
       });
-
-      const confirmation = await response.json();
-
-      console.log(confirmation);
 
       reviewContent.innerText = "";
 
@@ -2362,8 +2251,6 @@ loadComments = async (discussionId, leaderId) => {
   const comments = await fetch("/api/discussion-posts?id=" + discussionId).then(
     (response) => response.json()
   );
-
-  console.log(comments[0]);
 
   spinnerDiv.remove();
 
@@ -2439,10 +2326,6 @@ loadComments = async (discussionId, leaderId) => {
               body: JSON.stringify(body),
             });
 
-            const confirmation = await response.json();
-
-            console.log(confirmation);
-
             loadComments(discussionId);
           });
 
@@ -2479,13 +2362,9 @@ loadDiscussion = async () => {
     "/api/discussion-guide?id=" + clubId + "&isbn=" + isbn
   ).then((response) => response.json());
 
-  console.log(discussion);
-
   const club = await fetch("/api/club?id=" + clubId).then((response) =>
     response.json()
   );
-
-  console.log(club);
 
   let leaderId = club[0].properties["Club Leader"].relation[0].id.replaceAll(
     "-",
@@ -2495,8 +2374,6 @@ loadDiscussion = async () => {
   const leader = await fetch("/api/teacher?id=" + leaderId).then((response) =>
     response.json()
   );
-
-  console.log(leader);
 
   let discussionLeader = document.getElementById("discussion-leader");
   discussionLeader.innerText = leader[0].properties["Full Name"].formula.string;
@@ -2513,8 +2390,6 @@ loadDiscussion = async () => {
   );
 
   // update the DOM with book information
-  console.log(book);
-
   let bookThumbnail = document.createElement("img");
 
   // if there are no thumbnails, display a generic image
@@ -2595,8 +2470,6 @@ loadDiscussion = async () => {
     if (commentContent.innerText.trim() == "") {
       messageWarning.classList.remove("d-none");
     } else {
-      console.log("Message: ", commentContent.innerText);
-
       if (messageWarning.classList.contains("d-none") == false) {
         messageWarning.classList.add("d-none");
       }
@@ -2623,10 +2496,6 @@ loadDiscussion = async () => {
         body: JSON.stringify(body),
       });
 
-      const confirmation = await response.json();
-
-      console.log(confirmation);
-
       commentContent.innerText = "";
 
       commentSubmitted.classList.remove("d-none");
@@ -2650,8 +2519,6 @@ loadTeacher = async () => {
   const teacher = await fetch("/api/teacher?id=" + teacherId).then((response) =>
     response.json()
   );
-
-  console.log(teacher);
 
   let firstName = document.querySelectorAll(".first-name");
   for (let i = 0; i < firstName.length; i++) {
@@ -2723,8 +2590,6 @@ loadTeacher = async () => {
     if (messageContent.innerText.trim() == "") {
       messageWarning.classList.remove("d-none");
     } else {
-      console.log("Message: ", messageContent.innerText);
-
       if (messageWarning.classList.contains("d-none") == false) {
         messageWarning.classList.add("d-none");
       }
@@ -2751,10 +2616,6 @@ loadTeacher = async () => {
         body: JSON.stringify(body),
       });
 
-      const confirmation = await response.json();
-
-      console.log(confirmation);
-
       messageContent.innerText = "";
 
       messageSent.classList.remove("d-none");
@@ -2763,7 +2624,6 @@ loadTeacher = async () => {
 
   // if the teacherId matches the logged in user
   // do NOT allow the buttons to send kudos
-
   if (teacherId == localStorage.getItem("userId").replaceAll("-", "")) {
     let kudosEmpathetic = document.getElementById("kudos-empathetic");
     let kudosHelpful = document.getElementById("kudos-helpful");
@@ -2804,7 +2664,6 @@ async function giveKudos(sender) {
     sender.getAttribute("id") + "-count"
   );
 
-  console.log(null + 1);
   // construct a json body to update the count in the correct kudos column
   let body = {
     teacherId: teacherId,
@@ -2850,8 +2709,6 @@ async function loadShelf(shelfName, teacherId) {
   );
 
   spinnerDiv.remove();
-
-  console.log(shelfName, booklist);
 
   // IF there are books in the booklist
   if (booklist.length > 0) {
@@ -2920,8 +2777,6 @@ async function loadClubShelf(clubId, leaderId) {
   );
 
   spinnerDiv.remove();
-
-  console.log(shelf, booklist);
 
   // IF there are books in the booklist
   if (booklist.length > 0) {
@@ -2995,10 +2850,6 @@ async function loadClubShelf(clubId, leaderId) {
             body: JSON.stringify(body),
           });
 
-          const confirmation = await response.json();
-
-          console.log(confirmation);
-
           loadClub();
         }
       });
@@ -3046,8 +2897,6 @@ async function loadMembersShelf(clubId) {
   );
 
   spinnerDiv.remove();
-
-  console.log(shelf, members);
 
   // IF there are members in the clublist
   if (members.length > 0) {
